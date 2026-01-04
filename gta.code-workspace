@@ -1,0 +1,11 @@
+{
+    "folders": [
+        {
+            "path": "../gta-server"
+        },
+        {
+            "path": "."
+        }
+    ],
+    "settings": {}
+}
