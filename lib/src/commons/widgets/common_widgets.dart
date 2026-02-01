@@ -28,8 +28,8 @@ class PrimaryButton extends StatelessWidget {
           colors: onPressed == null
               ? [Colors.grey.shade400, Colors.grey.shade500]
               : [
-                  AppColors.primaryBackgroundColor,
-                  AppColors.primaryBackgroundColor.withValues(alpha: 0.8),
+                  BuyerColors.primaryLight,
+                  BuyerColors.primaryLight.withValues(alpha: 0.8),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -38,9 +38,7 @@ class PrimaryButton extends StatelessWidget {
         boxShadow: onPressed != null
             ? [
                 BoxShadow(
-                  color: AppColors.primaryBackgroundColor.withValues(
-                    alpha: 0.3,
-                  ),
+                  color: BuyerColors.primaryLight.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -110,10 +108,7 @@ class SecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(
-            color: AppColors.primaryBackgroundColor,
-            width: 1.5,
-          ),
+          side: BorderSide(color: BuyerColors.primaryLight, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -123,7 +118,7 @@ class SecondaryButton extends StatelessWidget {
                 height: 24,
                 width: 24,
                 child: CircularProgressIndicator(
-                  color: AppColors.primaryBackgroundColor,
+                  color: BuyerColors.primaryLight,
                   strokeWidth: 2.5,
                 ),
               )
@@ -131,11 +126,7 @@ class SecondaryButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[
-                    Icon(
-                      icon,
-                      size: 20,
-                      color: AppColors.primaryBackgroundColor,
-                    ),
+                    Icon(icon, size: 20, color: BuyerColors.primaryLight),
                     const SizedBox(width: 8),
                   ],
                   Text(
@@ -143,7 +134,7 @@ class SecondaryButton extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primaryBackgroundColor,
+                      color: BuyerColors.primaryLight,
                     ),
                   ),
                 ],
@@ -195,7 +186,7 @@ class CustomTextField extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: AppColors.black,
+              color: CommonColors.black,
             ),
           ),
           const SizedBox(height: 8),
@@ -209,7 +200,7 @@ class CustomTextField extends StatelessWidget {
           maxLines: maxLines,
           readOnly: readOnly,
           onTap: onTap,
-          style: GoogleFonts.inter(fontSize: 16, color: AppColors.black),
+          style: GoogleFonts.inter(fontSize: 16, color: CommonColors.black),
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: prefixIcon,
@@ -221,7 +212,7 @@ class CustomTextField extends StatelessWidget {
   }
 }
 
-/// App logo widget - uses logo.png with transparent background
+/// App logo widget - uses logo.png with white circular background for visibility
 class AppLogo extends StatelessWidget {
   final double size;
   final bool showText;
@@ -233,23 +224,40 @@ class AppLogo extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Logo with transparent background - no container
-        Image.asset(
-          ImageAssets.logo,
+        // Logo with white circular background for visibility
+        Container(
           width: size,
           height: size,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            // Fallback to text if image fails to load
-            return Text(
-              'GTA',
-              style: GoogleFonts.inter(
-                fontSize: size * 0.5,
-                fontWeight: FontWeight.bold,
-                color: AppColors.white,
+          decoration: BoxDecoration(
+            color: CommonColors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
-            );
-          },
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(size * 0.15),
+            child: Image.asset(
+              ImageAssets.logo,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Center(
+                  child: Text(
+                    'GTA',
+                    style: GoogleFonts.inter(
+                      fontSize: size * 0.35,
+                      fontWeight: FontWeight.bold,
+                      color: BuyerColors.primaryLight,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
         if (showText) ...[
           const SizedBox(height: 16),
@@ -258,7 +266,7 @@ class AppLogo extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.white,
+              color: CommonColors.white,
             ),
           ),
           const SizedBox(height: 4),
@@ -267,7 +275,7 @@ class AppLogo extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: AppColors.white.withValues(alpha: 0.8),
+              color: CommonColors.white.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -293,9 +301,9 @@ class GradientBackground extends StatelessWidget {
           colors:
               colors ??
               [
-                AppColors.primaryBackgroundColor,
-                AppColors.primaryBackgroundColor.withValues(alpha: 0.85),
-                const Color(0xFF2D8B5A),
+                BuyerColors.surface,
+                BuyerColors.surface.withValues(alpha: 0.85),
+                BuyerColors.primaryLight,
               ],
         ),
       ),
@@ -319,7 +327,7 @@ class ShadowCard extends StatelessWidget {
       child: Container(
         padding: padding ?? const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: CommonColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(

@@ -2,15 +2,33 @@ import 'package:gta_app/src/res/base.dart';
 
 class Endpoints {
   static const String baseUrl = BasePaths.baseUrl;
-  static const String sendOTP = '$baseUrl/partner/sendOTP';
-  static const String verifyOTP = '$baseUrl/partner/loginPhone';
-  static const String loginEmail = '$baseUrl/partner/loginEmail';
-  static const String updateSocketId = '$baseUrl/partner/update-chat-socket';
-  static const String signUp = '$baseUrl/partner/signup';
+
+  // Auth endpoints
+  static const String sendOTP = '${baseUrl}user/sendotp';
+  static const String verifyOTP = '${baseUrl}user/loginphone';
+
   //Profile
   static const String storage = "$baseUrl/storage/upload";
   static const String getProfile = "${baseUrl}partner/profile";
   static const String editProfile = "${baseUrl}partner/profile";
+
+  // Buyer Profile
+  static const String getBuyerProfile = "${baseUrl}buyer/profile";
+  static const String updateBuyerProfile = "${baseUrl}buyer/profile";
+  static const String getBuyerAddresses = "${baseUrl}buyer/address";
+  static const String addBuyerAddress = "${baseUrl}buyer/address/add";
+  static String removeBuyerAddress(String addressId) =>
+      "${baseUrl}buyer/address/$addressId";
+
+  // Buyer Complaints
+  static const String createBuyerComplaint = "${baseUrl}buyer/complaint/add";
+  static const String getBuyerComplaints = "${baseUrl}buyer/complaints";
+  static const String getBuyerComplaintStats =
+      "${baseUrl}buyer/complaint/stats";
+  static String getBuyerComplaintDetails(String id) =>
+      "${baseUrl}buyer/complaint/$id";
+  static String sendBuyerComplaintMessage(String id) =>
+      "${baseUrl}buyer/complaint/$id/message";
   //membership
   static const String createMembershipPayment =
       "${baseUrl}membership/create-payment";
@@ -26,9 +44,15 @@ class Endpoints {
   static const String uploadKYC = "${baseUrl}kyc/upload";
   static const String getKYC = "${baseUrl}kyc/status";
 
-  // Complaints
-  static const String getComplaints = "${baseUrl}partner/complaints";
-  static const String createComplaint = "${baseUrl}partner/complaints";
+  // Complaints (Seller)
+  static const String getComplaints = "${baseUrl}seller/complaints";
+  static const String createComplaint = "${baseUrl}seller/complaint/add";
+  static const String getSellerComplaintStats =
+      "${baseUrl}seller/complaint/stats";
+  static String getSellerComplaintDetails(String id) =>
+      "${baseUrl}seller/complaint/$id";
+  static String sendSellerComplaintMessage(String id) =>
+      "${baseUrl}seller/complaint/$id/message";
 
   //Warehouse
   static const String createWarehouse = "${baseUrl}business/create-profile";
@@ -64,4 +88,14 @@ class Endpoints {
       "${baseUrl}partner/reset/verify-otp";
   static const String updatePassword = "${baseUrl}partner/reset-password-sms";
   static const String resetLinkOnEmail = "${baseUrl}partner/reset-link-email";
+
+  // Seller Products
+  static const String addProduct = "${baseUrl}seller/product/add";
+
+  // Categories
+  static const String getCategories = "${baseUrl}categories";
+  static String getSubcategories(String categoryId) =>
+      "${baseUrl}categories/$categoryId/subcategories";
+  static String getProductTypes(String subcategoryId) =>
+      "${baseUrl}categories/subcategories/$subcategoryId/product-types";
 }

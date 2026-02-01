@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:gta_app/src/commons/providers/common_providers.dart';
 import 'package:gta_app/src/res/strings.dart';
@@ -10,7 +10,7 @@ import 'core.dart';
 
 /// Watch apiProvider to make sure to have the latest authToken passed.
 
-final apiProvider = StateProvider((ref) {
+final apiProvider = Provider((ref) {
   final authToken = ref.watch(authTokenProvider);
   return API(authToken: authToken);
 });

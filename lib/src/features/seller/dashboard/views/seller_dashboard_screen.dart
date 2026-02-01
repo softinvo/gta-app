@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../res/colors.dart';
+import '../../common/widgets/seller_app_bar.dart';
+import '../../profile/views/seller_profile_tab.dart';
+import '../../product/views/add_product_screen.dart';
+import '../../product/views/widgets/seller_product_card.dart';
+import '../../../../models/product_model.dart';
 
 class SellerDashboardScreen extends ConsumerStatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -18,7 +23,18 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroudColor,
+      backgroundColor: SellerColors.background,
+      appBar: SellerAppBar(
+        showLogo: true,
+        actions: [
+          SellerAppBarIconButton(
+            icon: Icons.notifications_outlined,
+            onTap: () {},
+            badgeCount: 3,
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: IndexedStack(
         index: _currentIndex,
         children: const [
@@ -26,7 +42,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
           _ProductsTab(),
           _QuotationsTab(),
           _OrdersTab(),
-          _ProfileTab(),
+          SellerProfileTab(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -36,7 +52,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: CommonColors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -119,7 +135,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? const Color(0xFFE67E22).withValues(alpha: 0.1)
+              ? SellerColors.primaryLight.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
@@ -129,8 +145,8 @@ class _NavItem extends StatelessWidget {
             Icon(
               isActive ? activeIcon : icon,
               color: isActive
-                  ? const Color(0xFFE67E22)
-                  : AppColors.greyTextColor,
+                  ? SellerColors.primaryLight
+                  : CommonColors.greyText,
               size: 24,
             ),
             const SizedBox(height: 4),
@@ -140,8 +156,8 @@ class _NavItem extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                 color: isActive
-                    ? const Color(0xFFE67E22)
-                    : AppColors.greyTextColor,
+                    ? SellerColors.primaryLight
+                    : CommonColors.greyText,
               ),
             ),
           ],
@@ -157,79 +173,25 @@ class _DashboardTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        // App Bar
-        SliverAppBar(
-          floating: true,
-          backgroundColor: AppColors.backgroudColor,
-          elevation: 0,
-          expandedHeight: 120,
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Hello, Seller! 🏪',
-                          style: GoogleFonts.inter(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Manage your business',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: AppColors.greyTextColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE67E22).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: Color(0xFFE67E22),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        // Stats Cards
-        SliverToBoxAdapter(
-          child: Padding(
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Greeting & Stats
+          Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Today's Overview
                 Text(
                   "Today's Overview",
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.black,
+                    color: CommonColors.black,
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 GridView.count(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -271,11 +233,9 @@ class _DashboardTab extends StatelessWidget {
               ],
             ),
           ),
-        ),
 
-        // Recent Orders
-        SliverToBoxAdapter(
-          child: Padding(
+          // Recent Orders
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
@@ -287,7 +247,7 @@ class _DashboardTab extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.black,
+                        color: CommonColors.black,
                       ),
                     ),
                     Text(
@@ -295,7 +255,7 @@ class _DashboardTab extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFFE67E22),
+                        color: SellerColors.primaryLight,
                       ),
                     ),
                   ],
@@ -305,11 +265,9 @@ class _DashboardTab extends StatelessWidget {
               ],
             ),
           ),
-        ),
 
-        // Quick Actions
-        SliverToBoxAdapter(
-          child: Padding(
+          // Quick Actions
+          Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +277,7 @@ class _DashboardTab extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.black,
+                    color: CommonColors.black,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -329,8 +287,15 @@ class _DashboardTab extends StatelessWidget {
                       child: _QuickActionCard(
                         icon: Icons.add_box,
                         title: 'Add Product',
-                        color: const Color(0xFF4A90E2),
-                        onTap: () {},
+                        color: SellerColors.primaryLight,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddProductScreen(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -338,7 +303,7 @@ class _DashboardTab extends StatelessWidget {
                       child: _QuickActionCard(
                         icon: Icons.bar_chart,
                         title: 'View Reports',
-                        color: const Color(0xFF27AE60),
+                        color: SellerColors.accent,
                         onTap: () {},
                       ),
                     ),
@@ -347,10 +312,9 @@ class _DashboardTab extends StatelessWidget {
               ],
             ),
           ),
-        ),
-
-        const SliverToBoxAdapter(child: SizedBox(height: 20)),
-      ],
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
@@ -375,7 +339,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: CommonColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -404,7 +368,7 @@ class _StatCard extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: CommonColors.black,
                 ),
               ),
             ],
@@ -415,7 +379,7 @@ class _StatCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: AppColors.greyTextColor,
+              color: CommonColors.greyText,
             ),
           ),
           const SizedBox(height: 4),
@@ -444,7 +408,7 @@ class _OrderCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: CommonColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -460,13 +424,10 @@ class _OrderCard extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.lightPrimaryColor,
+              color: SellerColors.surface,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.shopping_bag,
-              color: AppColors.primaryBackgroundColor,
-            ),
+            child: Icon(Icons.shopping_bag, color: SellerColors.primaryLight),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -478,7 +439,7 @@ class _OrderCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.black,
+                    color: CommonColors.black,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -486,7 +447,7 @@ class _OrderCard extends StatelessWidget {
                   'Buyer: John Doe • 3 items',
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: AppColors.greyTextColor,
+                    color: CommonColors.greyText,
                   ),
                 ),
               ],
@@ -519,7 +480,7 @@ class _OrderCard extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: CommonColors.black,
                 ),
               ),
             ],
@@ -573,13 +534,142 @@ class _QuickActionCard extends StatelessWidget {
   }
 }
 
-// Placeholder tabs
+// Products Tab
 class _ProductsTab extends StatelessWidget {
   const _ProductsTab();
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Products Tab - Coming Soon'));
+    // Dummy Data
+    final dummyProducts = [
+      Product(
+        name: 'Premium Silk Saree',
+        category: 'Garments',
+        subCategory: 'Ethical Wear',
+        productType: 'Saree',
+        brand: 'Banaras Hub',
+        description: ProductDescription(
+          short: 'Pure silk with gold zari.',
+          long: 'Detailed description...',
+        ),
+        minimumOrderQuantity: 10,
+        hasVariants: true,
+        variants: [
+          Variant(
+            variantColorCode: 'Gold',
+            size: 'Free',
+            price: Price(value: 15000),
+            stock: Stock(quantity: 50),
+          ),
+          Variant(
+            variantColorCode: 'Red',
+            size: 'Free',
+            price: Price(value: 12000),
+            stock: Stock(quantity: 30),
+          ),
+        ],
+      ),
+      Product(
+        name: 'Cotton Denim Fabric',
+        category: 'Fabric',
+        subCategory: 'Denim',
+        productType: 'Roll',
+        brand: 'Denim King',
+        description: ProductDescription(
+          short: '12oz high quality denim.',
+          long: 'Detailed description...',
+        ),
+        minimumOrderQuantity: 500,
+        hasVariants: false,
+        variants: [
+          Variant(
+            variantColorCode: 'Dark Blue',
+            size: '100m Roll',
+            price: Price(value: 8500),
+            stock: Stock(quantity: 100),
+          ),
+        ],
+      ),
+      Product(
+        name: 'Organic Linen Shirt',
+        category: 'Garments',
+        subCategory: "Men's Wear",
+        productType: 'Shirt',
+        brand: 'Linen Life',
+        description: ProductDescription(
+          short: 'Breathable organic linen.',
+          long: 'Detailed description...',
+        ),
+        minimumOrderQuantity: 20,
+        hasVariants: true,
+        variants: [
+          Variant(
+            variantColorCode: 'White',
+            size: 'L',
+            price: Price(value: 2500),
+            stock: Stock(quantity: 5),
+          ),
+          Variant(
+            variantColorCode: 'Blue',
+            size: 'M',
+            price: Price(value: 2500),
+            stock: Stock(quantity: 25),
+          ),
+        ],
+      ),
+    ];
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${dummyProducts.length} Products Found',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: CommonColors.greyText,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddProductScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add New'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: SellerColors.primaryLight,
+                    textStyle: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: dummyProducts.length,
+              itemBuilder: (context, index) => SellerProductCard(
+                product: dummyProducts[index],
+                onTap: () {},
+              ),
+            ),
+          ),
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
   }
 }
 
@@ -598,14 +688,5 @@ class _OrdersTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Orders Tab - Coming Soon'));
-  }
-}
-
-class _ProfileTab extends StatelessWidget {
-  const _ProfileTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Profile Tab - Coming Soon'));
   }
 }

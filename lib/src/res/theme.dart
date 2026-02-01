@@ -2,31 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'colors.dart';
 
+/// Main app theme - Uses buyer theme as default
+/// For seller-specific screens, use SellerTheme from seller_theme.dart
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primaryBackgroundColor,
+        seedColor: BuyerColors.primaryLight,
         brightness: Brightness.light,
       ),
-      scaffoldBackgroundColor: AppColors.backgroudColor,
+      scaffoldBackgroundColor: BuyerColors.background,
       textTheme: GoogleFonts.interTextTheme(),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0, // Prevents color change on scroll
+        surfaceTintColor: Colors.transparent, // Prevents tint on scroll
         centerTitle: true,
-        iconTheme: const IconThemeData(color: AppColors.black),
+        iconTheme: const IconThemeData(color: CommonColors.black),
         titleTextStyle: GoogleFonts.inter(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: AppColors.black,
+          color: CommonColors.black,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryBackgroundColor,
-          foregroundColor: AppColors.white,
+          backgroundColor: BuyerColors.primaryLight,
+          foregroundColor: CommonColors.white,
           minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -40,15 +44,12 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryBackgroundColor,
+          foregroundColor: BuyerColors.primaryLight,
           minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          side: const BorderSide(
-            color: AppColors.primaryBackgroundColor,
-            width: 1.5,
-          ),
+          side: const BorderSide(color: BuyerColors.primaryLight, width: 1.5),
           textStyle: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -57,7 +58,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: CommonColors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
@@ -73,7 +74,7 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(
-            color: AppColors.primaryBackgroundColor,
+            color: BuyerColors.primaryLight,
             width: 2,
           ),
         ),
@@ -82,19 +83,19 @@ class AppTheme {
           borderSide: const BorderSide(color: Colors.red, width: 1),
         ),
         hintStyle: GoogleFonts.inter(
-          color: AppColors.greyTextColor,
+          color: CommonColors.greyText,
           fontSize: 14,
         ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: AppColors.white,
+        color: CommonColors.white,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColors.white,
-        selectedItemColor: AppColors.primaryBackgroundColor,
-        unselectedItemColor: AppColors.greyTextColor,
+        backgroundColor: CommonColors.white,
+        selectedItemColor: BuyerColors.primaryLight,
+        unselectedItemColor: CommonColors.greyText,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
         selectedLabelStyle: GoogleFonts.inter(

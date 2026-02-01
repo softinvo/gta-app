@@ -12,9 +12,9 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: Colors.white,
         statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
       ),
     );
 
