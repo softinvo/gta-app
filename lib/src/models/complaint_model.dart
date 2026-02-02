@@ -120,6 +120,12 @@ class ComplaintMessage {
   /// Check if message is from buyer
   bool get isFromBuyer => sender == 'Buyer';
 
+  /// Check if message is from seller
+  bool get isFromSeller => sender == 'Seller';
+
+  /// Check if message is from the user who raised the complaint
+  bool get isFromUser => sender == 'Buyer' || sender == 'Seller';
+
   /// Check if message is from admin
   bool get isFromAdmin => sender == 'Admin';
 

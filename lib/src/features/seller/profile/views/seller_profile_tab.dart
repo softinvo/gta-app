@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
+import 'package:gta_app/src/features/common_features/auth/controller/auth_controller.dart';
+import 'package:gta_app/src/features/common_features/auth/views/login_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
+import 'package:gta_app/src/models/seller_model.dart';
 import 'seller_personal_details_screen.dart';
 import 'seller_business_address_screen.dart';
 import 'seller_verification_screen.dart';
 import 'seller_help_center_screen.dart';
-import 'seller_contact_support_screen.dart';
 import 'seller_policies_screen.dart';
 
 class SellerProfileTab extends ConsumerWidget {
@@ -16,6 +18,8 @@ class SellerProfileTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final sellerAsync = ref.watch(sellerProfileProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: false,
       backgroundColor: SellerColors.background,
@@ -23,12 +27,24 @@ class SellerProfileTab extends ConsumerWidget {
         slivers: [
           // Profile Header
           SliverToBoxAdapter(
-            child: _SellerProfileHeader(
-              name: 'Textile Seller',
-              phone: '+91 9876543210',
-              businessName: 'Global Textiles Co.',
-              onSettingsTap: () {},
-              onEditTap: () {},
+            child: sellerAsync.when(
+              data: (seller) => _SellerProfileHeader(
+                name: seller?.name ?? 'Textile Seller',
+                phone: seller?.phone ?? '+91 9876543210',
+                businessName: seller?.businessName ?? 'Global Textiles Co.',
+                avatarUrl: seller?.avatar?.fileUrl,
+                onSettingsTap: () {},
+                onEditTap: () =>
+                    context.push(SellerPersonalDetailsScreen.routePath),
+              ),
+              loading: () => const _SellerProfileHeaderPlaceholder(),
+              error: (err, st) => _SellerProfileHeader(
+                name: 'Error Loading',
+                phone: '',
+                businessName: '',
+                onSettingsTap: () {},
+                onEditTap: () {},
+              ),
             ),
           ),
 
@@ -146,7 +162,12 @@ class SellerProfileTab extends ConsumerWidget {
                       _SellerMenuItem(
                         icon: Icons.verified_outlined,
                         title: 'Verification Status',
-                        subtitle: 'Verified',
+                        subtitle: sellerAsync.when(
+                          data: (seller) =>
+                              seller?.verificationStatus.displayName,
+                          loading: () => 'Loading...',
+                          error: (_, __) => 'Error',
+                        ),
                         onTap: () =>
                             context.push(SellerVerificationScreen.routePath),
                       ),
@@ -161,12 +182,6 @@ class SellerProfileTab extends ConsumerWidget {
                         title: 'Seller Help Center',
                         onTap: () =>
                             context.push(SellerHelpCenterScreen.routePath),
-                      ),
-                      _SellerMenuItem(
-                        icon: Icons.support_agent_outlined,
-                        title: 'Contact Support',
-                        onTap: () =>
-                            context.push(SellerContactSupportScreen.routePath),
                       ),
                       _SellerMenuItem(
                         icon: Icons.policy_outlined,
@@ -209,6 +224,7 @@ class _SellerProfileHeader extends StatelessWidget {
   final String name;
   final String phone;
   final String businessName;
+  final String? avatarUrl;
   final VoidCallback onSettingsTap;
   final VoidCallback onEditTap;
 
@@ -216,6 +232,7 @@ class _SellerProfileHeader extends StatelessWidget {
     required this.name,
     required this.phone,
     required this.businessName,
+    this.avatarUrl,
     required this.onSettingsTap,
     required this.onEditTap,
   });
@@ -286,16 +303,35 @@ class _SellerProfileHeader extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: Center(
-                            child: Text(
-                              _getInitials(name),
-                              style: GoogleFonts.poppins(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: SellerColors.primary,
-                              ),
-                            ),
-                          ),
+                          child: avatarUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Image.network(
+                                    avatarUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Center(
+                                          child: Text(
+                                            _getInitials(name),
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: SellerColors.primary,
+                                            ),
+                                          ),
+                                        ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    _getInitials(name),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: SellerColors.primary,
+                                    ),
+                                  ),
+                                ),
                         ),
                         // Verified badge
                         Positioned(
@@ -661,16 +697,16 @@ class _SellerMenuItem extends StatelessWidget {
   }
 }
 
-class _LogoutButton extends StatelessWidget {
+class _LogoutButton extends ConsumerWidget {
   const _LogoutButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (dialogContext) => AlertDialog(
             title: Text(
               'Logout',
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
@@ -681,16 +717,20 @@ class _LogoutButton extends StatelessWidget {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
                   'Cancel',
                   style: GoogleFonts.inter(color: CommonColors.greyText),
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // Add logout logic here
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  // Call logout from auth controller
+                  await ref.read(verifyOtpStateProvider.notifier).logout();
+                  if (context.mounted) {
+                    context.go(LoginScreen.routePath);
+                  }
                 },
                 child: Text(
                   'Logout',
@@ -728,6 +768,30 @@ class _LogoutButton extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SellerProfileHeaderPlaceholder extends StatelessWidget {
+  const _SellerProfileHeaderPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 184,
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 }

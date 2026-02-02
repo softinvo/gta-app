@@ -128,6 +128,33 @@ class API {
     }
   }
 
+  /// Special put request for uploading raw data (bytes) to a signed URL.
+  FutureEither<Response> putRawRequest({
+    required String url,
+    required List<int> bytes,
+    String contentType = "application/octet-stream",
+  }) async {
+    final Map<String, String> requestHeaders = {"Content-Type": contentType};
+    if (AppConfig.logHttp) {
+      log('RAW PUT REQUEST TO : $url', name: LogLabel.httpPut);
+      log('CONTENT TYPE : $contentType', name: LogLabel.httpPut);
+      log('BYTES LENGTH : ${bytes.length}', name: LogLabel.httpPut);
+    }
+    try {
+      final response = await put(
+        Uri.parse(url),
+        body: bytes,
+        headers: requestHeaders,
+      );
+      log('RESPONSE STATUS : ${response.statusCode}', name: LogLabel.httpPut);
+      return Right(response);
+    } catch (e, stktrc) {
+      return Left(
+        Failure(message: FailureMessage.putRequestMessage, stackTrace: stktrc),
+      );
+    }
+  }
+
   FutureEither<Response> patchRequest({
     required String url,
     dynamic body,

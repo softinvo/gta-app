@@ -1,10 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
 import 'package:gta_app/src/models/buyer_model.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
+import 'package:gta_app/src/utils/upload_utils.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -22,6 +25,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _emailController;
   String _gender = 'Other';
   bool _isLoading = false;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -55,6 +59,106 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _lastNameController.dispose();
     _emailController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Upload Profile Picture',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildUploadOption(Icons.camera_alt, 'Camera', () {
+                  Navigator.pop(context, ImageSource.camera);
+                }),
+                _buildUploadOption(Icons.photo_library, 'Gallery', () {
+                  Navigator.pop(context, ImageSource.gallery);
+                }),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null) {
+      final XFile? pickedFile = await picker.pickImage(
+        source: source,
+        imageQuality: 70,
+      );
+
+      if (pickedFile != null) {
+        setState(() => _isUploading = true);
+
+        // Upload file
+        final uploadResult = await ref
+            .read(uploadUtilsProvider)
+            .uploadFile(File(pickedFile.path), 'Avatar');
+
+        await uploadResult.fold(
+          (failure) {
+            setState(() => _isUploading = false);
+            if (mounted) SnackBarService.showError(context, failure.message);
+          },
+          (attachment) async {
+            // Update profile with avatar URL
+            final success = await ref
+                .read(buyerProfileProvider.notifier)
+                .updateProfile(avatar: attachment);
+
+            setState(() => _isUploading = false);
+
+            if (mounted) {
+              if (success) {
+                SnackBarService.showSuccess(context, 'Profile picture updated');
+              } else {
+                SnackBarService.showError(context, 'Failed to update profile');
+              }
+            }
+          },
+        );
+      }
+    }
+  }
+
+  Widget _buildUploadOption(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: BuyerColors.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, size: 32, color: BuyerColors.primaryLight),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.inter(fontSize: 14, color: CommonColors.black),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -156,26 +260,48 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.person,
-                      size: 50,
-                      color: BuyerColors.primaryLight,
-                    ),
+                    child: _isUploading
+                        ? const Center(child: CircularProgressIndicator())
+                        : buyer.avatar != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: Image.network(
+                              buyer.avatar!.fileUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(
+                                    Icons.person,
+                                    size: 50,
+                                    color: BuyerColors.primaryLight,
+                                  ),
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            size: 50,
+                            color: BuyerColors.primaryLight,
+                          ),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: BuyerColors.primaryLight,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: CommonColors.white, width: 2),
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 16,
-                        color: Colors.white,
+                    child: GestureDetector(
+                      onTap: _isUploading ? null : _pickAndUploadImage,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: BuyerColors.primaryLight,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: CommonColors.white,
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          size: 16,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

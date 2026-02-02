@@ -38,7 +38,10 @@ class SellerComplaintRepository {
       final data = jsonDecode(response.body);
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           data['success'] == true) {
-        return Right(Complaint.fromJson(data['data']));
+        final complaintData = data['data'] ?? data['complaint'];
+        if (complaintData != null) {
+          return Right(Complaint.fromJson(complaintData));
+        }
       }
       return Left(
         Failure(message: data['message'] ?? 'Failed to create complaint'),
@@ -64,6 +67,70 @@ class SellerComplaintRepository {
       }
       return Left(
         Failure(message: data['message'] ?? 'Failed to get complaints'),
+      );
+    });
+  }
+
+  /// Get details of a specific complaint
+  FutureEither<Complaint> getComplaintDetails(String id) async {
+    final result = await _api.getRequest(
+      url: Endpoints.getSellerComplaintDetails(id),
+      requireAuth: true,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        final complaintData = data['data'] ?? data['complaint'];
+        if (complaintData != null) {
+          return Right(Complaint.fromJson(complaintData));
+        }
+      }
+      return Left(
+        Failure(message: data['message'] ?? 'Failed to get complaint details'),
+      );
+    });
+  }
+
+  /// Send a message in a complaint
+  FutureEither<bool> sendMessage({
+    required String complaintId,
+    required String text,
+  }) async {
+    final result = await _api.postRequest(
+      url: Endpoints.sendSellerComplaintMessage(complaintId),
+      body: {'text': text},
+      requireAuth: true,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return const Right(true);
+      }
+      return Left(
+        Failure(message: data['message'] ?? 'Failed to send message'),
+      );
+    });
+  }
+
+  /// Get or create chatbot thread for seller
+  FutureEither<Complaint> getChatbotThread() async {
+    final result = await _api.getRequest(
+      url: Endpoints.getSellerChatbot,
+      requireAuth: true,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        final complaintData = data['data'] ?? data['complaint'];
+        if (complaintData != null) {
+          return Right(Complaint.fromJson(complaintData));
+        }
+      }
+      return Left(
+        Failure(message: data['message'] ?? 'Failed to get chatbot thread'),
       );
     });
   }

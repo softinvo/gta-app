@@ -123,4 +123,25 @@ class ComplaintRepository {
       );
     });
   }
+
+  /// Get or create chatbot thread for buyer
+  FutureEither<Complaint> getChatbotThread() async {
+    final result = await _api.getRequest(
+      url: Endpoints.getBuyerChatbot,
+      requireAuth: true,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        final complaintData = data['data'] ?? data['complaint'];
+        if (complaintData != null) {
+          return Right(Complaint.fromJson(complaintData));
+        }
+      }
+      return Left(
+        Failure(message: data['message'] ?? 'Failed to get chatbot thread'),
+      );
+    });
+  }
 }

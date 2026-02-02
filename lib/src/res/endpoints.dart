@@ -8,9 +8,10 @@ class Endpoints {
   static const String verifyOTP = '${baseUrl}user/loginphone';
 
   //Profile
-  static const String storage = "$baseUrl/storage/upload";
-  static const String getProfile = "${baseUrl}partner/profile";
-  static const String editProfile = "${baseUrl}partner/profile";
+  static const String storage = "${baseUrl}storage/upload";
+  static const String sellerProfile = "${baseUrl}seller/profile";
+  static const String getProfile = "${baseUrl}seller/profile";
+  static const String editProfile = "${baseUrl}seller/profile";
 
   // Buyer Profile
   static const String getBuyerProfile = "${baseUrl}buyer/profile";
@@ -29,6 +30,7 @@ class Endpoints {
       "${baseUrl}buyer/complaint/$id";
   static String sendBuyerComplaintMessage(String id) =>
       "${baseUrl}buyer/complaint/$id/message";
+  static const String getBuyerChatbot = "${baseUrl}buyer/chatbot";
   //membership
   static const String createMembershipPayment =
       "${baseUrl}membership/create-payment";
@@ -53,6 +55,7 @@ class Endpoints {
       "${baseUrl}seller/complaint/$id";
   static String sendSellerComplaintMessage(String id) =>
       "${baseUrl}seller/complaint/$id/message";
+  static const String getSellerChatbot = "${baseUrl}seller/chatbot";
 
   //Warehouse
   static const String createWarehouse = "${baseUrl}business/create-profile";

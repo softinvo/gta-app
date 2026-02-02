@@ -1,6 +1,7 @@
 import 'attachment_model.dart';
 import 'document_model.dart';
 import 'buyer_model.dart'; // For Gender and ProfileStatus enums
+import 'address_model.dart';
 
 /// Seller model matching the backend seller schema.
 class Seller {
@@ -18,7 +19,7 @@ class Seller {
   final String? businessName;
   final DateTime? businessRegistrationDate;
   final BusinessType? businessType;
-  final String? addressId;
+  final Address? address;
   final List<Document> documents;
 
   // Designer-specific profile
@@ -45,7 +46,7 @@ class Seller {
     this.businessName,
     this.businessRegistrationDate,
     this.businessType,
-    this.addressId,
+    this.address,
     this.documents = const [],
     this.designerProfile,
     this.accountHolderName,
@@ -75,7 +76,10 @@ class Seller {
           ? DateTime.tryParse(json['businessRegistrationDate'])
           : null,
       businessType: BusinessType.fromString(json['businessType']),
-      addressId: json['address']?.toString(),
+      address:
+          json['address'] != null && json['address'] is Map<String, dynamic>
+          ? Address.fromJson(json['address'])
+          : null,
       documents:
           (json['documents'] as List<dynamic>?)
               ?.map((e) => Document.fromJson(e as Map<String, dynamic>))
@@ -109,7 +113,7 @@ class Seller {
       if (businessRegistrationDate != null)
         'businessRegistrationDate': businessRegistrationDate!.toIso8601String(),
       if (businessType != null) 'businessType': businessType!.value,
-      if (addressId != null) 'address': addressId,
+      if (address != null) 'address': address!.toJson(),
       'documents': documents.map((d) => d.toJson()).toList(),
       if (designerProfile != null) 'designerProfile': designerProfile!.toJson(),
       if (accountHolderName != null) 'accountHolderName': accountHolderName,
@@ -132,7 +136,7 @@ class Seller {
     String? businessName,
     DateTime? businessRegistrationDate,
     BusinessType? businessType,
-    String? addressId,
+    Address? address,
     List<Document>? documents,
     DesignerProfile? designerProfile,
     String? accountHolderName,
@@ -154,7 +158,7 @@ class Seller {
       businessRegistrationDate:
           businessRegistrationDate ?? this.businessRegistrationDate,
       businessType: businessType ?? this.businessType,
-      addressId: addressId ?? this.addressId,
+      address: address ?? this.address,
       documents: documents ?? this.documents,
       designerProfile: designerProfile ?? this.designerProfile,
       accountHolderName: accountHolderName ?? this.accountHolderName,

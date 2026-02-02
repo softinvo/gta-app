@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/complaint/controller/seller_complaint_controller.dart';
+import 'package:gta_app/src/features/seller/complaint/views/seller_complaint_details_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:intl/intl.dart';
 
@@ -125,7 +126,6 @@ class SellerComplaintsListScreen extends ConsumerWidget {
   }
 
   Widget _buildComplaintCard(BuildContext context, dynamic complaint) {
-    // Note: 'dynamic' because I might need to adapt to the exact Model
     final statusColor = _getStatusColor(complaint.status);
     final formattedDate = DateFormat(
       'MMM dd, yyyy',
@@ -214,7 +214,15 @@ class SellerComplaintsListScreen extends ConsumerWidget {
           ],
         ),
         onTap: () {
-          // Navigation to details can be added later if screen exists
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SellerComplaintDetailsScreen(
+                complaintId: complaint.id,
+                complaint: complaint,
+              ),
+            ),
+          );
         },
       ),
     );
@@ -225,8 +233,10 @@ class SellerComplaintsListScreen extends ConsumerWidget {
       case 'pending':
         return const Color(0xFFE67E22);
       case 'open':
+      case 'active':
         return SellerColors.primaryLight;
       case 'resolved':
+      case 'completed':
         return const Color(0xFF2ECC71);
       case 'closed':
         return CommonColors.greyText;

@@ -13,8 +13,15 @@ import 'package:gta_app/src/features/seller/profile/views/seller_personal_detail
 import 'package:gta_app/src/features/seller/profile/views/seller_business_address_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_verification_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_help_center_screen.dart';
-import 'package:gta_app/src/features/seller/profile/views/seller_contact_support_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_policies_screen.dart';
+import 'package:gta_app/src/features/buyer/complaint/views/complaints_list_screen.dart';
+import 'package:gta_app/src/features/buyer/complaint/views/create_complaint_screen.dart';
+import 'package:gta_app/src/features/buyer/complaint/views/complaint_details_screen.dart';
+import 'package:gta_app/src/features/seller/complaint/views/seller_complaints_list_screen.dart';
+import 'package:gta_app/src/features/seller/complaint/views/seller_create_complaint_screen.dart';
+import 'package:gta_app/src/features/seller/complaint/views/seller_complaint_details_screen.dart';
+import 'package:gta_app/src/features/common_features/chatbot/views/chatbot_screen.dart';
+import 'package:gta_app/src/models/complaint_model.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: Splashscreen.routePath,
@@ -71,6 +78,35 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const BuyerHelpFaqScreen(),
     ),
 
+    // Buyer Complaints
+    GoRoute(
+      path: '/buyer/complaints',
+      builder: (context, state) => const ComplaintsListScreen(),
+    ),
+    GoRoute(
+      path: '/buyer/complaint/create',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return CreateComplaintScreen(
+          category: extra?['category'] as String? ?? 'General',
+        );
+      },
+    ),
+    GoRoute(
+      path: '/buyer/complaint/details',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return ComplaintDetailsScreen(
+          complaintId: extra?['complaintId'] as String,
+          complaint: extra?['complaint'] as Complaint?,
+        );
+      },
+    ),
+    GoRoute(
+      path: ChatbotScreen.buyerRoutePath,
+      builder: (context, state) => const ChatbotScreen(userType: 'buyer'),
+    ),
+
     // Seller Routes
     GoRoute(
       path: SellerDashboardScreen.routePath,
@@ -93,12 +129,37 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const SellerHelpCenterScreen(),
     ),
     GoRoute(
-      path: SellerContactSupportScreen.routePath,
-      builder: (context, state) => const SellerContactSupportScreen(),
-    ),
-    GoRoute(
       path: SellerPoliciesScreen.routePath,
       builder: (context, state) => const SellerPoliciesScreen(),
+    ),
+
+    // Seller Complaints
+    GoRoute(
+      path: SellerComplaintsListScreen.routePath,
+      builder: (context, state) => const SellerComplaintsListScreen(),
+    ),
+    GoRoute(
+      path: '/seller/complaint/create',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return SellerCreateComplaintScreen(
+          category: extra?['category'] as String? ?? 'General',
+        );
+      },
+    ),
+    GoRoute(
+      path: SellerComplaintDetailsScreen.routePath,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return SellerComplaintDetailsScreen(
+          complaintId: extra?['complaintId'] as String,
+          complaint: extra?['complaint'] as Complaint?,
+        );
+      },
+    ),
+    GoRoute(
+      path: ChatbotScreen.sellerRoutePath,
+      builder: (context, state) => const ChatbotScreen(userType: 'seller'),
     ),
   ],
 );

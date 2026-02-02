@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
+import 'package:gta_app/src/models/seller_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 
 class SellerVerificationScreen extends ConsumerStatefulWidget {
@@ -15,41 +17,64 @@ class SellerVerificationScreen extends ConsumerStatefulWidget {
 
 class _SellerVerificationScreenState
     extends ConsumerState<SellerVerificationScreen> {
-  // Mock verification status - replace with actual provider data
-  final String _verificationStatus =
-      'pending'; // not_submitted, pending, approved, rejected
-  final String? _rejectionReason = null;
+  // Actual data will be derived from provider in build
+  String _verificationStatus = 'not_submitted';
+  String? _rejectionReason;
+  List<_DocumentItem> _documents = [];
 
-  // Mock documents list
-  final List<_DocumentItem> _documents = [
-    _DocumentItem(
-      docType: 'PAN Card',
-      docNumber: 'ABCDE1234F',
-      status: 'approved',
-      icon: Icons.credit_card,
-    ),
-    _DocumentItem(
-      docType: 'GST Certificate',
-      docNumber: '29ABCDE1234F1Z5',
-      status: 'pending',
-      icon: Icons.receipt_long,
-    ),
-    _DocumentItem(
-      docType: 'Business License',
-      docNumber: null,
-      status: 'not_submitted',
-      icon: Icons.description,
-    ),
-    _DocumentItem(
-      docType: 'Address Proof',
-      docNumber: null,
-      status: 'not_submitted',
-      icon: Icons.location_on,
-    ),
-  ];
+  void _initializeDocuments(Seller? seller) {
+    _verificationStatus = seller?.verificationStatus.value ?? 'not_submitted';
+    _rejectionReason = seller?.rejectionReason;
+
+    final List<String> requiredDocs = [
+      'PAN Card',
+      'GST Certificate',
+      'Business License',
+      'Address Proof',
+    ];
+
+    _documents = requiredDocs.map((type) {
+      final doc = seller?.getDocument(type);
+      IconData icon;
+      switch (type) {
+        case 'PAN Card':
+          icon = Icons.credit_card;
+          break;
+        case 'GST Certificate':
+          icon = Icons.receipt_long;
+          break;
+        case 'Business License':
+          icon = Icons.description;
+          break;
+        default:
+          icon = Icons.location_on;
+      }
+
+      return _DocumentItem(
+        docType: type,
+        docNumber: doc?.docNumber,
+        status: doc?.status.value ?? 'not_submitted',
+        icon: icon,
+      );
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final sellerAsync = ref.watch(sellerProfileProvider);
+
+    return sellerAsync.when(
+      data: (seller) {
+        _initializeDocuments(seller);
+        return _buildUI(context);
+      },
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, st) => Scaffold(body: Center(child: Text('Error: $err'))),
+    );
+  }
+
+  Widget _buildUI(BuildContext context) {
     return Scaffold(
       backgroundColor: SellerColors.background,
       appBar: AppBar(

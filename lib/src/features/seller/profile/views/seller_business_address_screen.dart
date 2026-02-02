@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
+import 'package:gta_app/src/models/seller_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 
 class SellerBusinessAddressScreen extends ConsumerStatefulWidget {
@@ -25,21 +27,33 @@ class _SellerBusinessAddressScreenState
   late TextEditingController _stateController;
   late TextEditingController _pincodeController;
   bool _isLoading = false;
+  bool _isPopulated = false;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Load from provider
-    _nameController = TextEditingController(text: 'Global Textiles Co.');
-    _phoneController = TextEditingController(text: '9876543210');
-    _addressController = TextEditingController(
-      text: 'Plot No. 45, Phase III, Okhla Industrial Estate',
-    );
-    _localityController = TextEditingController(text: 'Okhla');
-    _landmarkController = TextEditingController(text: 'Near Metro Station');
-    _cityController = TextEditingController(text: 'New Delhi');
-    _stateController = TextEditingController(text: 'Delhi');
-    _pincodeController = TextEditingController(text: '110020');
+    _nameController = TextEditingController();
+    _phoneController = TextEditingController();
+    _addressController = TextEditingController();
+    _localityController = TextEditingController();
+    _landmarkController = TextEditingController();
+    _cityController = TextEditingController();
+    _stateController = TextEditingController();
+    _pincodeController = TextEditingController();
+  }
+
+  void _populateFields(Seller seller) {
+    _nameController.text = seller.businessName ?? '';
+    _phoneController.text = seller.phone ?? '';
+    if (seller.address != null) {
+      _addressController.text = seller.address!.address;
+      _localityController.text = seller.address!.locality;
+      _landmarkController.text = seller.address!.landmark ?? '';
+      _cityController.text = seller.address!.city ?? '';
+      _stateController.text = seller.address!.state;
+      _pincodeController.text = seller.address!.pincode;
+    }
+    _isPopulated = true;
   }
 
   @override
@@ -82,6 +96,21 @@ class _SellerBusinessAddressScreenState
 
   @override
   Widget build(BuildContext context) {
+    final sellerAsync = ref.watch(sellerProfileProvider);
+
+    // Robust Initialization
+    if (!_isPopulated && sellerAsync.hasValue && sellerAsync.value != null) {
+      _populateFields(sellerAsync.value!);
+    }
+
+    ref.listen<AsyncValue<Seller?>>(sellerProfileProvider, (previous, next) {
+      if (next.hasValue && next.value != null && !_isPopulated) {
+        setState(() {
+          _populateFields(next.value!);
+        });
+      }
+    });
+
     return Scaffold(
       backgroundColor: SellerColors.background,
       appBar: AppBar(

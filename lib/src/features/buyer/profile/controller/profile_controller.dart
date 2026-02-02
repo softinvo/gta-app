@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gta_app/src/features/buyer/profile/repository/profile_repository.dart';
+import 'package:gta_app/src/models/attachment_model.dart';
 import 'package:gta_app/src/models/address_model.dart';
 import 'package:gta_app/src/models/buyer_model.dart';
 
@@ -41,14 +42,14 @@ class BuyerProfileController extends Notifier<AsyncValue<Buyer?>> {
     String? lastName,
     String? email,
     Gender? gender,
-    String? avatar,
+    Attachment? avatar,
   }) async {
     final Map<String, dynamic> updateData = {
       if (firstName != null) 'firstName': firstName,
       if (lastName != null) 'lastName': lastName,
       if (email != null) 'email': email,
       if (gender != null) 'gender': gender.value.toLowerCase(),
-      if (avatar != null) 'avatar': avatar,
+      if (avatar != null) 'avatar': avatar.toJson(),
     };
 
     final result = await _repo.updateProfile(updateData);

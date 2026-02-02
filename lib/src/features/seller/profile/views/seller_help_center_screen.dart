@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/common_features/chatbot/views/chatbot_screen.dart';
 import 'package:gta_app/src/features/seller/complaint/views/seller_complaints_list_screen.dart';
 import 'package:gta_app/src/features/seller/complaint/views/seller_create_complaint_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -34,6 +35,8 @@ class SellerHelpCenterScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          _buildChatbotCard(context),
+          const SizedBox(height: 16),
           _buildMyComplaintsCard(context),
           const SizedBox(height: 24),
           _buildSectionTitle('Raise a Complaint'),
@@ -141,6 +144,76 @@ class SellerHelpCenterScreen extends StatelessWidget {
 
           _buildContactCard(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildChatbotCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ChatbotScreen(userType: 'seller'),
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: SellerColors.primaryLight.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: SellerColors.primaryLight.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.smart_toy_outlined,
+                color: SellerColors.primaryLight,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Chat with GTA Assistant',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: CommonColors.black,
+                    ),
+                  ),
+                  Text(
+                    'Get instant answers to your queries',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: CommonColors.greyText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: CommonColors.greyText.withOpacity(0.5),
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }
