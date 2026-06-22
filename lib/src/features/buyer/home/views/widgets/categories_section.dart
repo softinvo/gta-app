@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/buyer/home/views/buyer_categories_screen.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'category_card.dart';
@@ -29,7 +30,15 @@ class CategoriesSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionHeader(title: 'Categories', onSeeAll: () {}),
+          SectionHeader(
+            title: 'Categories',
+            onSeeAll: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const BuyerCategoriesScreen(),
+              ),
+            ),
+          ),
           const SizedBox(height: 16),
           SizedBox(
             height: 100,

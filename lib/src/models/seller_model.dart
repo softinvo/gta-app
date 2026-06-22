@@ -30,6 +30,7 @@ class Seller {
   final String? bankName;
   final String? bankAccountNumber;
   final String? ifscCode;
+  final String? cashfreeVendorStatus;
 
   final DateTime? createdAt;
 
@@ -53,6 +54,7 @@ class Seller {
     this.bankName,
     this.bankAccountNumber,
     this.ifscCode,
+    this.cashfreeVendorStatus,
     this.createdAt,
   });
 
@@ -92,6 +94,7 @@ class Seller {
       bankName: json['bankName'],
       bankAccountNumber: json['bankAccountNumber'],
       ifscCode: json['ifscCode'],
+      cashfreeVendorStatus: json['cashfreeVendorStatus'],
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -120,6 +123,7 @@ class Seller {
       if (bankName != null) 'bankName': bankName,
       if (bankAccountNumber != null) 'bankAccountNumber': bankAccountNumber,
       if (ifscCode != null) 'ifscCode': ifscCode,
+      if (cashfreeVendorStatus != null) 'cashfreeVendorStatus': cashfreeVendorStatus,
     };
   }
 
@@ -143,6 +147,7 @@ class Seller {
     String? bankName,
     String? bankAccountNumber,
     String? ifscCode,
+    String? cashfreeVendorStatus,
   }) {
     return Seller(
       id: id ?? this.id,
@@ -165,6 +170,7 @@ class Seller {
       bankName: bankName ?? this.bankName,
       bankAccountNumber: bankAccountNumber ?? this.bankAccountNumber,
       ifscCode: ifscCode ?? this.ifscCode,
+      cashfreeVendorStatus: cashfreeVendorStatus ?? this.cashfreeVendorStatus,
       createdAt: createdAt,
     );
   }
@@ -211,9 +217,27 @@ class Seller {
   /// Check if bank details are complete
   bool get hasBankDetails =>
       accountHolderName != null &&
-      bankName != null &&
       bankAccountNumber != null &&
       ifscCode != null;
+
+  /// Whether the bank account is verified by Cashfree
+  bool get isBankVerified => cashfreeVendorStatus == 'ACTIVE';
+
+  /// Human-readable Cashfree bank verification status
+  String get bankVerificationLabel {
+    switch (cashfreeVendorStatus) {
+      case 'ACTIVE':
+        return 'Verified';
+      case 'IN_BANK_VALIDATION':
+        return 'Under Verification';
+      case 'BLOCKED':
+        return 'Blocked';
+      case 'DELETED':
+        return 'Deleted';
+      default:
+        return 'Not Added';
+    }
+  }
 
   /// Check if this is a designer account
   bool get isDesigner => businessType == BusinessType.designer;

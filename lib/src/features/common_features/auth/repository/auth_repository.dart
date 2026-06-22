@@ -20,9 +20,16 @@ class AuthRepository {
     required String userType,
     String otpType = 'login',
   }) async {
+    // Add country code if not present
+    final phoneWithCountryCode = phone.startsWith('+') ? phone : '+91$phone';
+
     final result = await _api.postRequest(
       url: Endpoints.sendOTP,
-      body: {'phone': phone, 'userType': userType, 'otpType': otpType},
+      body: {
+        'phone': phoneWithCountryCode,
+        'userType': userType,
+        'otpType': otpType,
+      },
       requireAuth: false,
     );
 
@@ -41,9 +48,12 @@ class AuthRepository {
     required String otp,
     required String userType,
   }) async {
+    // Add country code if not present
+    final phoneWithCountryCode = phone.startsWith('+') ? phone : '+91$phone';
+
     final result = await _api.postRequest(
       url: Endpoints.verifyOTP,
-      body: {'phone': phone, 'otp': otp, 'userType': userType},
+      body: {'phone': phoneWithCountryCode, 'otp': otp, 'userType': userType},
       requireAuth: false,
     );
 
@@ -57,6 +67,30 @@ class AuthRepository {
         });
       }
       return Left(Failure(message: data['message'] ?? 'Invalid OTP'));
+    });
+  }
+
+  /// Google Login
+  FutureEither<Map<String, dynamic>> googleLogin({
+    required String idToken,
+    required String userType,
+  }) async {
+    final result = await _api.postRequest(
+      url: Endpoints.googleLogin,
+      body: {'idToken': idToken, 'userType': userType},
+      requireAuth: false,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return Right({
+          'token': data['token'],
+          'userType': data['userType'],
+          'user': data['data'],
+        });
+      }
+      return Left(Failure(message: data['message'] ?? 'Google login failed'));
     });
   }
 }

@@ -4,13 +4,18 @@ import 'package:gta_app/src/res/colors.dart';
 
 class GoogleSignInButton extends StatelessWidget {
   final VoidCallback onTap;
+  final bool isLoading;
 
-  const GoogleSignInButton({super.key, required this.onTap});
+  const GoogleSignInButton({
+    super.key,
+    required this.onTap,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -26,21 +31,32 @@ class GoogleSignInButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.g_mobiledata_rounded, size: 24, color: Colors.red),
-            const SizedBox(width: 10),
-            Text(
-              'Sign In with Google',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: CommonColors.black,
+        child: isLoading
+            ? const Center(
+                child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.g_mobiledata_rounded, size: 24, color: Colors.red),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Sign In with Google',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: CommonColors.black,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

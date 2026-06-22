@@ -5,21 +5,41 @@ import 'package:gta_app/src/res/colors.dart';
 class SectionHeader extends StatelessWidget {
   final String title;
   final VoidCallback onSeeAll;
+  final IconData? icon;
+  final Color? iconColor;
 
-  const SectionHeader({super.key, required this.title, required this.onSeeAll});
+  const SectionHeader({
+    super.key,
+    required this.title,
+    required this.onSeeAll,
+    this.icon,
+    this.iconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: CommonColors.black,
-          ),
+        Row(
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 20,
+                color: iconColor ?? BuyerColors.primaryLight,
+              ),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              title,
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: CommonColors.black,
+              ),
+            ),
+          ],
         ),
         GestureDetector(
           onTap: onSeeAll,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
 import 'package:gta_app/src/features/buyer/profile/views/add_address_screen.dart';
+import 'package:gta_app/src/features/buyer/profile/views/edit_address_screen.dart';
 import 'package:gta_app/src/models/address_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 
@@ -39,35 +40,43 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
         ),
         centerTitle: true,
       ),
-      body: ref
-          .watch(buyerAddressesProvider)
-          .when(
-            data: (addresses) => addresses.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.location_off_outlined,
-                          size: 64,
-                          color: CommonColors.greyText,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No addresses saved',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: CommonColors.greyText,
-                            fontWeight: FontWeight.w500,
+      body: Column(
+        children: [
+          Expanded(
+            child: ref
+                .watch(buyerAddressesProvider)
+                .when(
+                  data: (addresses) => addresses.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.location_off_outlined,
+                                size: 64,
+                                color: CommonColors.greyText,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No addresses saved',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  color: CommonColors.greyText,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Add your first address to get started',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  color: CommonColors.greyText,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
+                        )
+                      : ListView.builder(
                           padding: const EdgeInsets.all(20),
                           itemCount: addresses.length,
                           itemBuilder: (context, index) {
@@ -75,13 +84,14 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                             return _buildAddressCard(address);
                           },
                         ),
-                      ),
-                      _buildAddButton(),
-                    ],
-                  ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error: $e')),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Error: $e')),
+                ),
           ),
+          _buildAddButton(),
+        ],
+      ),
     );
   }
 
@@ -185,46 +195,109 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              _buildCardOption(Icons.edit_outlined, 'Edit', () {}),
-              const SizedBox(width: 24),
-              _buildCardOption(Icons.delete_outline, 'Delete', () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Delete Address'),
-                    content: const Text(
-                      'Are you sure you want to delete this address?',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.red),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                if (!address.isPrimary) ...[
+                  _buildCardOption(
+                    Icons.check_circle_outline,
+                    'Mark as Primary',
+                    () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Mark as Primary'),
+                          content: const Text(
+                            'Do you want to set this as your primary address?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Confirm'),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
+                      );
 
-                if (confirmed == true && mounted) {
-                  final success = await ref
-                      .read(buyerAddressesProvider.notifier)
-                      .removeAddress(address.id!);
-                  if (!success && mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Failed to delete address')),
-                    );
+                      if (confirmed == true && mounted) {
+                        final success = await ref
+                            .read(buyerAddressesProvider.notifier)
+                            .markAddressPrimary(address.id!);
+                        if (success && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Address marked as primary'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } else if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Failed to mark address as primary',
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 24),
+                ],
+                _buildCardOption(Icons.edit_outlined, 'Edit', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditAddressScreen(address: address),
+                    ),
+                  );
+                }),
+                const SizedBox(width: 24),
+                _buildCardOption(Icons.delete_outline, 'Delete', () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Delete Address'),
+                      content: const Text(
+                        'Are you sure you want to delete this address?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirmed == true && mounted) {
+                    final success = await ref
+                        .read(buyerAddressesProvider.notifier)
+                        .removeAddress(address.id!);
+                    if (!success && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to delete address'),
+                        ),
+                      );
+                    }
                   }
-                }
-              }, isDestructive: true),
-            ],
+                }, isDestructive: true),
+              ],
+            ),
           ),
         ],
       ),

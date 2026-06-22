@@ -52,7 +52,7 @@ class FileUploadUtils {
               fileUrl: downloadUrl,
               fileName: fileName,
               fileType: type,
-              fileExtension: extension,
+              fileExtension: '.$extension',
               uploadedAt: DateTime.now(),
             ),
           ),

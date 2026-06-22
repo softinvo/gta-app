@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/assets.dart';
 import 'package:gta_app/src/res/colors.dart';
 
-/// Common App Bar for Seller flow with logo
+/// Common App Bar for Seller flow
 class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final List<Widget>? actions;
@@ -22,98 +23,153 @@ class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.automaticallyImplyLeading = true,
   });
 
+  // 64px toolbar + 1px separator line
   @override
-  Size get preferredSize => const Size.fromHeight(70);
+  Size get preferredSize => const Size.fromHeight(65);
 
   @override
   Widget build(BuildContext context) {
+    final canPop = automaticallyImplyLeading && Navigator.of(context).canPop();
+
+    Widget? leadingWidget;
+    if (canPop && leading == null) {
+      leadingWidget = _BackButton();
+    } else {
+      leadingWidget = leading;
+    }
+
     return AppBar(
-      backgroundColor: CommonColors.white,
+      backgroundColor: Colors.white,
       elevation: 0,
+      scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
-      automaticallyImplyLeading: automaticallyImplyLeading,
-      leading: leading,
+      toolbarHeight: 64,
+      automaticallyImplyLeading: false,
+      leading: leadingWidget,
+      leadingWidth: leadingWidget != null ? 64 : 0,
+      titleSpacing: leadingWidget != null ? 0 : 16,
       centerTitle: centerTitle,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
       title: showLogo
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Logo
-                Container(
-                  width: 100,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      ImageAssets.logo,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Container(
-                        decoration: BoxDecoration(
-                          color: SellerColors.surface,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'GTA',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: SellerColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                if (title != null) ...[
-                  const SizedBox(width: 12),
-                  Text(
-                    title!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: CommonColors.black,
-                    ),
-                  ),
-                ],
-              ],
-            )
+          ? _LogoTitle(title: title)
           : title != null
           ? Text(
               title!,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
+              style: GoogleFonts.inter(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
                 color: CommonColors.black,
               ),
             )
           : null,
-      actions:
-          actions ??
+      actions: actions ??
           [
-            // Notification bell
             SellerAppBarIconButton(
               icon: Icons.notifications_outlined,
               onTap: () {},
               badgeCount: 3,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
           ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(height: 1, color: const Color(0xFFF0F2F5)),
+      ),
     );
   }
 }
 
-/// Seller App Bar icon button with optional badge
+class _LogoTitle extends StatelessWidget {
+  final String? title;
+  const _LogoTitle({this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 80,
+          height: 40,
+          child: Image.asset(
+            ImageAssets.logo,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => Container(
+              decoration: BoxDecoration(
+                color: SellerColors.surface,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  'GTA',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: SellerColors.primary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (title != null) ...[
+          const SizedBox(width: 10),
+          Container(width: 1, height: 20, color: const Color(0xFFE0E0E0)),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              title!,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: CommonColors.black,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _BackButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Container(
+          width: 36,
+          height: 36,
+          margin: const EdgeInsets.only(left: 16),
+          decoration: BoxDecoration(
+            color: SellerColors.surface,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 16,
+            color: SellerColors.primaryLight,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Icon button used in the seller app bar
 class SellerAppBarIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final int? badgeCount;
 
   const SellerAppBarIconButton({
+    super.key,
     required this.icon,
     required this.onTap,
     this.badgeCount,
@@ -124,39 +180,27 @@ class SellerAppBarIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 42,
-        height: 42,
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        width: 38,
+        height: 38,
         decoration: BoxDecoration(
-          color: SellerColors.surface,
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(11),
+          border: Border.all(color: const Color(0xFFEEEFF3), width: 1.5),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Icon(icon, color: SellerColors.primaryLight, size: 22),
+            Icon(icon, color: SellerColors.primaryLight, size: 20),
             if (badgeCount != null && badgeCount! > 0)
               Positioned(
-                top: 6,
-                right: 6,
+                top: 7,
+                right: 7,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: CommonColors.error,
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE53935),
                     shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    badgeCount! > 9 ? '9+' : badgeCount.toString(),
-                    style: GoogleFonts.inter(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: CommonColors.white,
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -199,7 +243,6 @@ class SellerSliverAppBar extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo
               Container(
                 width: 48,
                 height: 48,
@@ -235,7 +278,6 @@ class SellerSliverAppBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 14),
-              // Greeting Text
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,15 +302,15 @@ class SellerSliverAppBar extends StatelessWidget {
                   ],
                 ),
               ),
-              // Notification Button
               GestureDetector(
                 onTap: onNotificationTap,
                 child: Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: SellerColors.surface,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFEEEFF3), width: 1.5),
                   ),
                   child: Stack(
                     alignment: Alignment.center,
@@ -280,28 +322,14 @@ class SellerSliverAppBar extends StatelessWidget {
                       ),
                       if (notificationCount > 0)
                         Positioned(
-                          top: 8,
-                          right: 8,
+                          top: 9,
+                          right: 9,
                           child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: CommonColors.error,
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE53935),
                               shape: BoxShape.circle,
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 18,
-                              minHeight: 18,
-                            ),
-                            child: Text(
-                              notificationCount > 9
-                                  ? '9+'
-                                  : notificationCount.toString(),
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: CommonColors.white,
-                              ),
-                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),

@@ -10,6 +10,8 @@ import 'package:gta_app/src/features/common_features/auth/views/widgets/user_typ
 import 'package:gta_app/src/res/assets.dart';
 import 'package:gta_app/src/features/common_features/auth/controller/auth_controller.dart';
 import '../../../../res/colors.dart';
+import 'package:gta_app/src/features/buyer/home/views/buyer_home_screen.dart';
+import 'package:gta_app/src/features/seller/dashboard/views/seller_dashboard_screen.dart';
 import 'otp_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -69,6 +71,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error?.toString() ?? 'Failed to send OTP'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _googleSignIn() async {
+    final success = await ref
+        .read(verifyOtpStateProvider.notifier)
+        .signInWithGoogle(userType: _userType);
+
+    if (success && mounted) {
+      if (_userType == 'buyer') {
+        context.go(BuyerHomeScreen.routePath);
+      } else {
+        context.go(SellerDashboardScreen.routePath);
+      }
+    } else if (mounted) {
+      final error = ref.read(verifyOtpStateProvider).error;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error?.toString() ?? 'Google Sign-In failed'),
           backgroundColor: Colors.red,
         ),
       );
@@ -276,7 +300,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           ),
                           const SizedBox(height: 20),
 
-                          GoogleSignInButton(onTap: () {}),
+                          const SizedBox(height: 20),
+
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final verifyState = ref.watch(
+                                verifyOtpStateProvider,
+                              );
+                              return GoogleSignInButton(
+                                isLoading: verifyState.isLoading,
+                                onTap: _googleSignIn,
+                              );
+                            },
+                          ),
                           const SizedBox(height: 24),
 
                           Center(

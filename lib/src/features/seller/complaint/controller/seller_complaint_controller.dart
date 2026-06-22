@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gta_app/src/core/core.dart';
 import 'package:gta_app/src/features/seller/complaint/repository/seller_complaint_repository.dart';
 import 'package:gta_app/src/models/complaint_model.dart';
 
@@ -18,12 +19,9 @@ final createSellerComplaintProvider =
       },
     );
 
-class SellerComplaintsController extends Notifier<AsyncValue<List<Complaint>>> {
+class SellerComplaintsController extends TokenAwareNotifier<List<Complaint>> {
   @override
-  AsyncValue<List<Complaint>> build() {
-    getComplaints();
-    return const AsyncValue.loading();
-  }
+  void onAuthenticated() => getComplaints();
 
   SellerComplaintRepository get _repo =>
       ref.read(sellerComplaintRepositoryProvider);

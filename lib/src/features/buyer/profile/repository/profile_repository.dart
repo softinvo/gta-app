@@ -107,4 +107,25 @@ class BuyerProfileRepository {
       );
     });
   }
+
+  /// Mark address as primary
+  FutureEither<Address> markAddressPrimary(String addressId) async {
+    final result = await _api.patchRequest(
+      url: Endpoints.markAddressPrimary(addressId),
+      body: {},
+      requireAuth: true,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return Right(Address.fromJson(data['data']));
+      }
+      return Left(
+        Failure(
+          message: data['message'] ?? 'Failed to mark address as primary',
+        ),
+      );
+    });
+  }
 }

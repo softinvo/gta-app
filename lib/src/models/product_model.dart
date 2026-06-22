@@ -45,15 +45,120 @@ class Variant {
 
   Map<String, dynamic> toJson() {
     return {
-      'variantColorCode': variantColorCode,
-      'size': size,
+      if (variantColorCode != null && variantColorCode!.isNotEmpty)
+        'variantColorCode': variantColorCode,
+      if (size != null && size!.isNotEmpty) 'size': size,
       'price': price.toJson(),
       'stock': stock.toJson(),
-      'barcode': barcode,
+      if (barcode != null && barcode!.isNotEmpty) 'barcode': barcode,
       'type': type,
+      if (thumbnail != null) 'thumbnail': thumbnail!.toJson(),
+      if (previewImages != null && previewImages!.isNotEmpty)
+        'previewImages': previewImages!.map((i) => i.toJson()).toList(),
+    };
+  }
+}
+
+// Variant Summary for color picker
+class VariantSummary {
+  final String variantColorCode;
+  final Attachment? thumbnail;
+
+  VariantSummary({required this.variantColorCode, this.thumbnail});
+
+  factory VariantSummary.fromJson(Map<String, dynamic> json) {
+    return VariantSummary(
+      variantColorCode: json['variantColorCode'] ?? '',
+      thumbnail: json['thumbnail'] != null
+          ? Attachment.fromJson(json['thumbnail'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'variantColorCode': variantColorCode,
+      if (thumbnail != null) 'thumbnail': thumbnail!.toJson(),
+    };
+  }
+}
+
+// Variant Group - all variants for a specific color
+class VariantGroup {
+  final String variantColorCode;
+  final Attachment? thumbnail;
+  final List<Attachment>? previewImages;
+  final List<VariantDetails> productVariants;
+
+  VariantGroup({
+    required this.variantColorCode,
+    this.thumbnail,
+    this.previewImages,
+    required this.productVariants,
+  });
+
+  factory VariantGroup.fromJson(Map<String, dynamic> json) {
+    return VariantGroup(
+      variantColorCode: json['variantColorCode'] ?? '',
+      thumbnail: json['thumbnail'] != null
+          ? Attachment.fromJson(json['thumbnail'])
+          : null,
+      previewImages: json['previewImages'] != null
+          ? (json['previewImages'] as List)
+                .map((i) => Attachment.fromJson(i))
+                .toList()
+          : null,
+      productVariants: json['productVariants'] != null
+          ? (json['productVariants'] as List)
+                .map((i) => VariantDetails.fromJson(i))
+                .toList()
+          : [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'variantColorCode': variantColorCode,
       if (thumbnail != null) 'thumbnail': thumbnail!.toJson(),
       if (previewImages != null)
         'previewImages': previewImages!.map((i) => i.toJson()).toList(),
+      'productVariants': productVariants.map((i) => i.toJson()).toList(),
+    };
+  }
+}
+
+// Individual variant details (size/price/stock for a color)
+class VariantDetails {
+  final String? size;
+  final Price price;
+  final Stock stock;
+  final String type;
+  final String verificationStatus;
+
+  VariantDetails({
+    this.size,
+    required this.price,
+    required this.stock,
+    this.type = 'secondary',
+    this.verificationStatus = 'pending',
+  });
+
+  factory VariantDetails.fromJson(Map<String, dynamic> json) {
+    return VariantDetails(
+      size: json['size'],
+      price: Price.fromJson(json['price'] ?? {}),
+      stock: Stock.fromJson(json['stock'] ?? {}),
+      type: json['type'] ?? 'secondary',
+      verificationStatus: json['verificationStatus'] ?? 'pending',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'size': size,
+      'price': price.toJson(),
+      'stock': stock.toJson(),
+      'type': type,
       'verificationStatus': verificationStatus,
     };
   }
@@ -77,7 +182,7 @@ class Price {
   Map<String, dynamic> toJson() {
     return {
       'value': value,
-      'discountPercent': discountPercent,
+      'discountPercent': discountPercent ?? 0,
       'currency': currency,
     };
   }
@@ -122,6 +227,7 @@ class Product {
   final double? sampleCost;
   final bool hasVariants;
   final List<Variant> variants;
+  final VariantGroup? selectedVariant; // The currently selected variant group
   final int minimumOrderQuantity;
   final Map<String, dynamic> attributes;
   final Rating? rating;
@@ -149,6 +255,7 @@ class Product {
     this.sampleCost,
     this.hasVariants = false,
     this.variants = const [],
+    this.selectedVariant,
     this.minimumOrderQuantity = 1,
     this.attributes = const {},
     this.rating,
@@ -178,8 +285,26 @@ class Product {
       sampleCost: json['sampleCost']?.toDouble(),
       hasVariants: json['hasVariants'] ?? false,
       variants: json['variants'] != null
-          ? (json['variants'] as List).map((v) => Variant.fromJson(v)).toList()
+          ? (json['variants'] as List).map((i) {
+              // Check if it's a full Variant or just VariantSummary
+              if (i['price'] != null) {
+                return Variant.fromJson(i);
+              } else {
+                // It's a VariantSummary, convert to minimal Variant for backwards compatibility
+                return Variant(
+                  variantColorCode: i['variantColorCode'],
+                  thumbnail: i['thumbnail'] != null
+                      ? Attachment.fromJson(i['thumbnail'])
+                      : null,
+                  price: Price(value: 0), // Placeholder
+                  stock: Stock(quantity: 0), // Placeholder
+                );
+              }
+            }).toList()
           : [],
+      selectedVariant: json['selectedVariant'] != null
+          ? VariantGroup.fromJson(json['selectedVariant'])
+          : null,
       minimumOrderQuantity: json['minimumOrderQuantity'] ?? 1,
       attributes: json['attributes'] ?? {},
       rating: json['rating'] != null ? Rating.fromJson(json['rating']) : null,
@@ -200,7 +325,6 @@ class Product {
       if (seller != null) 'seller': seller,
       'name': name,
       if (slug != null) 'slug': slug,
-      if (brand != null) 'brand': brand,
       'category': category,
       if (subCategory != null) 'subCategory': subCategory,
       if (productType != null) 'productType': productType,
@@ -216,9 +340,6 @@ class Product {
       'variants': variants.map((v) => v.toJson()).toList(),
       'minimumOrderQuantity': minimumOrderQuantity,
       'attributes': attributes,
-      if (rating != null) 'rating': rating!.toJson(),
-      'verificationStatus': verificationStatus,
-      if (createdBy != null) 'createdBy': createdBy,
     };
   }
 }

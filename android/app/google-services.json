@@ -1,0 +1,100 @@
+{
+  "project_info": {
+    "project_number": "794037180140",
+    "project_id": "project-gta-44e31",
+    "storage_bucket": "project-gta-44e31.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794037180140:android:d6e9813447300cd6dcf7c9",
+        "android_client_info": {
+          "package_name": "com.gta.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794037180140-1p77urkrglvr2bthu9tthfgo6vbepqvf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gta.app",
+            "certificate_hash": "f1396e9f61c086b1d060cf22045494475dbf622b"
+          }
+        },
+        {
+          "client_id": "794037180140-dg8h4lv8rcu3n8dig89nqe96r886u2qp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC43N9M0m9ZQ3T-M3mZIK968NC34suEC1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "794037180140-dg8h4lv8rcu3n8dig89nqe96r886u2qp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794037180140:android:ff650ef113b58244dcf7c9",
+        "android_client_info": {
+          "package_name": "com.softinvo.globaltextileaxis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794037180140-31964up6p880hppti736an4sjekmcagg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.softinvo.globaltextileaxis",
+            "certificate_hash": "f1396e9f61c086b1d060cf22045494475dbf622b"
+          }
+        },
+        {
+          "client_id": "794037180140-br7g0q9s078te73cj9mrurn9latgh2n1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.softinvo.globaltextileaxis",
+            "certificate_hash": "dd049aff41dd88a5b8783fec4778485a402a2a8e"
+          }
+        },
+        {
+          "client_id": "794037180140-tv8p2pq243agmcda274pk950vv6rjh0c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.softinvo.globaltextileaxis",
+            "certificate_hash": "acc42d380dd540bd9b8f8ff6654730f062f7c8ed"
+          }
+        },
+        {
+          "client_id": "794037180140-dg8h4lv8rcu3n8dig89nqe96r886u2qp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC43N9M0m9ZQ3T-M3mZIK968NC34suEC1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "794037180140-dg8h4lv8rcu3n8dig89nqe96r886u2qp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -14,12 +14,25 @@ import 'package:gta_app/src/features/seller/profile/views/seller_business_addres
 import 'package:gta_app/src/features/seller/profile/views/seller_verification_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_help_center_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_policies_screen.dart';
+import 'package:gta_app/src/features/seller/profile/views/seller_bank_details_screen.dart';
+import 'package:gta_app/src/features/seller/profile/views/seller_store_profile_screen.dart';
+import 'package:gta_app/src/features/seller/profile/views/seller_onboarding_screen.dart';
+import 'package:gta_app/src/features/seller/earnings/views/seller_earnings_screen.dart';
+import 'package:gta_app/src/features/seller/product/views/seller_product_details_screen.dart';
+import 'package:gta_app/src/features/seller/product/views/add_product_screen.dart';
+import 'package:gta_app/src/features/seller/product/views/edit_product_screen.dart';
+import 'package:gta_app/src/models/product_model.dart';
+import 'package:gta_app/src/features/seller/orders/views/seller_order_list_screen.dart';
+import 'package:gta_app/src/features/seller/orders/views/seller_order_details_screen.dart';
 import 'package:gta_app/src/features/buyer/complaint/views/complaints_list_screen.dart';
 import 'package:gta_app/src/features/buyer/complaint/views/create_complaint_screen.dart';
 import 'package:gta_app/src/features/buyer/complaint/views/complaint_details_screen.dart';
 import 'package:gta_app/src/features/seller/complaint/views/seller_complaints_list_screen.dart';
 import 'package:gta_app/src/features/seller/complaint/views/seller_create_complaint_screen.dart';
 import 'package:gta_app/src/features/seller/complaint/views/seller_complaint_details_screen.dart';
+import 'package:gta_app/src/features/buyer/home/views/buyer_search_screen.dart';
+import 'package:gta_app/src/features/buyer/product/views/buyer_product_details_screen.dart';
+import 'package:gta_app/src/features/buyer/wishlist/views/buyer_wishlist_screen.dart';
 import 'package:gta_app/src/features/common_features/chatbot/views/chatbot_screen.dart';
 import 'package:gta_app/src/models/complaint_model.dart';
 
@@ -58,6 +71,17 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const BuyerHomeScreen(),
     ),
     GoRoute(
+      path: BuyerSearchScreen.routePath,
+      builder: (context, state) => const BuyerSearchScreen(),
+    ),
+    GoRoute(
+      path: BuyerProductDetailsScreen.routePath,
+      builder: (context, state) {
+        final productId = state.pathParameters['id']!;
+        return BuyerProductDetailsScreen(productId: productId);
+      },
+    ),
+    GoRoute(
       path: EditProfileScreen.routePath,
       builder: (context, state) => const EditProfileScreen(),
     ),
@@ -76,6 +100,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: BuyerHelpFaqScreen.routePath,
       builder: (context, state) => const BuyerHelpFaqScreen(),
+    ),
+    GoRoute(
+      path: BuyerWishlistScreen.routePath,
+      builder: (context, state) => const BuyerWishlistScreen(),
     ),
 
     // Buyer Complaints
@@ -132,6 +160,27 @@ final GoRouter router = GoRouter(
       path: SellerPoliciesScreen.routePath,
       builder: (context, state) => const SellerPoliciesScreen(),
     ),
+    GoRoute(
+      path: SellerBankDetailsScreen.routePath,
+      builder: (context, state) => const SellerBankDetailsScreen(),
+    ),
+    GoRoute(
+      path: SellerStoreProfileScreen.routePath,
+      builder: (context, state) => const SellerStoreProfileScreen(),
+    ),
+    GoRoute(
+      path: SellerOnboardingScreen.routePath,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return SellerOnboardingScreen(
+          initialPage: extra?['initialPage'] as int? ?? 0,
+        );
+      },
+    ),
+    GoRoute(
+      path: SellerEarningsScreen.routePath,
+      builder: (context, state) => const SellerEarningsScreen(),
+    ),
 
     // Seller Complaints
     GoRoute(
@@ -160,6 +209,45 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: ChatbotScreen.sellerRoutePath,
       builder: (context, state) => const ChatbotScreen(userType: 'seller'),
+    ),
+
+    // Seller Orders
+    GoRoute(
+      path: SellerOrderListScreen.routePath,
+      builder: (context, state) => const SellerOrderListScreen(),
+    ),
+    GoRoute(
+      path: SellerOrderDetailsScreen.routePath,
+      builder: (context, state) {
+        final orderId = state.extra as String;
+        return SellerOrderDetailsScreen(orderId: orderId);
+      },
+    ),
+
+    // Seller Add Product (also used for duplicate when extra is a Product)
+    GoRoute(
+      path: AddProductScreen.routePath,
+      builder: (context, state) => AddProductScreen(
+        duplicateFrom: state.extra is Product ? state.extra as Product : null,
+      ),
+    ),
+
+    // Seller Edit Product
+    GoRoute(
+      path: EditProductScreen.routePath,
+      builder: (context, state) {
+        final product = state.extra as Product;
+        return EditProductScreen(product: product);
+      },
+    ),
+
+    // Seller Product Details
+    GoRoute(
+      path: SellerProductDetailsScreen.routePath,
+      builder: (context, state) {
+        final productId = state.pathParameters['id']!;
+        return SellerProductDetailsScreen(productId: productId);
+      },
     ),
   ],
 );

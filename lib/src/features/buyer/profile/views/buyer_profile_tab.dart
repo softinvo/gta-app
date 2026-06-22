@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_policies_screen.dart';
+import 'package:gta_app/src/features/buyer/wishlist/views/buyer_wishlist_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_verification_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/widgets/logout_button.dart';
+import 'package:gta_app/src/features/buyer/saved/controller/saved_products_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_stats.dart';
@@ -55,41 +57,15 @@ class BuyerProfileTab extends ConsumerWidget {
           // Quick Stats
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  children: [
-                    ProfileStatItem(
-                      icon: Icons.receipt_long,
-                      label: 'Orders',
-                      value: '0',
-                    ),
-                    ProfileStatDivider(),
-                    ProfileStatItem(
-                      icon: Icons.request_quote,
-                      label: 'Quotes',
-                      value: '0',
-                    ),
-                    ProfileStatDivider(),
-                    ProfileStatItem(
-                      icon: Icons.favorite,
-                      label: 'Wishlist',
-                      value: '0',
-                    ),
-                  ],
-                ),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: ProfileStatsCard(
+                orderCount: '0',
+                quoteCount: '0',
+                wishlistCount:
+                    ref.watch(savedProductsProvider).value?.length.toString() ??
+                        '0',
+                onWishlistTap: () =>
+                    context.push(BuyerWishlistScreen.routePath),
               ),
             ),
           ),
@@ -105,48 +81,40 @@ class BuyerProfileTab extends ConsumerWidget {
                     title: 'My Account',
                     items: [
                       ProfileMenuItem(
-                        icon: Icons.person_outline,
+                        icon: Icons.person_rounded,
+                        iconColor: BuyerColors.primaryLight,
+                        iconBgColor: BuyerColors.surface,
                         title: 'Edit Profile',
+                        subtitle: 'Update your name, email & photo',
                         onTap: () => context.push(EditProfileScreen.routePath),
                       ),
                       ProfileMenuItem(
-                        icon: Icons.location_on_outlined,
+                        icon: Icons.location_on_rounded,
+                        iconColor: const Color(0xFF2563EB),
+                        iconBgColor: const Color(0xFFEFF6FF),
                         title: 'Manage Addresses',
+                        subtitle: 'Add or edit delivery addresses',
                         onTap: () =>
                             context.push(ManageAddressesScreen.routePath),
                       ),
                       ProfileMenuItem(
-                        icon: Icons.verified_outlined,
+                        icon: Icons.verified_rounded,
+                        iconColor: const Color(0xFFD97706),
+                        iconBgColor: const Color(0xFFFFFBEB),
                         title: 'Verification Status',
+                        subtitle: 'Complete KYC verification',
                         onTap: () =>
                             context.push(BuyerVerificationScreen.routePath),
                       ),
-                      ProfileMenuItem(
-                        icon: Icons.payment_outlined,
-                        title: 'Payment Methods',
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ProfileMenuSection(
-                    title: 'Orders & Quotations',
-                    items: [
-                      ProfileMenuItem(
-                        icon: Icons.receipt_long_outlined,
-                        title: 'My Orders',
-                        onTap: () {},
-                      ),
-                      ProfileMenuItem(
-                        icon: Icons.request_quote_outlined,
-                        title: 'My Quotations',
-                        onTap: () {},
-                      ),
-                      ProfileMenuItem(
-                        icon: Icons.history,
-                        title: 'Order History',
-                        onTap: () {},
-                      ),
+                      // Payment methods — re-enable when payment flow is ready
+                      // ProfileMenuItem(
+                      //   icon: Icons.account_balance_wallet_rounded,
+                      //   iconColor: const Color(0xFF7C3AED),
+                      //   iconBgColor: const Color(0xFFF5F3FF),
+                      //   title: 'Payment Methods',
+                      //   subtitle: 'Manage cards & wallets',
+                      //   onTap: () {},
+                      // ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -154,18 +122,27 @@ class BuyerProfileTab extends ConsumerWidget {
                     title: 'Support',
                     items: [
                       ProfileMenuItem(
-                        icon: Icons.help_outline,
+                        icon: Icons.help_rounded,
+                        iconColor: const Color(0xFF0891B2),
+                        iconBgColor: const Color(0xFFECFEFF),
                         title: 'Help & FAQ',
+                        subtitle: 'Browse common questions',
                         onTap: () => context.push(BuyerHelpFaqScreen.routePath),
                       ),
                       ProfileMenuItem(
-                        icon: Icons.support_agent_outlined,
+                        icon: Icons.headset_mic_rounded,
+                        iconColor: const Color(0xFF4F46E5),
+                        iconBgColor: const Color(0xFFEEF2FF),
                         title: 'Contact Support',
-                        onTap: () {},
+                        subtitle: 'Chat or raise a complaint',
+                        onTap: () => context.push('/buyer/complaints'),
                       ),
                       ProfileMenuItem(
-                        icon: Icons.rate_review_outlined,
-                        title: 'Rate Us',
+                        icon: Icons.star_rounded,
+                        iconColor: const Color(0xFFEA580C),
+                        iconBgColor: const Color(0xFFFFF7ED),
+                        title: 'Rate the App',
+                        subtitle: 'Share your feedback',
                         onTap: () {},
                       ),
                     ],
@@ -175,19 +152,28 @@ class BuyerProfileTab extends ConsumerWidget {
                     title: 'Settings',
                     items: [
                       ProfileMenuItem(
-                        icon: Icons.notifications_outlined,
+                        icon: Icons.notifications_rounded,
+                        iconColor: const Color(0xFFDC2626),
+                        iconBgColor: const Color(0xFFFEF2F2),
                         title: 'Notifications',
+                        subtitle: 'Manage alerts & updates',
                         onTap: () {},
                       ),
+                      // Language switcher — re-enable when i18n is ready
+                      // ProfileMenuItem(
+                      //   icon: Icons.language_rounded,
+                      //   iconColor: const Color(0xFF2563EB),
+                      //   iconBgColor: const Color(0xFFEFF6FF),
+                      //   title: 'Language',
+                      //   subtitle: 'English',
+                      //   onTap: () {},
+                      // ),
                       ProfileMenuItem(
-                        icon: Icons.language_outlined,
-                        title: 'Language',
-                        subtitle: 'English',
-                        onTap: () {},
-                      ),
-                      ProfileMenuItem(
-                        icon: Icons.privacy_tip_outlined,
+                        icon: Icons.policy_rounded,
+                        iconColor: const Color(0xFF475569),
+                        iconBgColor: const Color(0xFFF1F5F9),
                         title: 'Legal & Policies',
+                        subtitle: 'Terms, privacy & refund policy',
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(

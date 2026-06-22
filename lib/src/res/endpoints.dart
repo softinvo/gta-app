@@ -6,12 +6,15 @@ class Endpoints {
   // Auth endpoints
   static const String sendOTP = '${baseUrl}user/sendotp';
   static const String verifyOTP = '${baseUrl}user/loginphone';
+  static const String googleLogin = '${baseUrl}user/google-login';
 
   //Profile
   static const String storage = "${baseUrl}storage/upload";
   static const String sellerProfile = "${baseUrl}seller/profile";
   static const String getProfile = "${baseUrl}seller/profile";
   static const String editProfile = "${baseUrl}seller/profile";
+  static const String sellerAddBank = "${baseUrl}seller/add-bank";
+  static const String sellerProfileStats = "${baseUrl}seller/profile/stats";
 
   // Buyer Profile
   static const String getBuyerProfile = "${baseUrl}buyer/profile";
@@ -20,6 +23,8 @@ class Endpoints {
   static const String addBuyerAddress = "${baseUrl}buyer/address/add";
   static String removeBuyerAddress(String addressId) =>
       "${baseUrl}buyer/address/$addressId";
+  static String markAddressPrimary(String addressId) =>
+      "${baseUrl}buyer/address/$addressId/primary";
 
   // Buyer Complaints
   static const String createBuyerComplaint = "${baseUrl}buyer/complaint/add";
@@ -94,6 +99,13 @@ class Endpoints {
 
   // Seller Products
   static const String addProduct = "${baseUrl}seller/product/add";
+  static const String getSellerProducts = "${baseUrl}seller/products";
+  static String getProductById(String id) =>
+      "${baseUrl}seller/product/$id/details";
+  static String deleteProduct(String id) => "${baseUrl}seller/product/$id";
+  static String updateProduct(String id) => "${baseUrl}seller/product/$id";
+  static String updateVariantByColor(String productId, String colorCode) =>
+      "${baseUrl}seller/product/$productId/update-variant-by-color/${Uri.encodeComponent(colorCode)}";
 
   // Categories
   static const String getCategories = "${baseUrl}categories";
@@ -101,4 +113,70 @@ class Endpoints {
       "${baseUrl}categories/$categoryId/subcategories";
   static String getProductTypes(String subcategoryId) =>
       "${baseUrl}categories/subcategories/$subcategoryId/product-types";
+
+  // Seller Orders
+  static const String sellerOrderList = "${baseUrl}order/seller/list";
+  static const String sellerOrderStats = "${baseUrl}order/seller/stats/orders";
+  static String sellerOrderDetails(String orderId) =>
+      "${baseUrl}order/seller/$orderId";
+  static String updateOrderStatus(String orderId) =>
+      "${baseUrl}order/seller/$orderId/status";
+
+  // Seller Quotations
+  static const String sellerQuotationList = "${baseUrl}quotation/seller/list";
+  static const String sellerQuotationStats = "${baseUrl}quotation/seller/stats";
+  static String sellerQuotationDetails(String id) =>
+      "${baseUrl}quotation/seller/$id";
+  static String finalizeQuotation(String id) =>
+      "${baseUrl}quotation/seller/$id/finalize";
+  static const String cancelQuotation = "${baseUrl}quotation/seller/cancel";
+
+  // Buyer Quotations
+  static const String createQuotation = "${baseUrl}quotation/add-new";
+  static const String buyerQuotationList = "${baseUrl}quotation/buyer/list";
+  static const String buyerQuotationStats = "${baseUrl}quotation/buyer/stats";
+  static String buyerQuotationDetails(String id) =>
+      "${baseUrl}quotation/buyer/$id";
+  static String cancelBuyerQuotation(String id) =>
+      "${baseUrl}quotation/buyer/$id/cancel";
+
+  // Buyer Orders
+  static const String createOrder = "${baseUrl}order/create";
+  static const String verifyOrderPayment = "${baseUrl}order/verify-payment";
+  static const String buyerOrderList = "${baseUrl}order/buyer/list";
+  static String buyerOrderDetails(String orderId) =>
+      "${baseUrl}order/$orderId";
+  static String cancelBuyerOrder(String orderId) =>
+      "${baseUrl}order/$orderId/cancel";
+
+  // FCM Token
+  static const String buyerFcmToken = "${baseUrl}buyer/fcm-token";
+  static const String sellerFcmToken = "${baseUrl}seller/fcm-token";
+
+  // Buyer Products
+  static const String buyerProductCollections =
+      "${baseUrl}buyer/product/collections";
+  static String buyerProductDetails(String productId) =>
+      "${baseUrl}buyer/product/$productId/details";
+  static String buyerProductSearch({
+    required String query,
+    String? category,
+    double? minPrice,
+    double? maxPrice,
+    String sortBy = 'newest',
+    int page = 1,
+    int limit = 20,
+  }) {
+    final params = <String, String>{
+      'search': query,
+      'sortBy': sortBy,
+      'page': '$page',
+      'limit': '$limit',
+      if (category != null) 'category': category,
+      if (minPrice != null) 'minPrice': '${minPrice.toInt()}',
+      if (maxPrice != null) 'maxPrice': '${maxPrice.toInt()}',
+    };
+    final query_ = Uri(queryParameters: params).query;
+    return "${baseUrl}buyer/products?$query_";
+  }
 }

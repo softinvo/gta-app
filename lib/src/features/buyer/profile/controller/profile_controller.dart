@@ -106,4 +106,23 @@ class BuyerAddressesController extends Notifier<AsyncValue<List<Address>>> {
       return true;
     });
   }
+
+  /// Mark address as primary
+  Future<bool> markAddressPrimary(String addressId) async {
+    final result = await _repo.markAddressPrimary(addressId);
+    return result.fold((failure) => false, (updatedAddress) {
+      final currentAddresses = state.asData?.value ?? [];
+      // Update the addresses list: set all to non-primary, then set the selected one as primary
+      final updatedAddresses = currentAddresses.map((address) {
+        if (address.id == addressId) {
+          return address.copyWith(isPrimary: true);
+        } else {
+          return address.copyWith(isPrimary: false);
+        }
+      }).toList();
+
+      state = AsyncValue.data(updatedAddresses);
+      return true;
+    });
+  }
 }

@@ -74,7 +74,34 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Custom Color'),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        contentPadding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: SellerColors.surface,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: const Icon(Icons.colorize_rounded,
+                  size: 16, color: SellerColors.primaryLight),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Custom Color',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: CommonColors.black,
+              ),
+            ),
+          ],
+        ),
         content: SingleChildScrollView(
           child: ColorPicker(
             pickerColor: _selectedColor,
@@ -90,8 +117,26 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
         ),
         actions: [
           TextButton(
-            child: const Text('Done'),
             onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              foregroundColor: CommonColors.greyText,
+            ),
+            child: Text('Cancel',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SellerColors.primaryLight,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: Text('Apply',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -165,6 +210,30 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                       controller: _colorLabelController,
                       hint: 'e.g. Navy Blue',
                       readOnly: true,
+                      trailingLabel: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.auto_awesome_rounded,
+                                size: 10, color: SellerColors.primaryLight),
+                            const SizedBox(width: 3),
+                            Text(
+                              'Auto',
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: SellerColors.primaryLight,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -246,12 +315,12 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                       onPressed: () {
                         if (!_formKey.currentState!.validate()) return;
 
-                        final colorHex =
-                            '#${_selectedColor.value.toRadixString(16).substring(2).toUpperCase()}';
                         final variant = Variant(
-                          variantColorCode:
-                              '${_colorLabelController.text} ($colorHex)',
-                          size: _sizeController.text,
+                          variantColorCode: _colorLabelController.text.trim(),
+                          size: _sizeController.text.trim().isEmpty
+                              ? null
+                              : _sizeController.text.trim(),
+                          type: 'primary',
                           price: Price(
                             value: double.tryParse(_priceController.text) ?? 0,
                             currency: _selectedCurrency,

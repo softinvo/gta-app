@@ -17,27 +17,32 @@ class ProfileMenuSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: CommonColors.black,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 10),
+          child: Text(
+            title.toUpperCase(),
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: CommonColors.greyText,
+              letterSpacing: 0.9,
+            ),
           ),
         ),
-        const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFF0F0F4)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
+          clipBehavior: Clip.antiAlias,
           child: Column(
             children: items.asMap().entries.map((entry) {
               final index = entry.key;
@@ -46,7 +51,12 @@ class ProfileMenuSection extends StatelessWidget {
                 children: [
                   item,
                   if (index < items.length - 1)
-                    Divider(height: 1, indent: 56, color: Colors.grey.shade100),
+                    const Divider(
+                      height: 1,
+                      indent: 68,
+                      endIndent: 0,
+                      color: Color(0xFFF5F5F8),
+                    ),
                 ],
               );
             }).toList(),
@@ -59,15 +69,21 @@ class ProfileMenuSection extends StatelessWidget {
 
 class ProfileMenuItem extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
+  final Color iconBgColor;
   final String title;
   final String? subtitle;
+  final String? badge;
   final VoidCallback onTap;
 
   const ProfileMenuItem({
     super.key,
     required this.icon,
+    required this.iconColor,
+    required this.iconBgColor,
     required this.title,
     this.subtitle,
+    this.badge,
     required this.onTap,
   });
 
@@ -75,40 +91,87 @@ class ProfileMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         child: Row(
           children: [
+            // Icon bubble
             Container(
-              padding: const EdgeInsets.all(8),
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                color: BuyerColors.surface,
-                borderRadius: BorderRadius.circular(10),
+                color: iconBgColor,
+                borderRadius: BorderRadius.circular(13),
               ),
-              child: Icon(icon, size: 20, color: BuyerColors.primaryLight),
+              child: Icon(icon, size: 20, color: iconColor),
             ),
             const SizedBox(width: 14),
+
+            // Title + subtitle
             Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: CommonColors.black,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: CommonColors.black,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: CommonColors.greyText,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: CommonColors.greyText,
+
+            // Optional badge
+            if (badge != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: BuyerColors.primaryLight,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  badge!,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            const SizedBox(width: 8),
-            Icon(Icons.chevron_right, size: 20, color: CommonColors.greyText),
+              const SizedBox(width: 8),
+            ],
+
+            // Chevron
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF4F4F8),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: CommonColors.greyText,
+              ),
+            ),
           ],
         ),
       ),

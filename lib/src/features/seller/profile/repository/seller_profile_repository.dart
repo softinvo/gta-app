@@ -35,6 +35,37 @@ class SellerProfileRepository {
     });
   }
 
+  /// Registers bank details and creates the seller as a Cashfree vendor.
+  FutureEither<void> addBankDetails({
+    required String accountHolderName,
+    required String bankAccountNumber,
+    required String ifscCode,
+  }) async {
+    final response = await _api.postRequest(
+      url: Endpoints.sellerAddBank,
+      body: {
+        'accountHolderName': accountHolderName,
+        'bankAccountNumber': bankAccountNumber,
+        'ifscCode': ifscCode,
+      },
+    );
+
+    return response.fold((l) => Left(l), (r) {
+      try {
+        final Map<String, dynamic> data = jsonDecode(r.body);
+        if (data['success'] == true) {
+          return const Right(null);
+        } else {
+          return Left(
+            Failure(message: data['message'] ?? 'Failed to save bank details'),
+          );
+        }
+      } catch (e) {
+        return Left(Failure(message: 'Failed to parse response'));
+      }
+    });
+  }
+
   /// Updates the seller profile with given data.
   FutureEither<Seller> updateProfile(Map<String, dynamic> updateData) async {
     final response = await _api.putRequest(
