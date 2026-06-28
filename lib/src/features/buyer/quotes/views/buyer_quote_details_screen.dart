@@ -9,7 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/orders/repository/buyer_order_repository.dart';
 import 'package:gta_app/src/features/buyer/orders/views/buyer_order_details_screen.dart';
+import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
 import 'package:gta_app/src/features/buyer/quotes/controller/buyer_quote_controller.dart';
+import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:intl/intl.dart';
@@ -72,7 +74,7 @@ class BuyerQuoteDetailsScreen extends ConsumerWidget {
   }
 }
 
-class _QuoteDetailsBody extends StatelessWidget {
+class _QuoteDetailsBody extends ConsumerWidget {
   final Quotation quotation;
   const _QuoteDetailsBody({required this.quotation});
 
@@ -90,7 +92,7 @@ class _QuoteDetailsBody extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isCancellable =
         !['cancelled', 'completed', 'paid'].contains(quotation.status);
 
@@ -111,7 +113,27 @@ class _QuoteDetailsBody extends StatelessWidget {
             _SectionCard(
               title: 'Seller',
               icon: Icons.store_outlined,
-              child: _SellerInfo(sellerSnapshot: quotation.sellerSnapshot!),
+              child: _SellerInfo(
+                sellerSnapshot: quotation.sellerSnapshot!,
+                onChatTap: () {
+                  final buyerId = ref.read(buyerProfileProvider).value?.id;
+                  if (buyerId == null) return;
+                  final sellerName = quotation.sellerSnapshot?.name ?? 'Seller';
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatDetailScreen(
+                        otherUserId: quotation.sellerId,
+                        otherUserType: 'seller',
+                        otherUserName: sellerName,
+                        otherUserAvatar: null,
+                        currentUserId: buyerId,
+                        currentUserType: 'buyer',
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 14),
           ],
@@ -344,17 +366,43 @@ class _StatusHeaderCard extends StatelessWidget {
 
 class _SellerInfo extends StatelessWidget {
   final QuotationSellerSnapshot sellerSnapshot;
-  const _SellerInfo({required this.sellerSnapshot});
+  final VoidCallback? onChatTap;
+  const _SellerInfo({required this.sellerSnapshot, this.onChatTap});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (sellerSnapshot.name != null)
-          _DetailRow(label: 'Name', value: sellerSnapshot.name!),
-        if (sellerSnapshot.phone != null)
-          _DetailRow(label: 'Phone', value: sellerSnapshot.phone!),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (sellerSnapshot.name != null)
+                _DetailRow(label: 'Name', value: sellerSnapshot.name!),
+              if (sellerSnapshot.phone != null)
+                _DetailRow(label: 'Phone', value: sellerSnapshot.phone!),
+            ],
+          ),
+        ),
+        if (onChatTap != null) ...[
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: onChatTap,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: BuyerColors.primaryLight.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 20,
+                color: BuyerColors.primaryLight,
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

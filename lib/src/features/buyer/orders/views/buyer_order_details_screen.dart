@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/orders/controller/buyer_order_controller.dart';
+import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
+import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:intl/intl.dart';
@@ -86,7 +88,26 @@ class _OrderDetailsBody extends ConsumerWidget {
           // Seller info (from populated sellerId)
           if (order.sellerSnapshot != null &&
               order.sellerSnapshot!.displayName.isNotEmpty)
-            _SellerCard(snap: order.sellerSnapshot!),
+            _SellerCard(
+              snap: order.sellerSnapshot!,
+              onChatTap: () {
+                final buyerId = ref.read(buyerProfileProvider).value?.id;
+                if (buyerId == null) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatDetailScreen(
+                      otherUserId: order.sellerId,
+                      otherUserType: 'seller',
+                      otherUserName: order.sellerSnapshot!.displayName,
+                      otherUserAvatar: null,
+                      currentUserId: buyerId,
+                      currentUserType: 'buyer',
+                    ),
+                  ),
+                );
+              },
+            ),
           if (order.sellerSnapshot != null &&
               order.sellerSnapshot!.displayName.isNotEmpty)
             const SizedBox(height: 14),
@@ -316,7 +337,8 @@ class _HeaderCard extends StatelessWidget {
 
 class _SellerCard extends StatelessWidget {
   final OrderSellerSnapshot snap;
-  const _SellerCard({required this.snap});
+  final VoidCallback? onChatTap;
+  const _SellerCard({required this.snap, this.onChatTap});
 
   @override
   Widget build(BuildContext context) {
@@ -386,6 +408,24 @@ class _SellerCard extends StatelessWidget {
               ],
             ),
           ),
+          if (onChatTap != null) ...[
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: onChatTap,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: BuyerColors.primaryLight.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  size: 20,
+                  color: BuyerColors.primaryLight,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

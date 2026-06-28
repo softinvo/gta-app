@@ -1,10 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/buyer/home/views/widgets/product_grid_card.dart';
 import 'package:gta_app/src/features/buyer/saved/controller/saved_products_controller.dart';
-import 'package:gta_app/src/features/buyer/product/views/buyer_product_details_screen.dart';
+import 'package:gta_app/src/models/attachment_model.dart';
+import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 
 class BuyerWishlistScreen extends ConsumerWidget {
@@ -19,107 +20,51 @@ class BuyerWishlistScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: BuyerColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: CommonColors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: BuyerColors.surface,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 16,
-              color: BuyerColors.primaryLight,
-            ),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: CommonColors.black,
+            size: 20,
           ),
           onPressed: () => context.pop(),
         ),
-        title: savedAsync.when(
-          data: (items) => Row(
-            children: [
-              Text(
-                'My Wishlist',
-                style: GoogleFonts.poppins(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: BuyerColors.primary,
-                ),
-              ),
-              if (items.isNotEmpty) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: BuyerColors.primaryLight,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${items.length}',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          loading: () => Text(
-            'My Wishlist',
-            style: GoogleFonts.poppins(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: BuyerColors.primary,
-            ),
-          ),
-          error: (_, __) => Text(
-            'My Wishlist',
-            style: GoogleFonts.poppins(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: BuyerColors.primary,
-            ),
+        title: Text(
+          'My Wishlist',
+          style: GoogleFonts.poppins(
+            color: CommonColors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F4)),
-        ),
+        centerTitle: true,
       ),
       body: savedAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: BuyerColors.primaryLight),
         ),
-        error: (e, _) => Center(
+        error: (_, __) => Center(
           child: Text(
             'Something went wrong',
             style: GoogleFonts.inter(color: CommonColors.greyText),
           ),
         ),
         data: (items) => items.isEmpty
-            ? _EmptyState()
-            : ListView.builder(
+            ? const _EmptyState()
+            : GridView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.65,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
                 itemCount: items.length,
-                itemBuilder: (context, index) => _WishlistCard(
-                  product: items[index],
-                  onRemove: () => ref
-                      .read(savedProductsProvider.notifier)
-                      .remove(items[index].id),
-                  onTap: () => context.push(
-                    BuyerProductDetailsScreen.routePath.replaceFirst(
-                      ':id',
-                      items[index].id,
-                    ),
-                  ),
+                itemBuilder: (context, index) => ProductGridCard(
+                  item: _toCollectionItem(items[index]),
                 ),
               ),
       ),
@@ -127,9 +72,22 @@ class BuyerWishlistScreen extends ConsumerWidget {
   }
 }
 
+ProductCollectionItem _toCollectionItem(SavedProduct p) =>
+    ProductCollectionItem(
+      id: p.id,
+      name: p.name,
+      shortDescription: p.shortDescription,
+      thumbnail:
+          p.thumbnailUrl != null ? Attachment(fileUrl: p.thumbnailUrl!) : null,
+      price: p.price,
+      discountPercent: p.discountPercent,
+    );
+
 // ── Empty State ───────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -139,7 +97,7 @@ class _EmptyState extends StatelessWidget {
           Container(
             width: 110,
             height: 110,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: BuyerColors.surface,
             ),
@@ -172,7 +130,10 @@ class _EmptyState extends StatelessWidget {
           GestureDetector(
             onTap: () => context.pop(),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 28,
+                vertical: 14,
+              ),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [BuyerColors.primaryLight, BuyerColors.primary],
@@ -213,212 +174,4 @@ class _EmptyState extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Wishlist Card ─────────────────────────────────────────────────────────────
-
-class _WishlistCard extends StatelessWidget {
-  final SavedProduct product;
-  final VoidCallback onRemove;
-  final VoidCallback onTap;
-
-  const _WishlistCard({
-    required this.product,
-    required this.onRemove,
-    required this.onTap,
-  });
-
-  String _fmt(double v) =>
-      v % 1 == 0 ? v.toInt().toString() : v.toStringAsFixed(2);
-
-  @override
-  Widget build(BuildContext context) {
-    final hasDiscount = product.discountPercent > 0;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: BuyerColors.cardBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Thumbnail
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(16),
-              ),
-              child: product.thumbnailUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: product.thumbnailUrl!,
-                      width: 100,
-                      height: 110,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => _placeholder(),
-                      errorWidget: (_, __, ___) => _placeholder(),
-                    )
-                  : _placeholder(),
-            ),
-
-            // Info
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name + remove button
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            product.name,
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: BuyerColors.primary,
-                              height: 1.3,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: onRemove,
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.favorite_rounded,
-                              size: 16,
-                              color: Colors.red.shade400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Short description
-                    if (product.shortDescription?.isNotEmpty ?? false) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        product.shortDescription!,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: CommonColors.greyText,
-                          height: 1.4,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-
-                    const SizedBox(height: 8),
-
-                    // Price row
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 6,
-                      children: [
-                        Text(
-                          '₹${_fmt(product.discountedPrice)}',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: BuyerColors.primaryLight,
-                          ),
-                        ),
-                        if (hasDiscount) ...[
-                          Text(
-                            '₹${_fmt(product.price)}',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: CommonColors.greyText,
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: CommonColors.greyText,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: StatusColors.verifiedBg,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: StatusColors.verifiedDot
-                                    .withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: Text(
-                              '${product.discountPercent.toInt()}% off',
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: StatusColors.verifiedText,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // View button
-                    Row(
-                      children: [
-                        Text(
-                          'View Product',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: BuyerColors.primaryLight,
-                          ),
-                        ),
-                        const SizedBox(width: 3),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 13,
-                          color: BuyerColors.primaryLight,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _placeholder() => Container(
-        width: 100,
-        height: 110,
-        color: BuyerColors.surface,
-        child: const Icon(
-          Icons.image_outlined,
-          color: BuyerColors.primaryLight,
-          size: 28,
-        ),
-      );
 }

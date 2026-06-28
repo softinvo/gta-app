@@ -153,6 +153,19 @@ class Endpoints {
   static const String buyerFcmToken = "${baseUrl}buyer/fcm-token";
   static const String sellerFcmToken = "${baseUrl}seller/fcm-token";
 
+  // Chat Server (port 5002 — no auth)
+  static const String chatSocketUrl = BasePaths.chatSocketUrl;
+  static const String chatUserInfo =
+      '${BasePaths.chatRestUrl}api/chat/user-info';
+  static const String chatConversations =
+      '${BasePaths.chatRestUrl}api/chat/conversations';
+  static const String chatMessages =
+      '${BasePaths.chatRestUrl}api/chat/messages';
+  static const String chatUploadUrl =
+      '${BasePaths.chatRestUrl}api/chat/upload-url';
+  static String chatDeleteMessage(String messageId) =>
+      '${BasePaths.chatRestUrl}api/chat/message/$messageId';
+
   // Buyer Products
   static const String buyerProductCollections =
       "${baseUrl}buyer/product/collections";

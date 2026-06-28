@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/common/widgets/buyer_app_bar.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_profile_tab.dart';
+import 'package:gta_app/src/features/chat/views/chat_list_tab.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'tabs/home_tabs.dart';
 
@@ -38,6 +39,7 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
           HomeTab(),
           QuotationsTab(),
           OrdersTab(),
+          ChatListTab(userType: 'buyer'),
           BuyerProfileTab(),
         ],
       ),
@@ -85,11 +87,18 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
                 onTap: () => setState(() => _currentIndex = 2),
               ),
               _NavItem(
+                icon: Icons.chat_bubble_outline_rounded,
+                activeIcon: Icons.chat_bubble_rounded,
+                label: 'Chat',
+                isActive: _currentIndex == 3,
+                onTap: () => setState(() => _currentIndex = 3),
+              ),
+              _NavItem(
                 icon: Icons.person_outline,
                 activeIcon: Icons.person,
                 label: 'Profile',
-                isActive: _currentIndex == 3,
-                onTap: () => setState(() => _currentIndex = 3),
+                isActive: _currentIndex == 4,
+                onTap: () => setState(() => _currentIndex = 4),
               ),
             ],
           ),

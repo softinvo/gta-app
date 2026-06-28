@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
+import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
 import 'package:gta_app/src/features/seller/quotes/controller/seller_quote_controller.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -26,6 +28,34 @@ class SellerQuoteDetailsScreen extends ConsumerStatefulWidget {
 
 class _SellerQuoteDetailsScreenState
     extends ConsumerState<SellerQuoteDetailsScreen> {
+
+  void _openChat(BuildContext context, Quotation quote) {
+    final sellerId = ref.read(sellerProfileProvider).value?.id;
+    if (sellerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile not loaded. Try again.')),
+      );
+      return;
+    }
+    final buyerName = (quote.buyerSnapshot?.name?.isNotEmpty == true)
+        ? quote.buyerSnapshot!.name!
+        : (quote.buyerName.isNotEmpty ? quote.buyerName : 'Buyer');
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChatDetailScreen(
+          otherUserId: quote.buyerId,
+          otherUserType: 'buyer',
+          otherUserName: buyerName,
+          otherUserAvatar: null,
+          currentUserId: sellerId,
+          currentUserType: 'seller',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final quoteAsync = ref.watch(
@@ -33,7 +63,7 @@ class _SellerQuoteDetailsScreenState
     );
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: SellerColors.background,
       appBar: const SellerAppBar(title: 'Quote Details', showLogo: false),
       body: quoteAsync.when(
         data: (quote) {
@@ -55,7 +85,10 @@ class _SellerQuoteDetailsScreenState
                   const SizedBox(height: 20),
 
                   // Buyer Info Card
-                  QuoteBuyerCard(quote: quote),
+                  QuoteBuyerCard(
+                    quote: quote,
+                    onChatTap: () => _openChat(context, quote),
+                  ),
                   const SizedBox(height: 20),
 
                   // Delivery Address Card

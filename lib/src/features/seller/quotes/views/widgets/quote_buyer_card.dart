@@ -7,8 +7,9 @@ import 'quote_contact_button.dart';
 
 class QuoteBuyerCard extends StatelessWidget {
   final Quotation quote;
+  final VoidCallback? onChatTap;
 
-  const QuoteBuyerCard({super.key, required this.quote});
+  const QuoteBuyerCard({super.key, required this.quote, this.onChatTap});
 
   @override
   Widget build(BuildContext context) {
@@ -77,11 +78,19 @@ class QuoteBuyerCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              if (quote.email != null)
+              if (quote.email != null) ...[
                 QuoteContactButton(
                   icon: Icons.email,
                   onTap: () => launchUrl(Uri.parse('mailto:${quote.email}')),
                   color: const Color(0xFFE67E22),
+                ),
+                const SizedBox(width: 8),
+              ],
+              if (onChatTap != null)
+                QuoteContactButton(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  onTap: onChatTap!,
+                  color: const Color(0xFF2563EB),
                 ),
             ],
           ),

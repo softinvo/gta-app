@@ -12,6 +12,7 @@ import '../../profile/views/seller_profile_tab.dart';
 import '../../profile/controller/seller_profile_controller.dart';
 import '../../quotes/controller/seller_quote_controller.dart';
 import '../../quotes/views/seller_quote_list_screen.dart';
+import 'package:gta_app/src/features/chat/views/chat_list_tab.dart';
 
 class SellerDashboardScreen extends ConsumerStatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -47,6 +48,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
           _ProductsTab(),
           _QuotationsTab(),
           _OrdersTab(),
+          ChatListTab(userType: 'seller'),
           SellerProfileTab(),
         ],
       ),
@@ -75,6 +77,11 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
         Icons.local_shipping_outlined,
         Icons.local_shipping_rounded,
         'Orders',
+      ),
+      _NavItemData(
+        Icons.chat_bubble_outline_rounded,
+        Icons.chat_bubble_rounded,
+        'Chat',
       ),
       _NavItemData(
         Icons.person_outline_rounded,

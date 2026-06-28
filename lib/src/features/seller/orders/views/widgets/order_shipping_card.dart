@@ -6,8 +6,9 @@ import 'package:gta_app/src/res/colors.dart';
 
 class OrderShippingCard extends StatelessWidget {
   final Order order;
+  final VoidCallback? onChatTap;
 
-  const OrderShippingCard({super.key, required this.order});
+  const OrderShippingCard({super.key, required this.order, this.onChatTap});
 
   @override
   Widget build(BuildContext context) {
@@ -67,30 +68,59 @@ class OrderShippingCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Name
-                if (buyerName.isNotEmpty)
-                  _ContactRow(
-                    icon: Icons.person_outline_rounded,
-                    text: buyerName,
-                  ),
-                // Phone
-                if (phone != null && phone.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  _ContactRow(
-                    icon: Icons.phone_outlined,
-                    text: phone,
-                    copyable: true,
-                  ),
-                ],
-                // Email
-                if (email != null && email.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  _ContactRow(
-                    icon: Icons.mail_outline_rounded,
-                    text: email,
-                    copyable: true,
-                  ),
-                ],
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Name
+                          if (buyerName.isNotEmpty)
+                            _ContactRow(
+                              icon: Icons.person_outline_rounded,
+                              text: buyerName,
+                            ),
+                          // Phone
+                          if (phone != null && phone.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _ContactRow(
+                              icon: Icons.phone_outlined,
+                              text: phone,
+                              copyable: true,
+                            ),
+                          ],
+                          // Email
+                          if (email != null && email.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _ContactRow(
+                              icon: Icons.mail_outline_rounded,
+                              text: email,
+                              copyable: true,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (onChatTap != null) ...[
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: onChatTap,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: SellerColors.primaryLight.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            size: 20,
+                            color: SellerColors.primaryLight,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ),

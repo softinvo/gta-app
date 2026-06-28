@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,31 +19,25 @@ class BuyerQuoteListScreen extends ConsumerStatefulWidget {
 class _BuyerQuoteListScreenState extends ConsumerState<BuyerQuoteListScreen> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
+  Timer? _debounce;
   String? _selectedStatus;
-
-  static const _statusFilters = [
-    ('All', null),
-    ('Pending', 'pending'),
-    ('In Progress', 'in-progress'),
-    ('Agreed', 'agreed'),
-    ('Completed', 'completed'),
-    ('Cancelled', 'cancelled'),
-  ];
+  String _sort = '-1';
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _searchController.addListener(_onSearchChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(buyerQuotationsProvider.notifier)
-          .fetchQuotations(refresh: true);
+      ref.read(buyerQuotationsProvider.notifier).fetchQuotations(refresh: true);
     });
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _scrollController.dispose();
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -51,127 +46,388 @@ class _BuyerQuoteListScreenState extends ConsumerState<BuyerQuoteListScreen> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.9) {
       ref.read(buyerQuotationsProvider.notifier).loadMore(
-        search: _searchController.text.trim().isEmpty
-            ? null
-            : _searchController.text.trim(),
-        status: _selectedStatus,
-      );
+            search: _searchController.text.trim().isEmpty
+                ? null
+                : _searchController.text.trim(),
+            status: _selectedStatus,
+            sort: _sort,
+          );
     }
   }
 
-  void _applyFilter({String? status}) {
-    setState(() => _selectedStatus = status);
-    ref.read(buyerQuotationsProvider.notifier).fetchQuotations(
-      refresh: true,
-      search: _searchController.text.trim().isEmpty
-          ? null
-          : _searchController.text.trim(),
-      status: status,
-    );
+  void _onSearchChanged() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      ref.read(buyerQuotationsProvider.notifier).fetchQuotations(
+            refresh: true,
+            search: _searchController.text.trim().isEmpty
+                ? null
+                : _searchController.text.trim(),
+            status: _selectedStatus,
+            sort: _sort,
+          );
+    });
   }
 
-  void _onSearch(String value) {
+  void _applyFilter({String? status, String? sort}) {
+    setState(() {
+      _selectedStatus = status;
+      if (sort != null) _sort = sort;
+    });
     ref.read(buyerQuotationsProvider.notifier).fetchQuotations(
-      refresh: true,
-      search: value.trim().isEmpty ? null : value.trim(),
-      status: _selectedStatus,
+          refresh: true,
+          search: _searchController.text.trim().isEmpty
+              ? null
+              : _searchController.text.trim(),
+          status: status,
+          sort: sort ?? _sort,
+        );
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    const statuses = [
+      {'id': '', 'label': 'All'},
+      {'id': 'pending', 'label': 'Pending'},
+      {'id': 'in-progress', 'label': 'In Progress'},
+      {'id': 'agreed', 'label': 'Agreed'},
+      {'id': 'completed', 'label': 'Completed'},
+      {'id': 'cancelled', 'label': 'Cancelled'},
+    ];
+
+    String sheetSort = _sort;
+    String? sheetStatus = _selectedStatus;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => StatefulBuilder(
+        builder: (ctx, setSheet) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: BuyerColors.surface,
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: const Icon(Icons.tune_rounded,
+                        size: 16, color: BuyerColors.primaryLight),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Filter & Sort',
+                    style: GoogleFonts.poppins(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: CommonColors.black,
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => setSheet(() {
+                      sheetSort = '-1';
+                      sheetStatus = null;
+                    }),
+                    child: Text(
+                      'Reset',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: BuyerColors.primaryLight,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Text(
+                'SORT BY',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: CommonColors.greyText,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  _SortChip(
+                    label: 'Newest First',
+                    icon: Icons.arrow_downward_rounded,
+                    isSelected: sheetSort == '-1',
+                    onTap: () => setSheet(() => sheetSort = '-1'),
+                  ),
+                  const SizedBox(width: 10),
+                  _SortChip(
+                    label: 'Oldest First',
+                    icon: Icons.arrow_upward_rounded,
+                    isSelected: sheetSort == '1',
+                    onTap: () => setSheet(() => sheetSort = '1'),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+              Container(height: 1, color: Colors.grey.shade100),
+              const SizedBox(height: 16),
+
+              Text(
+                'STATUS',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: CommonColors.greyText,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: statuses.map((s) {
+                  final id = s['id']!;
+                  final label = s['label']!;
+                  final effectiveId = id.isEmpty ? null : id;
+                  final isSelected = sheetStatus == effectiveId;
+                  return GestureDetector(
+                    onTap: () => setSheet(() => sheetStatus = effectiveId),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? BuyerColors.primaryLight
+                            : Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isSelected
+                              ? BuyerColors.primaryLight
+                              : Colors.grey.shade200,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Text(
+                        label,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isSelected ? Colors.white : CommonColors.greyText,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 24),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _applyFilter(status: sheetStatus, sort: sheetSort);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: BuyerColors.primaryLight,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    'Apply Filters',
+                    style: GoogleFonts.inter(
+                        fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final quoteState = ref.watch(buyerQuotationsProvider);
+    final hasStatus = _selectedStatus != null;
+    final hasSort = _sort != '-1';
+    final hasAnyFilter = hasStatus || hasSort;
 
     return Scaffold(
       backgroundColor: BuyerColors.background,
       body: Column(
         children: [
-          // ── Search bar ─────────────────────────────────────────
+          // ── Search + Filter bar ────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _searchController,
+                    builder: (_, value, w) => Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: CommonColors.black,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Search quotations...',
+                          hintStyle: GoogleFonts.inter(
+                            color: CommonColors.greyText,
+                            fontSize: 14,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: CommonColors.greyText,
+                            size: 20,
+                          ),
+                          suffixIcon: value.text.isNotEmpty
+                              ? GestureDetector(
+                                  onTap: () {
+                                    _searchController.clear();
+                                    _applyFilter(
+                                        status: _selectedStatus, sort: _sort);
+                                  },
+                                  child: const Icon(
+                                    Icons.close_rounded,
+                                    color: CommonColors.greyText,
+                                    size: 18,
+                                  ),
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _onSearch,
-                decoration: InputDecoration(
-                  hintText: 'Search quotations...',
-                  hintStyle: GoogleFonts.inter(
-                    color: CommonColors.greyText,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: CommonColors.greyText,
-                    size: 20,
-                  ),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            _onSearch('');
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-              ),
-            ),
-          ),
-
-          // ── Status filter chips ────────────────────────────────
-          SizedBox(
-            height: 48,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-              itemCount: _statusFilters.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, i) {
-                final (label, value) = _statusFilters[i];
-                final selected = _selectedStatus == value;
-                return GestureDetector(
-                  onTap: () => _applyFilter(status: value),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () => _showFilterSheet(context),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    duration: const Duration(milliseconds: 200),
+                    height: 48,
+                    width: 48,
                     decoration: BoxDecoration(
-                      color: selected
+                      color: hasAnyFilter
                           ? BuyerColors.primaryLight
                           : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: selected
+                        color: hasAnyFilter
                             ? BuyerColors.primaryLight
                             : Colors.grey.shade200,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      label,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: selected ? Colors.white : CommonColors.greyText,
-                      ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          color: hasAnyFilter
+                              ? Colors.white
+                              : BuyerColors.primaryLight,
+                          size: 22,
+                        ),
+                        if (hasAnyFilter)
+                          Positioned(
+                            top: 9,
+                            right: 9,
+                            child: Container(
+                              width: 7,
+                              height: 7,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
+
+          // ── Active filter chips ────────────────────────────────────
+          if (hasAnyFilter)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Row(
+                children: [
+                  if (hasSort)
+                    _ActiveChip(
+                      label: _sort == '1' ? 'Oldest First' : 'Newest First',
+                      icon: _sort == '1'
+                          ? Icons.arrow_upward_rounded
+                          : Icons.arrow_downward_rounded,
+                      onRemove: () =>
+                          _applyFilter(status: _selectedStatus, sort: '-1'),
+                    ),
+                  if (hasSort && hasStatus) const SizedBox(width: 8),
+                  if (hasStatus)
+                    _ActiveChip(
+                      label: _statusLabel(_selectedStatus!),
+                      onRemove: () =>
+                          _applyFilter(status: null, sort: _sort),
+                    ),
+                ],
+              ),
+            ),
 
           const SizedBox(height: 8),
 
@@ -184,59 +440,78 @@ class _BuyerQuoteListScreenState extends ConsumerState<BuyerQuoteListScreen> {
                     ),
                   )
                 : quoteState.error != null && quoteState.quotations.isEmpty
-                ? _ErrorView(
-                    message: quoteState.error!,
-                    onRetry: () => ref
-                        .read(buyerQuotationsProvider.notifier)
-                        .fetchQuotations(refresh: true),
-                  )
-                : quoteState.quotations.isEmpty
-                ? _EmptyView(
-                    icon: Icons.request_quote_outlined,
-                    title: 'No Quotations Yet',
-                    subtitle:
-                        'Your quotation requests will appear here.',
-                  )
-                : RefreshIndicator(
-                    color: BuyerColors.primaryLight,
-                    onRefresh: () => ref
-                        .read(buyerQuotationsProvider.notifier)
-                        .fetchQuotations(
-                          refresh: true,
-                          search: _searchController.text.trim().isEmpty
-                              ? null
-                              : _searchController.text.trim(),
-                          status: _selectedStatus,
-                        ),
-                    child: ListView.separated(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                      itemCount: quoteState.quotations.length +
-                          (quoteState.isLoadingMore ? 1 : 0),
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(height: 10),
-                      itemBuilder: (_, i) {
-                        if (i == quoteState.quotations.length) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: BuyerColors.primaryLight,
-                              ),
+                    ? _ErrorView(
+                        message: quoteState.error!,
+                        onRetry: () => ref
+                            .read(buyerQuotationsProvider.notifier)
+                            .fetchQuotations(refresh: true),
+                      )
+                    : quoteState.quotations.isEmpty
+                        ? _EmptyView(
+                            icon: Icons.request_quote_outlined,
+                            title: 'No Quotations Yet',
+                            subtitle: 'Your quotation requests will appear here.',
+                          )
+                        : RefreshIndicator(
+                            color: BuyerColors.primaryLight,
+                            onRefresh: () => ref
+                                .read(buyerQuotationsProvider.notifier)
+                                .fetchQuotations(
+                                  refresh: true,
+                                  search: _searchController.text.trim().isEmpty
+                                      ? null
+                                      : _searchController.text.trim(),
+                                  status: _selectedStatus,
+                                  sort: _sort,
+                                ),
+                            child: ListView.separated(
+                              controller: _scrollController,
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                              itemCount: quoteState.quotations.length +
+                                  (quoteState.isLoadingMore ? 1 : 0),
+                              separatorBuilder: (_, idx) =>
+                                  const SizedBox(height: 10),
+                              itemBuilder: (_, i) {
+                                if (i == quoteState.quotations.length) {
+                                  return const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 16),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: BuyerColors.primaryLight,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return _QuoteCard(
+                                  quotation: quoteState.quotations[i],
+                                );
+                              },
                             ),
-                          );
-                        }
-                        return _QuoteCard(
-                          quotation: quoteState.quotations[i],
-                        );
-                      },
-                    ),
-                  ),
+                          ),
           ),
         ],
       ),
     );
+  }
+
+  static String _statusLabel(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pending';
+      case 'in-progress':
+        return 'In Progress';
+      case 'agreed':
+        return 'Agreed';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
+    }
   }
 }
 
@@ -377,35 +652,161 @@ class _QuoteCard extends StatelessWidget {
   }
 
   String _totalQty(Quotation q) {
-    final qty =
-        q.selectedVariants.fold(0, (sum, v) => sum + v.quantity);
+    final qty = q.selectedVariants.fold(0, (sum, v) => sum + v.quantity);
     return '$qty units requested';
   }
 
   String _statusLabel(String status) {
     switch (status) {
-      case 'pending':       return 'Pending';
-      case 'in-progress':   return 'In Progress';
-      case 'agreed':        return 'Agreed';
-      case 'invoiced':      return 'Invoiced';
-      case 'paid':          return 'Paid';
-      case 'completed':     return 'Completed';
-      case 'cancelled':     return 'Cancelled';
-      default:              return status;
+      case 'pending':
+        return 'Pending';
+      case 'in-progress':
+        return 'In Progress';
+      case 'agreed':
+        return 'Agreed';
+      case 'invoiced':
+        return 'Invoiced';
+      case 'paid':
+        return 'Paid';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
     }
   }
 
   Color _statusColor(String status) {
     switch (status) {
-      case 'pending':       return const Color(0xFFE67E22);
-      case 'in-progress':   return const Color(0xFF3498DB);
-      case 'agreed':        return const Color(0xFF27AE60);
-      case 'invoiced':      return const Color(0xFF8E44AD);
-      case 'paid':          return const Color(0xFF16A085);
-      case 'completed':     return const Color(0xFF27AE60);
-      case 'cancelled':     return CommonColors.error;
-      default:              return CommonColors.greyText;
+      case 'pending':
+        return const Color(0xFFE67E22);
+      case 'in-progress':
+        return const Color(0xFF3498DB);
+      case 'agreed':
+        return const Color(0xFF27AE60);
+      case 'invoiced':
+        return const Color(0xFF8E44AD);
+      case 'paid':
+        return const Color(0xFF16A085);
+      case 'completed':
+        return const Color(0xFF27AE60);
+      case 'cancelled':
+        return CommonColors.error;
+      default:
+        return CommonColors.greyText;
     }
+  }
+}
+
+// ── Sort Chip ─────────────────────────────────────────────────────────────────
+
+class _SortChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SortChip({
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? BuyerColors.primaryLight : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected
+                ? BuyerColors.primaryLight
+                : Colors.grey.shade200,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? Colors.white : CommonColors.greyText,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : CommonColors.greyText,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Active Filter Chip ────────────────────────────────────────────────────────
+
+class _ActiveChip extends StatelessWidget {
+  final String label;
+  final IconData? icon;
+  final VoidCallback onRemove;
+
+  const _ActiveChip({
+    required this.label,
+    this.icon,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: BuyerColors.primaryLight.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: BuyerColors.primaryLight.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: BuyerColors.primaryLight),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: BuyerColors.primaryLight,
+            ),
+          ),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: onRemove,
+            child: Icon(
+              Icons.close_rounded,
+              size: 13,
+              color: BuyerColors.primaryLight,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -450,7 +851,8 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
+            style:
+                GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
             overflow: TextOverflow.ellipsis,
           ),
         ),

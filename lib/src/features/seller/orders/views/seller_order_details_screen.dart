@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
 import 'package:gta_app/src/features/seller/orders/controller/seller_order_controller.dart';
+import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'widgets/order_header_card.dart';
@@ -27,6 +29,36 @@ class SellerOrderDetailsScreen extends ConsumerStatefulWidget {
 class _SellerOrderDetailsScreenState
     extends ConsumerState<SellerOrderDetailsScreen> {
   bool _isUpdating = false;
+
+  void _openChat(BuildContext context, Order order) {
+    final sellerId = ref.read(sellerProfileProvider).value?.id;
+    if (sellerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile not loaded. Try again.')),
+      );
+      return;
+    }
+    final snap = order.buyerSnapshot;
+    final rawName = snap?.name ??
+        [snap?.firstName, snap?.lastName]
+            .where((p) => p != null && p.isNotEmpty)
+            .join(' ');
+    final buyerName = rawName.isNotEmpty ? rawName : 'Buyer';
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChatDetailScreen(
+          otherUserId: order.buyerId,
+          otherUserType: 'buyer',
+          otherUserName: buyerName,
+          otherUserAvatar: null,
+          currentUserId: sellerId,
+          currentUserType: 'seller',
+        ),
+      ),
+    );
+  }
 
   static const _statusOptions = [
     {
@@ -95,7 +127,10 @@ class _SellerOrderDetailsScreenState
                 const SizedBox(height: 16),
 
                 // Shipping Details
-                OrderShippingCard(order: order),
+                OrderShippingCard(
+                  order: order,
+                  onChatTap: () => _openChat(context, order),
+                ),
                 const SizedBox(height: 16),
 
                 // Timeline

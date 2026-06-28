@@ -19,10 +19,12 @@ class BuyerQuoteRepository {
     int limit = 10,
     String? search,
     String? status,
+    String sort = '-1',
   }) async {
     final queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
+      'sort': sort,
       if (search != null && search.isNotEmpty) 'search': search,
       if (status != null && status.isNotEmpty) 'status': status,
     };

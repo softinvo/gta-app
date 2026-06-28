@@ -63,6 +63,7 @@ class BuyerOrdersController extends Notifier<BuyerOrderListState> {
     bool refresh = false,
     String? search,
     String? status,
+    String sort = '-1',
   }) async {
     if (refresh) {
       state = const BuyerOrderListState(isLoading: true);
@@ -74,6 +75,7 @@ class BuyerOrdersController extends Notifier<BuyerOrderListState> {
       page: 1,
       search: search,
       status: status,
+      sort: sort,
     );
 
     result.fold(
@@ -96,7 +98,7 @@ class BuyerOrdersController extends Notifier<BuyerOrderListState> {
     );
   }
 
-  Future<void> loadMore({String? search, String? status}) async {
+  Future<void> loadMore({String? search, String? status, String sort = '-1'}) async {
     if (!state.hasMore || state.isLoadingMore || state.isLoading) return;
 
     state = state.copyWith(isLoadingMore: true);
@@ -106,6 +108,7 @@ class BuyerOrdersController extends Notifier<BuyerOrderListState> {
       page: nextPage,
       search: search,
       status: status,
+      sort: sort,
     );
 
     result.fold(
