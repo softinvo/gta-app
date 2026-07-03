@@ -1103,6 +1103,7 @@ class _DescriptionCardState extends State<_DescriptionCard> {
         : widget.description.short ?? '';
 
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1298,15 +1299,29 @@ class _SellerCard extends StatelessWidget {
               Container(
                 width: 48,
                 height: 48,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   gradient: BuyerColors.primaryGradient,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
-                  Icons.storefront_outlined,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                // Gradient is always the background so a missing or failed
+                // avatar still shows a visible (not white-on-white) icon.
+                child: seller.avatar?.fileUrl.isNotEmpty == true
+                    ? AppNetworkImage(
+                        url: seller.avatar!.fileUrl,
+                        width: 48,
+                        height: 48,
+                        errorWidget: const Icon(
+                          Icons.storefront_outlined,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.storefront_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1314,7 +1329,8 @@ class _SellerCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Textile Seller',
+                      seller.displayName,
+                      overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,

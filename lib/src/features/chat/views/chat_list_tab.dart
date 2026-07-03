@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
+import 'package:gta_app/src/features/chat/providers/user_presence_provider.dart';
 import 'package:gta_app/src/features/chat/repository/chat_repository.dart';
 import 'package:gta_app/src/features/chat/services/chat_socket_service.dart';
 import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
@@ -65,16 +66,48 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
     socket.connect(userId, widget.userType);
     socket.on('get_list_message', _onListUpdate);
     socket.on('messageRead', _onListUpdate);
+    socket.on('user_online', _onUserOnline);
+    socket.on('user_offline', _onUserOffline);
   }
 
   void _onListUpdate(dynamic data) {
     if (!mounted) return;
     if (data is Map && data['success'] == true && data['data'] is List) {
-      setState(() {
-        _conversations = (data['data'] as List)
-            .map((e) => ChatConversation.fromJson(e as Map<String, dynamic>))
-            .toList();
-      });
+      final convos = (data['data'] as List)
+          .map((e) => ChatConversation.fromJson(e as Map<String, dynamic>))
+          .toList();
+      setState(() => _conversations = convos);
+      _seedPresence(convos);
+    }
+  }
+
+  void _onUserOnline(dynamic data) {
+    if (!mounted || data is! Map) return;
+    final userId = data['userId']?.toString();
+    if (userId != null) {
+      ref.read(userPresenceProvider.notifier).setOnline(userId);
+    }
+  }
+
+  void _onUserOffline(dynamic data) {
+    if (!mounted || data is! Map) return;
+    final userId = data['userId']?.toString();
+    final lastActiveAt = data['lastActiveAt'] != null
+        ? DateTime.tryParse(data['lastActiveAt'].toString())?.toLocal()
+        : null;
+    if (userId != null) {
+      ref.read(userPresenceProvider.notifier).setOffline(userId, lastActiveAt);
+    }
+  }
+
+  void _seedPresence(List<ChatConversation> convos) {
+    final notifier = ref.read(userPresenceProvider.notifier);
+    for (final c in convos) {
+      notifier.seed(
+        c.otherUserId,
+        isOnline: c.isOnline,
+        lastActiveAt: c.lastActiveAt,
+      );
     }
   }
 
@@ -88,7 +121,10 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
       final convos = await ref
           .read(chatRepositoryProvider)
           .getConversations(userId, widget.userType);
-      if (mounted) setState(() => _conversations = convos);
+      if (mounted) {
+        setState(() => _conversations = convos);
+        _seedPresence(convos);
+      }
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {
@@ -109,8 +145,13 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
   void dispose() {
     _searchController.dispose();
     final socket = _socket;
-    socket.off('get_list_message');
-    socket.off('messageRead');
+    // Pass explicit handler refs — the socket is a shared singleton, so an
+    // unscoped off() here would also rip out other screens' listeners
+    // (e.g. ChatDetailScreen's user_online/user_offline handlers).
+    socket.off('get_list_message', _onListUpdate);
+    socket.off('messageRead', _onListUpdate);
+    socket.off('user_online', _onUserOnline);
+    socket.off('user_offline', _onUserOffline);
     super.dispose();
   }
 
@@ -254,6 +295,7 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
                   otherUserAvatar: convo.otherUserAvatar,
                   currentUserId: _currentUserId!,
                   currentUserType: widget.userType,
+                  otherLastActiveAt: convo.lastActiveAt ?? convo.lastSentAt,
                 ),
               ),
             );
@@ -312,7 +354,7 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
 
 // ─── Conversation Tile ────────────────────────────────────────────────────────
 
-class _ConvoTile extends StatelessWidget {
+class _ConvoTile extends ConsumerWidget {
   final ChatConversation convo;
   final Color primaryColor;
   final VoidCallback onTap;
@@ -378,7 +420,10 @@ class _ConvoTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final presence = ref.watch(userPresenceProvider)[convo.otherUserId];
+    final isOnline = presence?.isOnline ?? convo.isOnline;
+
     final name = convo.otherUserName;
     final initials = name.trim().split(' ').where((w) => w.isNotEmpty).take(2)
         .map((w) => w[0].toUpperCase()).join();
@@ -430,7 +475,7 @@ class _ConvoTile extends StatelessWidget {
                           )
                         : _buildInitialsAvatar(initials, avatarColor),
                   ),
-                  // Blocked indicator dot
+                  // Blocked indicator takes priority over online dot
                   if (isBlocked)
                     Positioned(
                       right: 0,
@@ -447,6 +492,20 @@ class _ConvoTile extends StatelessWidget {
                           Icons.block,
                           size: 7,
                           color: Colors.white,
+                        ),
+                      ),
+                    )
+                  else if (isOnline)
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade400,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2.5),
                         ),
                       ),
                     ),

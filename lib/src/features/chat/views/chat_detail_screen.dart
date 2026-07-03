@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart' hide Config;
+import 'package:gta_app/src/features/chat/providers/user_presence_provider.dart';
 import 'package:gta_app/src/features/chat/repository/chat_repository.dart';
 import 'package:gta_app/src/features/chat/services/chat_socket_service.dart';
 import 'package:gta_app/src/models/chat_message_model.dart';
@@ -20,6 +21,8 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
   final String? otherUserAvatar;
   final String currentUserId;
   final String currentUserType;
+  // Seed value for "last seen" shown immediately before socket events arrive.
+  final DateTime? otherLastActiveAt;
 
   const ChatDetailScreen({
     super.key,
@@ -29,6 +32,7 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
     required this.otherUserAvatar,
     required this.currentUserId,
     required this.currentUserType,
+    this.otherLastActiveAt,
   });
 
   @override
@@ -54,6 +58,18 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   bool _showEmojiPicker = false;
   late FocusNode _focusNode;
   Timer? _typingTimer;
+
+  // Presence — driven by real server events (user_online/user_offline,
+  // typing, receive_message, messages_seen), with a short inactivity
+  // timeout as a fallback if a disconnect event is ever missed.
+  bool _isOtherOnline = false;
+  DateTime? _otherLastActiveAt;
+  Timer? _presenceTimer;
+  static const _presenceTimeout = Duration(minutes: 5);
+  late final void Function(dynamic) _presenceOnlineHandler;
+  late final void Function(dynamic) _presenceOfflineHandler;
+  late final void Function(dynamic) _userStatusResponseHandler;
+  late final void Function(dynamic) _messagesSeenHandler;
 
   late String _displayName;
   String? _displayAvatar;
@@ -82,18 +98,88 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     _socket = ref.read(chatSocketServiceProvider);
     _displayName = widget.otherUserName;
     _displayAvatar = widget.otherUserAvatar;
+    // Seed last-seen immediately from the conversation list timestamp so the
+    // subtitle is never blank while waiting for messages to load.
+    _otherLastActiveAt = widget.otherLastActiveAt;
     _focusNode = FocusNode();
-    // When keyboard appears (user taps the text field), dismiss emoji picker
     _focusNode.addListener(() {
       if (_focusNode.hasFocus && _showEmojiPicker) {
         setState(() => _showEmojiPicker = false);
       }
     });
+
+    // Build lambdas once so the same references can be removed in dispose.
+    _presenceOnlineHandler = (data) {
+      if (!mounted || data is! Map) return;
+      if (data['userId']?.toString() == widget.otherUserId) {
+        setState(() => _isOtherOnline = true);
+        ref.read(userPresenceProvider.notifier).setOnline(widget.otherUserId);
+      }
+    };
+    _presenceOfflineHandler = (data) {
+      if (!mounted || data is! Map) return;
+      if (data['userId']?.toString() == widget.otherUserId) {
+        final lastAt = data['lastActiveAt'] != null
+            ? DateTime.tryParse(data['lastActiveAt'].toString())?.toLocal()
+            : null;
+        setState(() {
+          _isOtherOnline = false;
+          _otherLastActiveAt = lastAt ?? DateTime.now();
+        });
+        ref
+            .read(userPresenceProvider.notifier)
+            .setOffline(widget.otherUserId, _otherLastActiveAt);
+      }
+    };
+    // Response to the initial status request sent below — seeds online/last
+    // seen for the header before any live activity happens.
+    _userStatusResponseHandler = (data) {
+      if (!mounted || data is! Map) return;
+      if (data['userId']?.toString() != widget.otherUserId) return;
+      final online = data['isOnline'] == true;
+      final lastAt = data['lastActiveAt'] != null
+          ? DateTime.tryParse(data['lastActiveAt'].toString())?.toLocal()
+          : null;
+      setState(() {
+        _isOtherOnline = online;
+        if (!online && lastAt != null) _otherLastActiveAt = lastAt;
+      });
+      if (online) {
+        ref.read(userPresenceProvider.notifier).setOnline(widget.otherUserId);
+      }
+    };
+
+    // The other party just marked our messages as read — flip their tick to
+    // blue in real time, and treat it as a presence signal (they're online).
+    _messagesSeenHandler = (data) {
+      if (!mounted || data is! Map) return;
+      if (data['by']?.toString() != widget.otherUserId) return;
+      final seenAt = data['seenAt'] != null
+          ? DateTime.tryParse(data['seenAt'].toString())?.toLocal()
+          : DateTime.now();
+      setState(() {
+        _messages = _messages.map((m) {
+          if (m.senderDocId == widget.currentUserId &&
+              m.receiverDocId == widget.otherUserId &&
+              !m.isSeen) {
+            return m.copyWithSeen(seenAt: seenAt);
+          }
+          return m;
+        }).toList();
+      });
+      _markOtherOnline();
+    };
+
     _setupSocketListeners();
     _loadMessages();
     if (_looksLikePhone(widget.otherUserName)) {
       _resolveName();
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _socket.requestUserStatus(widget.otherUserId, widget.otherUserType);
+    });
   }
 
   Future<void> _resolveName() async {
@@ -120,6 +206,10 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     _socket.on('chat_blocked', _onChatBlocked);
     _socket.on('chat_unblocked', _onChatUnblocked);
     _socket.on('send_error', _onSendError);
+    _socket.on('user_online', _presenceOnlineHandler);
+    _socket.on('user_offline', _presenceOfflineHandler);
+    _socket.on('user_status_response', _userStatusResponseHandler);
+    _socket.on('messages_seen', _messagesSeenHandler);
   }
 
   void _onReceiveMessage(dynamic data) {
@@ -133,14 +223,10 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
               msg.receiverDocId == widget.currentUserId);
       if (!belongsHere) return;
       setState(() {
-        // Atomically replace the pending optimistic bubble with the confirmed
-        // server message — no gap, no flicker.
         if (msg.attachments.isNotEmpty) {
           final confirmedUrl = msg.attachments.first.url;
           final matched = _pendingUploads.where((p) => p.downloadUrl == confirmedUrl).firstOrNull;
           if (matched != null && matched.isImage) {
-            // Preserve local bytes so the confirmed bubble renders from memory
-            // instead of re-downloading the image we just uploaded.
             _localImageCache[confirmedUrl] = matched.bytes;
           }
           _pendingUploads.removeWhere((p) => p.downloadUrl == confirmedUrl);
@@ -149,6 +235,8 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
       });
       _scrollToBottom();
       _markAsRead();
+      // Receiving a message means the other user is actively connected.
+      if (msg.senderDocId == widget.otherUserId) _markOtherOnline();
     } catch (_) {}
   }
 
@@ -169,6 +257,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     if (!mounted) return;
     if (data is Map && data['senderId']?.toString() == widget.otherUserId) {
       setState(() => _otherIsTyping = true);
+      _markOtherOnline(); // typing = definitely online
     }
   }
 
@@ -176,7 +265,23 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     if (!mounted) return;
     if (data is Map && data['senderId']?.toString() == widget.otherUserId) {
       setState(() => _otherIsTyping = false);
+      _markOtherOnline(); // still online after typing stops
     }
+  }
+
+  // Marks the other user as online and restarts the inactivity timer.
+  // After _presenceTimeout of no activity, switches to "last seen now".
+  void _markOtherOnline() {
+    if (!mounted) return;
+    _presenceTimer?.cancel();
+    if (!_isOtherOnline) setState(() => _isOtherOnline = true);
+    _presenceTimer = Timer(_presenceTimeout, () {
+      if (!mounted) return;
+      setState(() {
+        _isOtherOnline = false;
+        _otherLastActiveAt = DateTime.now();
+      });
+    });
   }
 
   void _onChatBlocked(dynamic data) {
@@ -240,6 +345,20 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         setState(() => _messages = msgs);
         _scrollToBottom();
         _markAsRead();
+        // Seed "last seen" from the other user's most recent message so the
+        // subtitle shows something meaningful before any live events arrive.
+        if (!_isOtherOnline) {
+          ChatMessage? lastFromOther;
+          for (final m in msgs.reversed) {
+            if (m.senderDocId == widget.otherUserId) {
+              lastFromOther = m;
+              break;
+            }
+          }
+          if (lastFromOther != null) {
+            setState(() => _otherLastActiveAt = lastFromOther!.sentAt);
+          }
+        }
       }
     } catch (e) {
       if (e is ChatBlockedException && mounted) {
@@ -531,6 +650,12 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     _socket.off('chat_blocked');
     _socket.off('chat_unblocked');
     _socket.off('send_error');
+    // Remove only this screen's presence handlers, not ChatListTab's.
+    _socket.off('user_online', _presenceOnlineHandler);
+    _socket.off('user_offline', _presenceOfflineHandler);
+    _socket.off('user_status_response', _userStatusResponseHandler);
+    _socket.off('messages_seen', _messagesSeenHandler);
+    _presenceTimer?.cancel();
     _msgController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
@@ -576,6 +701,18 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   PreferredSizeWidget _buildAppBar() {
     final initials = _displayName.isNotEmpty ? _displayName[0].toUpperCase() : '?';
 
+    String? subtitleText;
+    Color subtitleColor = CommonColors.greyText;
+    if (_otherIsTyping) {
+      subtitleText = 'typing...';
+      subtitleColor = _primaryColor;
+    } else if (_isOtherOnline) {
+      subtitleText = 'Online';
+      subtitleColor = Colors.green.shade500;
+    } else if (_otherLastActiveAt != null) {
+      subtitleText = _formatLastSeen(_otherLastActiveAt!);
+    }
+
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -586,26 +723,61 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
       ),
       title: Row(
         children: [
-          ClipOval(
-            child: _displayAvatar != null
-                ? CachedNetworkImage(
-                    imageUrl: _displayAvatar!,
-                    width: 36,
-                    height: 36,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, _, _) =>
-                        _buildInitialsChip(initials, size: 36, fontSize: 14),
-                  )
-                : _buildInitialsChip(initials, size: 36, fontSize: 14),
+          // Avatar with online dot overlay
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ClipOval(
+                child: _displayAvatar != null
+                    ? CachedNetworkImage(
+                        imageUrl: _displayAvatar!,
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.cover,
+                        errorWidget: (_, _, _) =>
+                            _buildInitialsChip(initials, size: 36, fontSize: 14),
+                      )
+                    : _buildInitialsChip(initials, size: 36, fontSize: 14),
+              ),
+              if (_isOtherOnline)
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 11,
+                    height: 11,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade400,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(width: 10),
-          Text(
-            _displayName,
-            style: GoogleFonts.inter(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: CommonColors.black,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _displayName,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: CommonColors.black,
+                ),
+              ),
+              if (subtitleText != null)
+                Text(
+                  subtitleText,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: subtitleColor,
+                    fontStyle: _otherIsTyping ? FontStyle.italic : FontStyle.normal,
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -614,6 +786,17 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         child: Container(height: 1, color: Colors.grey.shade100),
       ),
     );
+  }
+
+  String _formatLastSeen(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inSeconds < 60) return 'Last seen just now';
+    if (diff.inMinutes < 60) return 'Last seen ${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return 'Last seen ${diff.inHours}h ago';
+    if (diff.inDays == 1) return 'Last seen yesterday';
+    if (diff.inDays < 7) return 'Last seen ${diff.inDays}d ago';
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return 'Last seen ${dt.day} ${months[dt.month - 1]}';
   }
 
   Widget _buildBlockedBanner() {

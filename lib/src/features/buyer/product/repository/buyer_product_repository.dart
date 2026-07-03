@@ -40,6 +40,8 @@ class BuyerProductRepository {
   FutureEither<List<ProductCollectionItem>> searchProducts({
     required String query,
     String? category,
+    String? subCategory,
+    String? productType,
     double? minPrice,
     double? maxPrice,
     String sortBy = 'newest',
@@ -48,6 +50,8 @@ class BuyerProductRepository {
     final url = Endpoints.buyerProductSearch(
       query: query,
       category: category,
+      subCategory: subCategory,
+      productType: productType,
       minPrice: minPrice,
       maxPrice: maxPrice,
       sortBy: sortBy,

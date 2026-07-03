@@ -6,6 +6,8 @@ import 'package:gta_app/src/models/product_collection_model.dart';
 class SearchParams {
   final String query;
   final String? category;
+  final String? subCategory;
+  final String? productType;
   final double? minPrice;
   final double? maxPrice;
   final String sortBy;
@@ -13,6 +15,8 @@ class SearchParams {
   const SearchParams({
     required this.query,
     this.category,
+    this.subCategory,
+    this.productType,
     this.minPrice,
     this.maxPrice,
     this.sortBy = 'newest',
@@ -23,13 +27,22 @@ class SearchParams {
       other is SearchParams &&
       other.query == query &&
       other.category == category &&
+      other.subCategory == subCategory &&
+      other.productType == productType &&
       other.minPrice == minPrice &&
       other.maxPrice == maxPrice &&
       other.sortBy == sortBy;
 
   @override
-  int get hashCode =>
-      Object.hash(query, category, minPrice, maxPrice, sortBy);
+  int get hashCode => Object.hash(
+        query,
+        category,
+        subCategory,
+        productType,
+        minPrice,
+        maxPrice,
+        sortBy,
+      );
 }
 
 final productCollectionsProvider =
@@ -49,6 +62,8 @@ final buyerProductSearchProvider =
   final result = await repo.searchProducts(
     query: params.query,
     category: params.category,
+    subCategory: params.subCategory,
+    productType: params.productType,
     minPrice: params.minPrice,
     maxPrice: params.maxPrice,
     sortBy: params.sortBy,

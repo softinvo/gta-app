@@ -7,13 +7,15 @@ class BasePaths {
   static const baseUrl = AppConfig.devMode ? baseTestUrl : baseProdUrl;
 
   // Chat server — port 5002, no auth
-  static const chatTestSocketUrl = 'http://10.81.42.44:5002';
+  static const chatTestSocketUrl = 'http://10.81.42.44:5005';
   static const chatProdSocketUrl = 'https://chat.texax.in';
-  static const chatSocketUrl =
-      AppConfig.devMode ? chatTestSocketUrl : chatProdSocketUrl;
+  static const chatSocketUrl = AppConfig.devMode
+      ? chatTestSocketUrl
+      : chatProdSocketUrl;
 
-  static const chatTestRestUrl = 'http://10.81.42.44:5002/';
+  static const chatTestRestUrl = 'http://10.81.42.44:5005/';
   static const chatProdRestUrl = 'https://chat.texax.in/';
-  static const chatRestUrl =
-      AppConfig.devMode ? chatTestRestUrl : chatProdRestUrl;
+  static const chatRestUrl = AppConfig.devMode
+      ? chatTestRestUrl
+      : chatProdRestUrl;
 }

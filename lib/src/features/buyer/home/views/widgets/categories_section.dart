@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/home/views/buyer_categories_screen.dart';
+import 'package:gta_app/src/features/buyer/home/views/buyer_search_screen.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'category_card.dart';
@@ -65,6 +66,15 @@ class CategoriesSection extends ConsumerWidget {
                           thumbnailUrl: category.thumbnail,
                           title: category.name,
                           color: _getCategoryColor(index),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BuyerSearchScreen(
+                                initialCategory: category.name,
+                                filterLabel: category.name,
+                              ),
+                            ),
+                          ),
                         );
                       },
                     );

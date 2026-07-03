@@ -9,7 +9,22 @@ import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 
 class BuyerSearchScreen extends ConsumerStatefulWidget {
-  const BuyerSearchScreen({super.key});
+  // Pre-applied filters — used when arriving from a category card tap
+  // instead of typing into the search field.
+  final String? initialCategory;
+  final String? initialSubCategory;
+  final String? initialProductType;
+  // Display label for the pre-applied filter (e.g. "Fabrics"), shown in the
+  // results header in place of a typed query.
+  final String? filterLabel;
+
+  const BuyerSearchScreen({
+    super.key,
+    this.initialCategory,
+    this.initialSubCategory,
+    this.initialProductType,
+    this.filterLabel,
+  });
   static const routePath = '/buyer/search';
 
   @override
@@ -22,22 +37,41 @@ class _BuyerSearchScreenState extends ConsumerState<BuyerSearchScreen> {
 
   String _submittedQuery = '';
   String? _filterCategory;
+  String? _filterSubCategory;
+  String? _filterProductType;
   double? _filterMinPrice;
   double? _filterMaxPrice;
   String _filterSortBy = 'newest';
 
   bool get _hasActiveFilters =>
       _filterCategory != null ||
+      _filterSubCategory != null ||
+      _filterProductType != null ||
       _filterMinPrice != null ||
       _filterMaxPrice != null ||
       _filterSortBy != 'newest';
 
+  // Whether there's enough to show results — either a typed query or a
+  // category/sub-category/product-type filter carried in from a category card.
+  bool get _shouldShowResults =>
+      _submittedQuery.isNotEmpty ||
+      _filterCategory != null ||
+      _filterSubCategory != null ||
+      _filterProductType != null;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
+    _filterCategory = widget.initialCategory;
+    _filterSubCategory = widget.initialSubCategory;
+    _filterProductType = widget.initialProductType;
+    // Only steal focus (and pop the keyboard) when landing on a blank search
+    // — not when arriving pre-filtered from a category card.
+    if (!_shouldShowResults) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _focusNode.requestFocus();
+      });
+    }
   }
 
   @override
@@ -81,18 +115,21 @@ class _BuyerSearchScreenState extends ConsumerState<BuyerSearchScreen> {
         controller: _controller,
         focusNode: _focusNode,
         onSubmit: _onSubmit,
-        onFilterTap: _submittedQuery.isNotEmpty ? _openFilters : null,
+        onFilterTap: _shouldShowResults ? _openFilters : null,
         hasActiveFilters: _hasActiveFilters,
       ),
 
-      body: _submittedQuery.isEmpty
+      body: !_shouldShowResults
           ? const _EmptyPrompt()
           : _SearchResults(
               query: _submittedQuery,
               category: _filterCategory,
+              subCategory: _filterSubCategory,
+              productType: _filterProductType,
               minPrice: _filterMinPrice,
               maxPrice: _filterMaxPrice,
               sortBy: _filterSortBy,
+              filterLabel: widget.filterLabel,
             ),
     );
   }
@@ -354,16 +391,22 @@ class _EmptyPrompt extends StatelessWidget {
 class _SearchResults extends ConsumerWidget {
   final String query;
   final String? category;
+  final String? subCategory;
+  final String? productType;
   final double? minPrice;
   final double? maxPrice;
   final String sortBy;
+  final String? filterLabel;
 
   const _SearchResults({
     required this.query,
     this.category,
+    this.subCategory,
+    this.productType,
     this.minPrice,
     this.maxPrice,
     required this.sortBy,
+    this.filterLabel,
   });
 
   @override
@@ -371,6 +414,8 @@ class _SearchResults extends ConsumerWidget {
     final params = SearchParams(
       query: query,
       category: category,
+      subCategory: subCategory,
+      productType: productType,
       minPrice: minPrice,
       maxPrice: maxPrice,
       sortBy: sortBy,
@@ -384,9 +429,13 @@ class _SearchResults extends ConsumerWidget {
       ),
       data: (items) {
         if (items.isEmpty) {
-          return _NoResults(query: query);
+          return _NoResults(query: query, filterLabel: filterLabel);
         }
-        return _ResultsGrid(items: items, query: query);
+        return _ResultsGrid(
+          items: items,
+          query: query,
+          filterLabel: filterLabel,
+        );
       },
     );
   }
@@ -395,8 +444,21 @@ class _SearchResults extends ConsumerWidget {
 class _ResultsGrid extends StatelessWidget {
   final List<ProductCollectionItem> items;
   final String query;
+  final String? filterLabel;
 
-  const _ResultsGrid({required this.items, required this.query});
+  const _ResultsGrid({
+    required this.items,
+    required this.query,
+    this.filterLabel,
+  });
+
+  String get _headerText {
+    final count = items.length;
+    final plural = count == 1 ? '' : 's';
+    if (query.isNotEmpty) return '$count result$plural for "$query"';
+    if (filterLabel != null) return '$count product$plural in $filterLabel';
+    return '$count product$plural';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -406,7 +468,7 @@ class _ResultsGrid extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
           child: Text(
-            '${items.length} result${items.length == 1 ? '' : 's'} for "$query"',
+            _headerText,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -438,7 +500,14 @@ class _ResultsGrid extends StatelessWidget {
 
 class _NoResults extends StatelessWidget {
   final String query;
-  const _NoResults({required this.query});
+  final String? filterLabel;
+  const _NoResults({required this.query, this.filterLabel});
+
+  String get _message {
+    if (query.isNotEmpty) return 'No results for "$query"';
+    if (filterLabel != null) return 'No products in $filterLabel';
+    return 'No products found';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -455,7 +524,7 @@ class _NoResults extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No results for "$query"',
+              _message,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 16,

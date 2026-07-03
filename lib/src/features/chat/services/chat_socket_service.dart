@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:gta_app/src/res/endpoints.dart';
@@ -35,6 +36,12 @@ class ChatSocketService {
       _socket!.emit('join_chat', {'userId': userId, 'userType': userType});
     });
 
+    if (kDebugMode) {
+      _socket!.onAny((event, data) {
+        debugPrint('[Socket ←] $event  $data');
+      });
+    }
+
     _socket!.connect();
   }
 
@@ -42,8 +49,14 @@ class ChatSocketService {
     _socket?.on(event, handler);
   }
 
-  void off(String event) {
-    _socket?.off(event);
+  // If [handler] is provided, only that specific listener is removed.
+  // Without a handler, all listeners for the event are removed.
+  void off(String event, [void Function(dynamic)? handler]) {
+    if (handler != null) {
+      _socket?.off(event, handler);
+    } else {
+      _socket?.off(event);
+    }
   }
 
   void sendMessage({
@@ -87,6 +100,10 @@ class ChatSocketService {
       'senderId': senderId,
       'receiverId': receiverId,
     });
+  }
+
+  void requestUserStatus(String userId, String userType) {
+    _socket?.emit('get_user_status', {'userId': userId, 'userType': userType});
   }
 
   void dispose() {
