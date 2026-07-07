@@ -8,6 +8,9 @@
         },
         {
             "path": "../gta-chat-server"
+        },
+        {
+            "path": "../global-textile-axis-admin-dashboard"
         }
     ],
     "settings": {}

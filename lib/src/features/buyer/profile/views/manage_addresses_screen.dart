@@ -7,6 +7,7 @@ import 'package:gta_app/src/features/buyer/profile/views/add_address_screen.dart
 import 'package:gta_app/src/features/buyer/profile/views/edit_address_screen.dart';
 import 'package:gta_app/src/models/address_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class ManageAddressesScreen extends ConsumerStatefulWidget {
   const ManageAddressesScreen({super.key});
@@ -31,7 +32,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Manage Addresses',
+          context.l10n.profileManageAddressesTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -58,7 +59,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'No addresses saved',
+                                context.l10n.addressEmptyTitle,
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   color: CommonColors.greyText,
@@ -67,7 +68,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Add your first address to get started',
+                                context.l10n.addressEmptySubtitle,
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   color: CommonColors.greyText,
@@ -86,7 +87,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                         ),
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Error: $e')),
+                  error: (e, _) => Center(child: Text(context.l10n.commonErrorPrefix(e.toString()))),
                 ),
           ),
           _buildAddButton(),
@@ -157,7 +158,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    'Primary',
+                    context.l10n.addressPrimaryBadge,
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -202,23 +203,23 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                 if (!address.isPrimary) ...[
                   _buildCardOption(
                     Icons.check_circle_outline,
-                    'Mark as Primary',
+                    context.l10n.addressMarkPrimaryTitle,
                     () async {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Mark as Primary'),
-                          content: const Text(
-                            'Do you want to set this as your primary address?',
+                          title: Text(context.l10n.addressMarkPrimaryTitle),
+                          content: Text(
+                            context.l10n.addressMarkPrimaryConfirm,
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel'),
+                              child: Text(context.l10n.commonCancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Confirm'),
+                              child: Text(context.l10n.commonConfirm),
                             ),
                           ],
                         ),
@@ -230,16 +231,16 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                             .markAddressPrimary(address.id!);
                         if (success && mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Address marked as primary'),
+                            SnackBar(
+                              content: Text(context.l10n.addressMarkedPrimarySuccess),
                               backgroundColor: Colors.green,
                             ),
                           );
                         } else if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                'Failed to mark address as primary',
+                                context.l10n.addressMarkPrimaryFailed,
                               ),
                               backgroundColor: Colors.red,
                             ),
@@ -250,7 +251,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                   ),
                   const SizedBox(width: 24),
                 ],
-                _buildCardOption(Icons.edit_outlined, 'Edit', () {
+                _buildCardOption(Icons.edit_outlined, context.l10n.commonEdit, () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -259,24 +260,24 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                   );
                 }),
                 const SizedBox(width: 24),
-                _buildCardOption(Icons.delete_outline, 'Delete', () async {
+                _buildCardOption(Icons.delete_outline, context.l10n.commonDelete, () async {
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('Delete Address'),
-                      content: const Text(
-                        'Are you sure you want to delete this address?',
+                      title: Text(context.l10n.addressDeleteDialogTitle),
+                      content: Text(
+                        context.l10n.addressDeleteConfirm,
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
+                          child: Text(context.l10n.commonCancel),
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text(
-                            'Delete',
-                            style: TextStyle(color: Colors.red),
+                          child: Text(
+                            context.l10n.commonDelete,
+                            style: const TextStyle(color: Colors.red),
                           ),
                         ),
                       ],
@@ -289,8 +290,8 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                         .removeAddress(address.id!);
                     if (!success && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Failed to delete address'),
+                        SnackBar(
+                          content: Text(context.l10n.addressDeleteFailed),
                         ),
                       );
                     }
@@ -346,7 +347,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
           onPressed: () => context.push(AddAddressScreen.routePath),
           icon: const Icon(Icons.add, color: Colors.white),
           label: Text(
-            'Add New Address',
+            context.l10n.addressAddNewCta,
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.bold,

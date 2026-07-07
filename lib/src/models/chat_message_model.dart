@@ -100,6 +100,24 @@ class ChatMessage {
       deletedByType: deletedByType,
     );
   }
+
+  ChatMessage copyWithSeen({DateTime? seenAt}) {
+    return ChatMessage(
+      id: id,
+      senderDocId: senderDocId,
+      senderType: senderType,
+      receiverDocId: receiverDocId,
+      receiverType: receiverType,
+      messageType: messageType,
+      message: message,
+      attachments: attachments,
+      sentAt: sentAt,
+      isSeen: true,
+      seenAt: seenAt ?? this.seenAt,
+      isDeleted: isDeleted,
+      deletedByType: deletedByType,
+    );
+  }
 }
 
 class ChatConversation {
@@ -114,6 +132,8 @@ class ChatConversation {
   final int unreadCount;
   final bool isBlocked;
   final String? blockReason;
+  final bool isOnline;
+  final DateTime? lastActiveAt;
 
   const ChatConversation({
     required this.id,
@@ -127,6 +147,8 @@ class ChatConversation {
     required this.unreadCount,
     required this.isBlocked,
     this.blockReason,
+    this.isOnline = false,
+    this.lastActiveAt,
   });
 
   factory ChatConversation.fromJson(Map<String, dynamic> json) {
@@ -145,6 +167,10 @@ class ChatConversation {
       unreadCount: (json['unreadCount'] as num?)?.toInt() ?? 0,
       isBlocked: json['isBlocked'] ?? false,
       blockReason: json['blockReason'],
+      isOnline: json['isOnline'] ?? false,
+      lastActiveAt: json['lastActiveAt'] != null
+          ? DateTime.tryParse(json['lastActiveAt'].toString())?.toLocal()
+          : null,
     );
   }
 }

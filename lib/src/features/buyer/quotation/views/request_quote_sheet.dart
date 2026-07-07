@@ -10,6 +10,7 @@ import 'package:gta_app/src/models/address_model.dart';
 import 'package:gta_app/src/models/buyer_product_details_model.dart';
 import 'package:gta_app/src/models/product_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:intl/intl.dart';
 
 // ── State helper ──────────────────────────────────────────────────────────────
@@ -162,7 +163,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
 
     final selected = _rows.where((r) => r.selected).toList();
     if (selected.isEmpty) {
-      _showSnack('Please select at least one variant', isError: true);
+      _showSnack(context.l10n.quoteErrorSelectVariant, isError: true);
       return;
     }
 
@@ -172,14 +173,16 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
       final qty = int.tryParse(r.qtyCtrl.text) ?? 0;
       if (price <= 0) {
         _showSnack(
-          'Enter a valid price for size ${r.variant.size ?? 'one size'}',
+          context.l10n.quoteErrorInvalidPrice(
+            r.variant.size ?? context.l10n.quoteSizeFallbackLower,
+          ),
           isError: true,
         );
         return;
       }
       if (qty < _moq) {
         _showSnack(
-          'Minimum order quantity is $_moq pcs',
+          context.l10n.quoteMinOrderQtyMsg(_moq.toString()),
           isError: true,
         );
         return;
@@ -187,11 +190,11 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
     }
 
     if (_selectedAddress == null) {
-      _showSnack('Please select a delivery address', isError: true);
+      _showSnack(context.l10n.quoteErrorSelectAddress, isError: true);
       return;
     }
     if (widget.product.seller == null) {
-      _showSnack('Seller information not available', isError: true);
+      _showSnack(context.l10n.quoteErrorNoSellerInfo, isError: true);
       return;
     }
 
@@ -235,7 +238,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
 
     if (success) {
       Navigator.pop(context);
-      _showSnack('Quote request sent successfully!');
+      _showSnack(context.l10n.quoteSentSuccess);
     }
   }
 
@@ -301,7 +304,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Request Quote',
+                        context.l10n.productRequestQuoteCta,
                         style: GoogleFonts.inter(
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
@@ -358,8 +361,8 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                   children: [
                     // ── Contact Info ──────────────────────────────────────
                     _SectionLabel(
-                      'Contact Info',
-                      subtitle: 'Pre-filled from your profile',
+                      context.l10n.quoteContactInfoTitle,
+                      subtitle: context.l10n.quotePrefilledSubtitle,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -367,19 +370,19 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                         children: [
                           _InputField(
                             controller: _nameCtrl,
-                            label: 'Full Name',
-                            hint: 'Your full name',
+                            label: context.l10n.quoteFullNameLabel,
+                            hint: context.l10n.quoteFullNameHint,
                             prefixIcon: Icons.person_outline_rounded,
                             validator: (v) =>
                                 v?.trim().isEmpty == true
-                                    ? 'Name is required'
+                                    ? context.l10n.quoteNameRequired
                                     : null,
                           ),
                           const SizedBox(height: 12),
                           _InputField(
                             controller: _phoneCtrl,
-                            label: 'Mobile Number',
-                            hint: '10-digit mobile number',
+                            label: context.l10n.quoteMobileLabel,
+                            hint: context.l10n.quoteMobileHint,
                             prefixIcon: Icons.phone_outlined,
                             keyboardType: TextInputType.phone,
                             inputFormatters: [
@@ -387,10 +390,10 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                             ],
                             validator: (v) {
                               if (v?.trim().isEmpty == true) {
-                                return 'Phone is required';
+                                return context.l10n.quotePhoneRequired;
                               }
                               if ((v?.trim().length ?? 0) < 10) {
-                                return 'Enter a valid 10-digit number';
+                                return context.l10n.quoteInvalidPhone;
                               }
                               return null;
                             },
@@ -398,8 +401,8 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                           const SizedBox(height: 12),
                           _InputField(
                             controller: _altPhoneCtrl,
-                            label: 'Alternate Mobile (optional)',
-                            hint: 'Another contact number',
+                            label: context.l10n.quoteAltMobileLabel,
+                            hint: context.l10n.quoteAltMobileHint,
                             prefixIcon: Icons.phone_callback_outlined,
                             keyboardType: TextInputType.phone,
                             inputFormatters: [
@@ -409,7 +412,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                               if (v != null &&
                                   v.trim().isNotEmpty &&
                                   v.trim().length < 10) {
-                                return 'Enter a valid 10-digit number';
+                                return context.l10n.quoteInvalidPhone;
                               }
                               return null;
                             },
@@ -417,8 +420,8 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                           const SizedBox(height: 12),
                           _InputField(
                             controller: _emailCtrl,
-                            label: 'Email (optional)',
-                            hint: 'For order updates',
+                            label: context.l10n.quoteEmailLabel,
+                            hint: context.l10n.quoteEmailHint,
                             prefixIcon: Icons.mail_outline_rounded,
                             keyboardType: TextInputType.emailAddress,
                             validator: (v) {
@@ -427,7 +430,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                                   r'^[\w.-]+@[\w.-]+\.\w{2,}$',
                                 );
                                 if (!emailRegex.hasMatch(v.trim())) {
-                                  return 'Enter a valid email address';
+                                  return context.l10n.quoteInvalidEmail;
                                 }
                               }
                               return null;
@@ -440,7 +443,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                     const SizedBox(height: 24),
 
                     // ── Delivery Address ──────────────────────────────────
-                    _SectionLabel('Delivery Address'),
+                    _SectionLabel(context.l10n.quoteDeliveryAddressTitle),
                     _AddressPicker(
                       addressesAsync: addressesAsync,
                       selectedAddress: _selectedAddress,
@@ -452,14 +455,14 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
 
                     // ── Variants ──────────────────────────────────────────
                     _SectionLabel(
-                      'Variants & Quantity',
-                      subtitle: 'MOQ: $_moq pcs · Negotiate your price',
+                      context.l10n.quoteVariantsTitle,
+                      subtitle: context.l10n.quoteVariantsSubtitle(_moq.toString()),
                     ),
                     if (_rows.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
-                          'No variants available for the selected color.',
+                          context.l10n.quoteNoVariantsForColor,
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             color: CommonColors.greyText,
@@ -485,7 +488,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                                     const SizedBox(width: 32),
                                     Expanded(
                                       child: Text(
-                                        'Variant',
+                                        context.l10n.quoteTableVariant,
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w700,
@@ -497,7 +500,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                                     SizedBox(
                                       width: 90,
                                       child: Text(
-                                        'Quantity',
+                                        context.l10n.quoteTableQuantity,
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
@@ -511,7 +514,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                                     SizedBox(
                                       width: 80,
                                       child: Text(
-                                        'Your Price',
+                                        context.l10n.quoteTableYourPrice,
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
@@ -638,7 +641,7 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        'Send Quote Request',
+                                        context.l10n.quoteSendRequestCta,
                                         style: GoogleFonts.inter(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -703,7 +706,7 @@ class _OrderSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Order Summary',
+                  context.l10n.quoteOrderSummaryTitle,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -712,7 +715,7 @@ class _OrderSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$selectedCount variant${selectedCount > 1 ? 's' : ''} · $totalQty pcs total',
+                  context.l10n.quoteOrderSummaryLine(selectedCount, totalQty),
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     color: CommonColors.greyText,
@@ -733,7 +736,7 @@ class _OrderSummaryCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'Quoted total',
+                context.l10n.quoteQuotedTotalLabel,
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   color: CommonColors.greyText,
@@ -894,7 +897,7 @@ class _AddressPicker extends StatelessWidget {
       error: (e, _) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Text(
-          'Failed to load addresses',
+          context.l10n.quoteFailedLoadAddresses,
           style: GoogleFonts.inter(fontSize: 13, color: CommonColors.error),
         ),
       ),
@@ -982,7 +985,7 @@ class _AddressPicker extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
-                                    'Primary',
+                                    context.l10n.addressPrimaryBadge,
                                     style: GoogleFonts.inter(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
@@ -1048,7 +1051,7 @@ class _NoAddressesHint extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'No saved addresses',
+            context.l10n.quoteNoSavedAddresses,
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -1057,7 +1060,7 @@ class _NoAddressesHint extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Add a delivery address to continue',
+            context.l10n.quoteAddAddressToContinue,
             style: GoogleFonts.inter(
               fontSize: 12,
               color: CommonColors.greyText,
@@ -1073,7 +1076,7 @@ class _NoAddressesHint extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '+ Add Address',
+                context.l10n.quoteAddAddressCta,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -1190,7 +1193,7 @@ class _VariantRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            row.variant.size ?? 'One Size',
+                            row.variant.size ?? context.l10n.productSizeFallback,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -1201,7 +1204,10 @@ class _VariantRow extends StatelessWidget {
                           ),
                           if (discount > 0)
                             Text(
-                              'List: ₹${listPrice.toStringAsFixed(0)} (${discount.toStringAsFixed(0)}% off)',
+                              context.l10n.quoteListPriceDiscounted(
+                                listPrice.toStringAsFixed(0),
+                                discount.toStringAsFixed(0),
+                              ),
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 color: CommonColors.greyText,
@@ -1210,7 +1216,7 @@ class _VariantRow extends StatelessWidget {
                             )
                           else
                             Text(
-                              'List: ₹${listPrice.toStringAsFixed(0)}',
+                              context.l10n.quoteListPrice(listPrice.toStringAsFixed(0)),
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 color: CommonColors.greyText,
@@ -1252,7 +1258,7 @@ class _VariantRow extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color: BuyerColors.primaryLight,
                   ),
-                  decoration: _compactDecoration('₹ Price', row.selected),
+                  decoration: _compactDecoration(context.l10n.quotePriceFieldLabel, row.selected),
                 ),
               ),
             ],
@@ -1271,7 +1277,7 @@ class _VariantRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Min. order qty is $moq pcs',
+                    context.l10n.quoteMinOrderQtyWarning(moq.toString()),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: CommonColors.warning,

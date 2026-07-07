@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class FilterBottomSheet extends ConsumerStatefulWidget {
   final String? selectedCategory;
@@ -35,14 +36,13 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
   static const double _maxPriceLimit = 100000;
   late RangeValues _priceRange;
 
-  // Sort options from backend
-  final List<Map<String, String>> _sortOptions = [
-    {'value': 'newest', 'label': 'Newest First'},
-    {'value': 'priceLowToHigh', 'label': 'Price: Low to High'},
-    {'value': 'priceHighToLow', 'label': 'Price: High to Low'},
-    {'value': 'ratingHighToLow', 'label': 'Top Rated'},
-    {'value': 'relevance', 'label': 'Most Relevant'},
-  ];
+  List<Map<String, String>> _sortOptions(BuildContext context) => [
+        {'value': 'newest', 'label': context.l10n.filterSortNewest},
+        {'value': 'priceLowToHigh', 'label': context.l10n.filterSortPriceLowHigh},
+        {'value': 'priceHighToLow', 'label': context.l10n.filterSortPriceHighLow},
+        {'value': 'ratingHighToLow', 'label': context.l10n.homeTopRated},
+        {'value': 'relevance', 'label': context.l10n.filterSortRelevance},
+      ];
 
   @override
   void initState() {
@@ -100,7 +100,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Filter & Sort',
+                context.l10n.filterTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -116,12 +116,12 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
           const SizedBox(height: 24),
 
           // Sort By Section
-          _buildSectionTitle('Sort By'),
+          _buildSectionTitle(context.l10n.filterSortBy),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _sortOptions.map((option) {
+            children: _sortOptions(context).map((option) {
               final isSelected = _selectedSortBy == option['value'];
               return GestureDetector(
                 onTap: () => setState(() => _selectedSortBy = option['value']!),
@@ -156,7 +156,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
           const SizedBox(height: 24),
 
           // Category Section (from API)
-          _buildSectionTitle('Category'),
+          _buildSectionTitle(context.l10n.filterCategory),
           const SizedBox(height: 12),
           SizedBox(
             height: 40,
@@ -182,7 +182,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            'All',
+                            context.l10n.filterAllCategories,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -233,7 +233,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                 ),
               ),
               error: (_, __) => Text(
-                'Failed to load categories',
+                context.l10n.homeFailedToLoadCategories,
                 style: GoogleFonts.inter(color: CommonColors.error),
               ),
             ),
@@ -241,7 +241,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
           const SizedBox(height: 24),
 
           // Price Range Section with RangeSlider
-          _buildSectionTitle('Price Range'),
+          _buildSectionTitle(context.l10n.filterPriceRange),
           const SizedBox(height: 8),
 
           // Price labels
@@ -267,7 +267,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                 ),
               ),
               Text(
-                'to',
+                context.l10n.filterPriceRangeTo,
                 style: GoogleFonts.inter(color: CommonColors.greyText),
               ),
               Container(
@@ -354,7 +354,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                     ),
                   ),
                   child: Text(
-                    'Reset',
+                    context.l10n.commonReset,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -374,7 +374,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
                     ),
                   ),
                   child: Text(
-                    'Apply Filters',
+                    context.l10n.filterApplyFilters,
                     style: GoogleFonts.inter(fontWeight: FontWeight.bold),
                   ),
                 ),

@@ -3,12 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/complaint/controller/complaint_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
 
 class CreateComplaintScreen extends ConsumerStatefulWidget {
-  final String category;
+  // Stable English identifier used for icon lookup — never shown to the user.
+  final String categoryKey;
+  // Localized label shown in the UI and pre-filled into the subject field.
+  final String categoryLabel;
 
-  const CreateComplaintScreen({super.key, required this.category});
+  const CreateComplaintScreen({
+    super.key,
+    required this.categoryKey,
+    required this.categoryLabel,
+  });
 
   @override
   ConsumerState<CreateComplaintScreen> createState() =>
@@ -21,12 +29,18 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
   final _descriptionController = TextEditingController();
   final _orderNumberController = TextEditingController();
   bool _isLoading = false;
+  bool _subjectPrefilled = false;
 
   @override
-  void initState() {
-    super.initState();
-    // Pre-fill subject based on category
-    _subjectController.text = '${widget.category} Issue';
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Pre-fill subject based on category — done here rather than initState()
+    // since it needs Localizations, which isn't available yet at that point.
+    if (!_subjectPrefilled) {
+      _subjectPrefilled = true;
+      _subjectController.text =
+          context.l10n.complaintSubjectTemplate(widget.categoryLabel);
+    }
   }
 
   @override
@@ -55,13 +69,13 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
-      SnackBarService.showSuccess(context, 'Complaint submitted successfully!');
+      SnackBarService.showSuccess(context, context.l10n.complaintSubmitSuccess);
       ref.invalidate(complaintsProvider);
       Navigator.pop(context);
     } else if (mounted) {
       SnackBarService.showError(
         context,
-        'Failed to submit complaint. Try again.',
+        context.l10n.complaintSubmitFailed,
       );
     }
   }
@@ -79,7 +93,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Raise a Complaint',
+          context.l10n.helpRaiseComplaintTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -109,13 +123,13 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      _getCategoryIcon(widget.category),
+                      _getCategoryIcon(widget.categoryKey),
                       size: 16,
                       color: BuyerColors.primaryLight,
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      widget.category,
+                      widget.categoryLabel,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -128,34 +142,34 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
               const SizedBox(height: 24),
 
               // Subject field
-              _buildLabel('Subject'),
+              _buildLabel(context.l10n.complaintSubjectLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _subjectController,
-                hint: 'Brief subject of your complaint',
+                hint: context.l10n.complaintSubjectHint,
                 validator: (v) =>
-                    v == null || v.isEmpty ? 'Subject is required' : null,
+                    v == null || v.isEmpty ? context.l10n.complaintSubjectRequired : null,
               ),
               const SizedBox(height: 20),
 
               // Order Number (optional)
-              _buildLabel('Order Number (Optional)'),
+              _buildLabel(context.l10n.complaintOrderNumberLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _orderNumberController,
-                hint: 'Enter order number if applicable',
+                hint: context.l10n.complaintOrderNumberHint,
               ),
               const SizedBox(height: 20),
 
               // Description
-              _buildLabel('Description'),
+              _buildLabel(context.l10n.complaintDescriptionLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _descriptionController,
-                hint: 'Describe your issue in detail...',
+                hint: context.l10n.complaintDescriptionHint,
                 maxLines: 6,
                 validator: (v) =>
-                    v == null || v.isEmpty ? 'Description is required' : null,
+                    v == null || v.isEmpty ? context.l10n.complaintDescriptionRequired : null,
               ),
               const SizedBox(height: 32),
 
@@ -183,7 +197,7 @@ class _CreateComplaintScreenState extends ConsumerState<CreateComplaintScreen> {
                           ),
                         )
                       : Text(
-                          'Submit Complaint',
+                          context.l10n.complaintSubmitCta,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

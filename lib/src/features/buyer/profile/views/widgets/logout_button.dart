@@ -6,6 +6,7 @@ import 'package:gta_app/src/features/common_features/auth/controller/auth_contro
 import 'package:gta_app/src/features/common_features/auth/views/login_screen.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/logout_confirmation_dialog.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class LogoutButton extends ConsumerWidget {
   const LogoutButton({super.key});
@@ -39,7 +40,7 @@ class LogoutButton extends ConsumerWidget {
             Icon(Icons.logout, color: CommonColors.error, size: 20),
             const SizedBox(width: 8),
             Text(
-              'Logout',
+              context.l10n.commonLogout,
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

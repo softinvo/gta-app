@@ -7,6 +7,7 @@ import 'package:gta_app/src/features/buyer/saved/controller/saved_products_contr
 import 'package:gta_app/src/models/attachment_model.dart';
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class BuyerWishlistScreen extends ConsumerWidget {
   static const routePath = '/buyer/wishlist';
@@ -32,7 +33,7 @@ class BuyerWishlistScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'My Wishlist',
+          context.l10n.wishlistTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -47,7 +48,7 @@ class BuyerWishlistScreen extends ConsumerWidget {
         ),
         error: (_, __) => Center(
           child: Text(
-            'Something went wrong',
+            context.l10n.commonSomethingWentWrong,
             style: GoogleFonts.inter(color: CommonColors.greyText),
           ),
         ),
@@ -109,7 +110,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Your wishlist is empty',
+            context.l10n.wishlistEmptyTitle,
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -118,7 +119,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Save products you love and find them here.',
+            context.l10n.wishlistEmptySubtitle,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 14,
@@ -159,7 +160,7 @@ class _EmptyState extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Browse Products',
+                    context.l10n.wishlistBrowseCta,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

@@ -3,19 +3,34 @@ import 'product_model.dart';
 
 class SellerInfo {
   final String id;
+  final String? name;
+  final String? businessName;
+  final Attachment? avatar;
   final String? phone;
   final String? profileStatus;
   final String? verificationStatus;
 
   const SellerInfo({
     required this.id,
+    this.name,
+    this.businessName,
+    this.avatar,
     this.phone,
     this.profileStatus,
     this.verificationStatus,
   });
 
+  String get displayName => name?.isNotEmpty == true
+      ? name!
+      : (businessName?.isNotEmpty == true ? businessName! : 'Textile Seller');
+
   factory SellerInfo.fromJson(Map<String, dynamic> json) => SellerInfo(
         id: (json['_id'] ?? '').toString(),
+        name: json['name'],
+        businessName: json['businessName'],
+        avatar: json['avatar'] is Map<String, dynamic>
+            ? Attachment.fromJson(json['avatar'])
+            : null,
         phone: json['phone'],
         profileStatus: json['profileStatus'],
         verificationStatus: json['verificationStatus'],

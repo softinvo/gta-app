@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -44,7 +45,7 @@ class SectionHeader extends StatelessWidget {
         GestureDetector(
           onTap: onSeeAll,
           child: Text(
-            'See All',
+            context.l10n.commonSeeAll,
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w600,

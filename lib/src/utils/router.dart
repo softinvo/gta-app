@@ -115,8 +115,10 @@ final GoRouter router = GoRouter(
       path: '/buyer/complaint/create',
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
+        final category = extra?['category'] as String? ?? 'General';
         return CreateComplaintScreen(
-          category: extra?['category'] as String? ?? 'General',
+          categoryKey: category.toLowerCase(),
+          categoryLabel: category,
         );
       },
     ),

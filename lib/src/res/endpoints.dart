@@ -174,6 +174,8 @@ class Endpoints {
   static String buyerProductSearch({
     required String query,
     String? category,
+    String? subCategory,
+    String? productType,
     double? minPrice,
     double? maxPrice,
     String sortBy = 'newest',
@@ -186,6 +188,8 @@ class Endpoints {
       'page': '$page',
       'limit': '$limit',
       if (category != null) 'category': category,
+      if (subCategory != null) 'subCategory': subCategory,
+      if (productType != null) 'productType': productType,
       if (minPrice != null) 'minPrice': '${minPrice.toInt()}',
       if (maxPrice != null) 'maxPrice': '${maxPrice.toInt()}',
     };

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/features/buyer/home/views/buyer_search_screen.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
 import 'package:gta_app/src/models/category_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 // ── Drill-down level ──────────────────────────────────────────────────────────
 
@@ -67,9 +69,12 @@ class _BuyerCategoriesScreenState
 
   String get _title {
     switch (_level) {
-      case _Level.categories:    return 'All Categories';
-      case _Level.subCategories: return _selectedCategory?.name ?? 'Sub-Categories';
-      case _Level.productTypes:  return _selectedSubCategory?.name ?? 'Product Types';
+      case _Level.categories:
+        return context.l10n.categoriesAllTitle;
+      case _Level.subCategories:
+        return _selectedCategory?.name ?? context.l10n.categoriesSubCategoriesFallback;
+      case _Level.productTypes:
+        return _selectedSubCategory?.name ?? context.l10n.categoriesProductTypesFallback;
     }
   }
 
@@ -85,12 +90,14 @@ class _BuyerCategoriesScreenState
       case _Level.subCategories:
         return _SubCategoriesGrid(
           categoryId: _selectedCategory!.id,
+          categoryName: _selectedCategory!.name,
           colors: _colors,
           onTap: _selectSubCategory,
         );
       case _Level.productTypes:
         return _ProductTypesList(
           subCategoryId: _selectedSubCategory!.id,
+          subCategoryName: _selectedSubCategory!.name,
         );
     }
   }
@@ -137,7 +144,7 @@ class _BuyerCategoriesScreenState
                           onTap: () =>
                               setState(() => _level = _Level.categories),
                           child: Text(
-                            'Categories',
+                            context.l10n.commonCategories,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: BuyerColors.primaryLight,
@@ -212,7 +219,7 @@ class _CategoriesGrid extends ConsumerWidget {
           const Center(child: CircularProgressIndicator(color: BuyerColors.primaryLight)),
       error: (_, __) => _ErrorView(onRetry: () => ref.invalidate(categoriesProvider)),
       data: (items) => items.isEmpty
-          ? const _EmptyView(message: 'No categories available')
+          ? _EmptyView(message: context.l10n.categoriesEmptyCategories)
           : _Grid(
               count: items.length,
               builder: (i) => _GridItem(
@@ -230,10 +237,12 @@ class _CategoriesGrid extends ConsumerWidget {
 
 class _SubCategoriesGrid extends ConsumerWidget {
   final String categoryId;
+  final String categoryName;
   final List<Color> colors;
   final void Function(SubCategory) onTap;
   const _SubCategoriesGrid({
     required this.categoryId,
+    required this.categoryName,
     required this.colors,
     required this.onTap,
   });
@@ -241,22 +250,40 @@ class _SubCategoriesGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(subCategoriesProvider(categoryId));
-    return async.when(
-      loading: () =>
-          const Center(child: CircularProgressIndicator(color: BuyerColors.primaryLight)),
-      error: (_, __) => _ErrorView(
-          onRetry: () => ref.invalidate(subCategoriesProvider(categoryId))),
-      data: (items) => items.isEmpty
-          ? const _EmptyView(message: 'No sub-categories available')
-          : _Grid(
-              count: items.length,
-              builder: (i) => _GridItem(
-                name: items[i].name,
-                thumbnail: items[i].thumbnail,
-                color: colors[i % colors.length],
-                onTap: () => onTap(items[i]),
+    return Column(
+      children: [
+        _ViewAllBanner(
+          label: context.l10n.categoriesViewAllIn(categoryName),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BuyerSearchScreen(
+                initialCategory: categoryName,
+                filterLabel: categoryName,
               ),
             ),
+          ),
+        ),
+        Expanded(
+          child: async.when(
+            loading: () => const Center(
+                child: CircularProgressIndicator(color: BuyerColors.primaryLight)),
+            error: (_, __) => _ErrorView(
+                onRetry: () => ref.invalidate(subCategoriesProvider(categoryId))),
+            data: (items) => items.isEmpty
+                ? _EmptyView(message: context.l10n.categoriesEmptySubCategories)
+                : _Grid(
+                    count: items.length,
+                    builder: (i) => _GridItem(
+                      name: items[i].name,
+                      thumbnail: items[i].thumbnail,
+                      color: colors[i % colors.length],
+                      onTap: () => onTap(items[i]),
+                    ),
+                  ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -265,67 +292,143 @@ class _SubCategoriesGrid extends ConsumerWidget {
 
 class _ProductTypesList extends ConsumerWidget {
   final String subCategoryId;
-  const _ProductTypesList({required this.subCategoryId});
+  final String subCategoryName;
+  const _ProductTypesList({
+    required this.subCategoryId,
+    required this.subCategoryName,
+  });
+
+  void _openResults(BuildContext context, {String? productType}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BuyerSearchScreen(
+          initialSubCategory: subCategoryName,
+          initialProductType: productType,
+          filterLabel: productType ?? subCategoryName,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(productTypesProvider(subCategoryId));
-    return async.when(
-      loading: () =>
-          const Center(child: CircularProgressIndicator(color: BuyerColors.primaryLight)),
-      error: (_, __) => _ErrorView(
-          onRetry: () => ref.invalidate(productTypesProvider(subCategoryId))),
-      data: (items) => items.isEmpty
-          ? const _EmptyView(message: 'No product types available')
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (_, i) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: BuyerColors.primaryLight.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.style_outlined,
-                        size: 18,
-                        color: BuyerColors.primaryLight,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text(
-                        items[i].name,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: CommonColors.black,
+    return Column(
+      children: [
+        _ViewAllBanner(
+          label: context.l10n.categoriesViewAllIn(subCategoryName),
+          onTap: () => _openResults(context),
+        ),
+        Expanded(
+          child: async.when(
+            loading: () => const Center(
+                child: CircularProgressIndicator(color: BuyerColors.primaryLight)),
+            error: (_, __) => _ErrorView(
+                onRetry: () => ref.invalidate(productTypesProvider(subCategoryId))),
+            data: (items) => items.isEmpty
+                ? _EmptyView(message: context.l10n.categoriesEmptyProductTypes)
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (_, i) => GestureDetector(
+                      onTap: () => _openResults(context, productType: items[i].name),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: BuyerColors.primaryLight.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.style_outlined,
+                                size: 18,
+                                color: BuyerColors.primaryLight,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Text(
+                                items[i].name,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: CommonColors.black,
+                                ),
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right,
+                                color: CommonColors.greyText, size: 18),
+                          ],
                         ),
                       ),
                     ),
-                    const Icon(Icons.chevron_right,
-                        color: CommonColors.greyText, size: 18),
-                  ],
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── "View all" banner shown atop the sub-category / product-type levels ───────
+
+class _ViewAllBanner extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _ViewAllBanner({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: BuyerColors.primaryLight.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: BuyerColors.primaryLight.withValues(alpha: 0.25)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.grid_view_rounded,
+                  size: 16, color: BuyerColors.primaryLight),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: BuyerColors.primaryLight,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
+              const Icon(Icons.arrow_forward_rounded,
+                  size: 16, color: BuyerColors.primaryLight),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -458,12 +561,12 @@ class _ErrorView extends StatelessWidget {
           Icon(Icons.error_outline, size: 48, color: CommonColors.error),
           const SizedBox(height: 12),
           Text(
-            'Failed to load',
+            context.l10n.commonFailedToLoad,
             style: GoogleFonts.inter(color: CommonColors.greyText),
           ),
           TextButton(
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(context.l10n.commonRetry),
           ),
         ],
       ),

@@ -5,6 +5,7 @@ import 'package:gta_app/src/features/buyer/common/widgets/buyer_app_bar.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_profile_tab.dart';
 import 'package:gta_app/src/features/chat/views/chat_list_tab.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'tabs/home_tabs.dart';
 
 class BuyerHomeScreen extends ConsumerStatefulWidget {
@@ -68,35 +69,35 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
               _NavItem(
                 icon: Icons.home_outlined,
                 activeIcon: Icons.home,
-                label: 'Home',
+                label: context.l10n.navHome,
                 isActive: _currentIndex == 0,
                 onTap: () => setState(() => _currentIndex = 0),
               ),
               _NavItem(
                 icon: Icons.request_quote_outlined,
                 activeIcon: Icons.request_quote,
-                label: 'Quotations',
+                label: context.l10n.navQuotations,
                 isActive: _currentIndex == 1,
                 onTap: () => setState(() => _currentIndex = 1),
               ),
               _NavItem(
                 icon: Icons.receipt_long_outlined,
                 activeIcon: Icons.receipt_long,
-                label: 'Orders',
+                label: context.l10n.navOrders,
                 isActive: _currentIndex == 2,
                 onTap: () => setState(() => _currentIndex = 2),
               ),
               _NavItem(
                 icon: Icons.chat_bubble_outline_rounded,
                 activeIcon: Icons.chat_bubble_rounded,
-                label: 'Chat',
+                label: context.l10n.navChat,
                 isActive: _currentIndex == 3,
                 onTap: () => setState(() => _currentIndex = 3),
               ),
               _NavItem(
                 icon: Icons.person_outline,
                 activeIcon: Icons.person,
-                label: 'Profile',
+                label: context.l10n.navProfile,
                 isActive: _currentIndex == 4,
                 onTap: () => setState(() => _currentIndex = 4),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/assets.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 /// Common App Bar for Buyer flow with logo
 class BuyerAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -170,21 +171,23 @@ class BuyerAppBarIconButton extends StatelessWidget {
 
 /// Sliver version of the Buyer App Bar for use in CustomScrollView
 class BuyerSliverAppBar extends StatelessWidget {
-  final String greeting;
-  final String subtitle;
+  final String? greeting;
+  final String? subtitle;
   final VoidCallback? onNotificationTap;
   final int notificationCount;
 
   const BuyerSliverAppBar({
     super.key,
-    this.greeting = 'Hello, Buyer!',
-    this.subtitle = 'Find the best textile products',
+    this.greeting,
+    this.subtitle,
     this.onNotificationTap,
     this.notificationCount = 0,
   });
 
   @override
   Widget build(BuildContext context) {
+    final resolvedGreeting = greeting ?? context.l10n.homeGreeting;
+    final resolvedSubtitle = subtitle ?? context.l10n.homeGreetingSubtitle;
     return SliverAppBar(
       floating: true,
       pinned: false,
@@ -241,7 +244,7 @@ class BuyerSliverAppBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      greeting,
+                      resolvedGreeting,
                       style: GoogleFonts.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -250,7 +253,7 @@ class BuyerSliverAppBar extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      subtitle,
+                      resolvedSubtitle,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         color: CommonColors.greyText,

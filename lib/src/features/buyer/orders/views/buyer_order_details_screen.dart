@@ -7,6 +7,7 @@ import 'package:gta_app/src/features/buyer/profile/controller/profile_controller
 import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:intl/intl.dart';
 
 class BuyerOrderDetailsScreen extends ConsumerWidget {
@@ -29,7 +30,7 @@ class BuyerOrderDetailsScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Order Details',
+          context.l10n.orderDetailsTitle,
           style: GoogleFonts.inter(
             fontSize: 17,
             fontWeight: FontWeight.w700,
@@ -56,7 +57,7 @@ class BuyerOrderDetailsScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () =>
                     ref.invalidate(buyerOrderDetailsProvider(orderId)),
-                child: const Text('Retry'),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -206,7 +207,7 @@ class _HeaderCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      order.productSnapshot?.name ?? 'Order',
+                      order.productSnapshot?.name ?? context.l10n.commonOrderFallback,
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -223,12 +224,12 @@ class _HeaderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _Badge(
-                    label: _orderStatusLabel(order.orderStatus),
+                    label: _orderStatusLabel(context, order.orderStatus),
                     color: orderColor,
                   ),
                   const SizedBox(height: 4),
                   _Badge(
-                    label: _paymentLabel(order.payment.status),
+                    label: _paymentLabel(context, order.payment.status),
                     color: payColor,
                   ),
                 ],
@@ -276,15 +277,21 @@ class _HeaderCard extends StatelessWidget {
     );
   }
 
-  String _orderStatusLabel(String s) {
-    const map = {
-      'processing': 'Processing',
-      'packed': 'Packed',
-      'shipped': 'Shipped',
-      'delivered': 'Delivered',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _orderStatusLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'processing':
+        return context.l10n.orderStatusProcessing;
+      case 'packed':
+        return context.l10n.orderStatusPacked;
+      case 'shipped':
+        return context.l10n.orderStatusShipped;
+      case 'delivered':
+        return context.l10n.orderStatusDelivered;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
   Color _orderStatusColor(String s) {
@@ -304,15 +311,21 @@ class _HeaderCard extends StatelessWidget {
     }
   }
 
-  String _paymentLabel(String s) {
-    const map = {
-      'pending': 'Unpaid',
-      'paid': 'Paid',
-      'failed': 'Failed',
-      'refunded': 'Refunded',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _paymentLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'pending':
+        return context.l10n.orderPaymentUnpaid;
+      case 'paid':
+        return context.l10n.quoteStatusPaid;
+      case 'failed':
+        return context.l10n.orderPaymentFailed;
+      case 'refunded':
+        return context.l10n.orderPaymentRefunded;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
   Color _paymentColor(String s) {
@@ -343,7 +356,7 @@ class _SellerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionCard(
-      title: 'Seller',
+      title: context.l10n.quoteSectionSeller,
       icon: Icons.store_outlined,
       child: Row(
         children: [
@@ -442,15 +455,15 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = order.productSnapshot!;
     return _SectionCard(
-      title: 'Product',
+      title: context.l10n.quoteSectionProduct,
       icon: Icons.inventory_2_outlined,
       child: Column(
         children: [
-          _InfoRow(label: 'Name', value: p.name),
+          _InfoRow(label: context.l10n.commonNameLabel, value: p.name),
           if (p.category != null && p.category!.isNotEmpty)
-            _InfoRow(label: 'Category', value: p.category!),
+            _InfoRow(label: context.l10n.filterCategory, value: p.category!),
           if (p.subCategory != null && p.subCategory!.isNotEmpty)
-            _InfoRow(label: 'Sub-Category', value: p.subCategory!),
+            _InfoRow(label: context.l10n.quoteSubCategoryLabel, value: p.subCategory!),
         ],
       ),
     );
@@ -476,11 +489,11 @@ class _ItemsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unit = order.unit.isNotEmpty ? order.unit : 'unit';
+    final unit = order.unit.isNotEmpty ? order.unit : context.l10n.orderUnitFallback;
     final nf = NumberFormat('#,##0');
 
     return _SectionCard(
-      title: 'Order Items',
+      title: context.l10n.orderItemsTitle,
       icon: Icons.list_alt_outlined,
       child: Column(
         children: order.variants.map((v) {
@@ -526,8 +539,8 @@ class _ItemsCard extends StatelessWidget {
                         children: [
                           if (hasColor)
                             _ColorTag(colorCode: v.variantColorCode!),
-                          if (hasSize) _Tag(label: 'Size ${v.size!}'),
-                          _Tag(label: 'Qty ${v.quantity} $unit'),
+                          if (hasSize) _Tag(label: context.l10n.orderSizeTag(v.size!)),
+                          _Tag(label: context.l10n.orderQtyTag(v.quantity.toString(), unit)),
                         ],
                       ),
                     ],
@@ -546,7 +559,7 @@ class _ItemsCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'per $unit',
+                      context.l10n.orderPerUnitLabel(unit),
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         color: CommonColors.greyText,
@@ -615,11 +628,11 @@ class _PricingCard extends StatelessWidget {
     final p = order.pricing;
 
     return _SectionCard(
-      title: 'Price Breakdown',
+      title: context.l10n.orderPriceBreakdownTitle,
       icon: Icons.receipt_long_outlined,
       child: Column(
         children: [
-          _PriceRow(label: 'Subtotal', value: '₹${_nf.format(p.subtotal)}'),
+          _PriceRow(label: context.l10n.pricingSubtotal, value: '₹${_nf.format(p.subtotal)}'),
 
           if (p.discountAmount > 0) ...[
             const SizedBox(height: 10),
@@ -627,8 +640,10 @@ class _PricingCard extends StatelessWidget {
               color: CommonColors.success,
               child: _PriceRow(
                 label: p.discountPercentage > 0
-                    ? 'Discount (${p.discountPercentage.toStringAsFixed(0)}% off)'
-                    : 'Discount',
+                    ? context.l10n.orderDiscountWithPercent(
+                        p.discountPercentage.toStringAsFixed(0),
+                      )
+                    : context.l10n.pricingDiscount,
                 value: '− ₹${_nf.format(p.discountAmount)}',
                 valueColor: CommonColors.success,
               ),
@@ -643,13 +658,13 @@ class _PricingCard extends StatelessWidget {
                 children: [
                   if (p.cgstAmount > 0 || p.sgstAmount > 0) ...[
                     _PriceRow(
-                      label: 'CGST (${_nf2.format(p.cgstPercentage)}%)',
+                      label: context.l10n.orderCgstLabel(_nf2.format(p.cgstPercentage)),
                       value: '₹${_nf2.format(p.cgstAmount)}',
                       light: true,
                     ),
                     const SizedBox(height: 6),
                     _PriceRow(
-                      label: 'SGST (${_nf2.format(p.sgstPercentage)}%)',
+                      label: context.l10n.orderSgstLabel(_nf2.format(p.sgstPercentage)),
                       value: '₹${_nf2.format(p.sgstAmount)}',
                       light: true,
                     ),
@@ -662,7 +677,7 @@ class _PricingCard extends StatelessWidget {
                     ),
                   ],
                   _PriceRow(
-                    label: 'Total GST',
+                    label: context.l10n.orderTotalGstLabel,
                     value: '₹${_nf.format(p.totalGst)}',
                   ),
                 ],
@@ -672,10 +687,10 @@ class _PricingCard extends StatelessWidget {
 
           const SizedBox(height: 10),
           _PriceRow(
-            label: 'Delivery',
+            label: context.l10n.pricingDelivery,
             value: p.deliveryCharges > 0
                 ? '₹${_nf.format(p.deliveryCharges)}'
-                : 'Free',
+                : context.l10n.orderFreeLabel,
             valueColor:
                 p.deliveryCharges == 0 ? CommonColors.success : null,
           ),
@@ -701,7 +716,7 @@ class _PricingCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total Payable',
+                  context.l10n.orderTotalPayableLabel,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -750,15 +765,21 @@ class _PaymentCard extends StatelessWidget {
     }
   }
 
-  String _payLabel(String s) {
-    const map = {
-      'paid': 'Paid',
-      'pending': 'Pending',
-      'failed': 'Failed',
-      'refunded': 'Refunded',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _payLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'paid':
+        return context.l10n.quoteStatusPaid;
+      case 'pending':
+        return context.l10n.quoteStatusPending;
+      case 'failed':
+        return context.l10n.orderPaymentFailed;
+      case 'refunded':
+        return context.l10n.orderPaymentRefunded;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
   IconData _methodIcon(String? method) {
@@ -782,7 +803,7 @@ class _PaymentCard extends StatelessWidget {
     final statusColor = _payColor(pay.status);
 
     return _SectionCard(
-      title: 'Payment',
+      title: context.l10n.orderPaymentTitle,
       icon: Icons.account_balance_wallet_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -824,10 +845,10 @@ class _PaymentCard extends StatelessWidget {
                     children: [
                       Text(
                         isPaid
-                            ? 'Payment Successful'
+                            ? context.l10n.orderPaymentSuccessful
                             : isFailed
-                                ? 'Payment Failed'
-                                : 'Payment Pending',
+                                ? context.l10n.orderPaymentFailedStatus
+                                : context.l10n.orderPaymentPendingStatus,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -837,8 +858,10 @@ class _PaymentCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         isPaid && pay.amountPaid != null
-                            ? '₹${_nf.format(pay.amountPaid!)} received'
-                            : '₹${_nf.format(order.totalPayableAmount)} ${isPaid ? 'paid' : 'due'}',
+                            ? context.l10n.orderAmountReceived(_nf.format(pay.amountPaid!))
+                            : isPaid
+                                ? context.l10n.orderAmountPaid(_nf.format(order.totalPayableAmount))
+                                : context.l10n.orderAmountDue(_nf.format(order.totalPayableAmount)),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           color: statusColor.withValues(alpha: 0.8),
@@ -857,7 +880,7 @@ class _PaymentCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    _payLabel(pay.status).toUpperCase(),
+                    _payLabel(context, pay.status).toUpperCase(),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
@@ -873,7 +896,7 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(height: 12),
             _PayRow(
               icon: _methodIcon(pay.method),
-              label: 'Method',
+              label: context.l10n.orderMethodLabel,
               value: pay.method!,
             ),
           ],
@@ -882,7 +905,7 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(height: 10),
             _PayRow(
               icon: Icons.calendar_today_outlined,
-              label: 'Paid On',
+              label: context.l10n.orderPaidOnLabel,
               value: DateFormat('d MMM y, h:mm a').format(
                 pay.paidAt!.toLocal(),
               ),
@@ -893,7 +916,7 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(height: 10),
             _PayRow(
               icon: Icons.tag_rounded,
-              label: 'Reference ID',
+              label: context.l10n.orderReferenceIdLabel,
               value: pay.cfPaymentId!,
               mono: true,
             ),
@@ -915,7 +938,7 @@ class _AddressCard extends StatelessWidget {
     final addr = order.deliveryAddress;
 
     return _SectionCard(
-      title: 'Delivery Address',
+      title: context.l10n.quoteDeliveryAddressTitle,
       icon: Icons.location_on_outlined,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -992,38 +1015,42 @@ class _TimelineCard extends StatelessWidget {
   final Order order;
   const _TimelineCard({required this.order});
 
-  static const _steps = [
-    _StepMeta(
-      key: 'order_placed',
-      label: 'Order Placed',
-      description: 'Order confirmed and received',
-      icon: Icons.check_circle_outline,
-    ),
-    _StepMeta(
-      key: 'processing',
-      label: 'Processing',
-      description: 'Seller is preparing your order',
-      icon: Icons.sync_rounded,
-    ),
-    _StepMeta(
-      key: 'packed',
-      label: 'Packed',
-      description: 'Items packed and ready to ship',
-      icon: Icons.inventory_2_outlined,
-    ),
-    _StepMeta(
-      key: 'shipped',
-      label: 'Shipped',
-      description: 'Order is on the way to you',
-      icon: Icons.local_shipping_outlined,
-    ),
-    _StepMeta(
-      key: 'delivered',
-      label: 'Delivered',
-      description: 'Order delivered to your address',
-      icon: Icons.home_outlined,
-    ),
+  static const _stepKeys = [
+    'order_placed', 'processing', 'packed', 'shipped', 'delivered',
   ];
+
+  List<_StepMeta> _steps(BuildContext context) => [
+        _StepMeta(
+          key: 'order_placed',
+          label: context.l10n.orderStepPlaced,
+          description: context.l10n.orderStepDescPlaced,
+          icon: Icons.check_circle_outline,
+        ),
+        _StepMeta(
+          key: 'processing',
+          label: context.l10n.orderStatusProcessing,
+          description: context.l10n.orderStepDescProcessing,
+          icon: Icons.sync_rounded,
+        ),
+        _StepMeta(
+          key: 'packed',
+          label: context.l10n.orderStatusPacked,
+          description: context.l10n.orderStepDescPacked,
+          icon: Icons.inventory_2_outlined,
+        ),
+        _StepMeta(
+          key: 'shipped',
+          label: context.l10n.orderStatusShipped,
+          description: context.l10n.orderStepDescShipped,
+          icon: Icons.local_shipping_outlined,
+        ),
+        _StepMeta(
+          key: 'delivered',
+          label: context.l10n.orderStatusDelivered,
+          description: context.l10n.orderStepDescDelivered,
+          icon: Icons.home_outlined,
+        ),
+      ];
 
   bool _isCompleted(String key) {
     if (key == 'order_placed') return true;
@@ -1038,18 +1065,19 @@ class _TimelineCard extends StatelessWidget {
 
   int get _currentStepIdx {
     if (order.orderStatus == 'cancelled') return 0;
-    final idx = _steps.indexWhere((s) => s.key == order.orderStatus);
+    final idx = _stepKeys.indexOf(order.orderStatus);
     return idx < 0 ? 0 : idx;
   }
 
   @override
   Widget build(BuildContext context) {
     final isCancelled = order.orderStatus == 'cancelled';
-    final totalSteps = isCancelled ? 2 : _steps.length;
+    final steps = _steps(context);
+    final totalSteps = isCancelled ? 2 : steps.length;
     final completedSteps = isCancelled ? 1 : _currentStepIdx + 1;
 
     return _SectionCard(
-      title: 'Order Tracking',
+      title: context.l10n.orderTrackingTitle,
       icon: Icons.local_shipping_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1074,7 +1102,10 @@ class _TimelineCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                isCancelled ? 'Cancelled' : 'Step $completedSteps of $totalSteps',
+                isCancelled
+                    ? context.l10n.quoteStatusCancelled
+                    : context.l10n.orderStepCounter(
+                        completedSteps.toString(), totalSteps.toString()),
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   color: isCancelled ? CommonColors.error : CommonColors.greyText,
@@ -1088,10 +1119,10 @@ class _TimelineCard extends StatelessWidget {
           if (isCancelled)
             _CancelledTimeline(order: order)
           else
-            ..._steps.asMap().entries.map((entry) {
+            ...steps.asMap().entries.map((entry) {
               final index = entry.key;
               final meta = entry.value;
-              final isLast = index == _steps.length - 1;
+              final isLast = index == steps.length - 1;
               final completed = _isCompleted(meta.key);
               final current = _isCurrent(meta.key);
               final date = meta.key == 'order_placed'
@@ -1195,7 +1226,7 @@ class _TimelineStep extends StatelessWidget {
                       ),
                       if (isCurrent)
                         _MiniChip(
-                          label: 'ACTIVE',
+                          label: context.l10n.quoteBadgeActive,
                           color: BuyerColors.primaryLight,
                         ),
                     ],
@@ -1205,7 +1236,7 @@ class _TimelineStep extends StatelessWidget {
                     date != null
                         ? DateFormat('d MMM yyyy, h:mm a').format(date!)
                         : isCurrent
-                            ? 'In progress...'
+                            ? context.l10n.orderInProgressLabel
                             : meta.description,
                     style: GoogleFonts.inter(
                       fontSize: 11,
@@ -1286,10 +1317,10 @@ class _CancelledTimeline extends StatelessWidget {
     return Column(
       children: [
         _TimelineStep(
-          meta: const _StepMeta(
+          meta: _StepMeta(
             key: 'order_placed',
-            label: 'Order Placed',
-            description: 'Order confirmed and received',
+            label: context.l10n.orderStepPlaced,
+            description: context.l10n.orderStepDescPlaced,
             icon: Icons.check_circle_outline,
           ),
           date: placedDate,
@@ -1299,10 +1330,10 @@ class _CancelledTimeline extends StatelessWidget {
           isPending: false,
         ),
         _TimelineStep(
-          meta: const _StepMeta(
+          meta: _StepMeta(
             key: 'cancelled',
-            label: 'Order Cancelled',
-            description: 'This order was cancelled',
+            label: context.l10n.orderStepCancelledLabel,
+            description: context.l10n.orderStepDescCancelled,
             icon: Icons.cancel_outlined,
           ),
           date: cancelledDate,
@@ -1336,21 +1367,21 @@ class _CancelButtonState extends ConsumerState<_CancelButton> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          'Cancel Order',
+          context.l10n.orderCancelDialogTitle,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Are you sure you want to cancel this order?',
+              context.l10n.orderCancelConfirmMessage,
               style: GoogleFonts.inter(fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
-              decoration: const InputDecoration(
-                hintText: 'Reason (optional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: context.l10n.quoteCancelReasonHint,
+                border: const OutlineInputBorder(),
               ),
               onChanged: (v) => reason = v,
             ),
@@ -1359,12 +1390,12 @@ class _CancelButtonState extends ConsumerState<_CancelButton> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('No'),
+            child: Text(context.l10n.commonNo),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'Yes, Cancel',
+              context.l10n.quoteYesCancelBtn,
               style: GoogleFonts.inter(color: CommonColors.error),
             ),
           ),
@@ -1406,7 +1437,7 @@ class _CancelButtonState extends ConsumerState<_CancelButton> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Text(
-                'Cancel Order',
+                context.l10n.orderCancelDialogTitle,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   color: CommonColors.error,

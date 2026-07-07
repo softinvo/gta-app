@@ -6,6 +6,7 @@ import 'package:gta_app/src/features/buyer/orders/controller/buyer_order_control
 import 'package:gta_app/src/features/buyer/orders/views/buyer_order_details_screen.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:intl/intl.dart';
 
 class BuyerOrderListScreen extends ConsumerStatefulWidget {
@@ -85,13 +86,13 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
   }
 
   void _showFilterSheet(BuildContext context) {
-    const statuses = [
-      {'id': '', 'label': 'All'},
-      {'id': 'processing', 'label': 'Processing'},
-      {'id': 'packed', 'label': 'Packed'},
-      {'id': 'shipped', 'label': 'Shipped'},
-      {'id': 'delivered', 'label': 'Delivered'},
-      {'id': 'cancelled', 'label': 'Cancelled'},
+    final statuses = [
+      {'id': '', 'label': context.l10n.quoteStatusAll},
+      {'id': 'processing', 'label': context.l10n.orderStatusProcessing},
+      {'id': 'packed', 'label': context.l10n.orderStatusPacked},
+      {'id': 'shipped', 'label': context.l10n.orderStatusShipped},
+      {'id': 'delivered', 'label': context.l10n.orderStatusDelivered},
+      {'id': 'cancelled', 'label': context.l10n.quoteStatusCancelled},
     ];
 
     String sheetSort = _sort;
@@ -137,7 +138,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Filter & Sort',
+                    context.l10n.filterTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -151,7 +152,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                       sheetStatus = null;
                     }),
                     child: Text(
-                      'Reset',
+                      context.l10n.commonReset,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -164,7 +165,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
               const SizedBox(height: 20),
 
               Text(
-                'SORT BY',
+                context.l10n.quoteSortBySection,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -176,14 +177,14 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
               Row(
                 children: [
                   _SortChip(
-                    label: 'Newest First',
+                    label: context.l10n.filterSortNewest,
                     icon: Icons.arrow_downward_rounded,
                     isSelected: sheetSort == '-1',
                     onTap: () => setSheet(() => sheetSort = '-1'),
                   ),
                   const SizedBox(width: 10),
                   _SortChip(
-                    label: 'Oldest First',
+                    label: context.l10n.quoteSortOldestFirst,
                     icon: Icons.arrow_upward_rounded,
                     isSelected: sheetSort == '1',
                     onTap: () => setSheet(() => sheetSort = '1'),
@@ -196,7 +197,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
               const SizedBox(height: 16),
 
               Text(
-                'STATUS',
+                context.l10n.quoteStatusSection,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -263,7 +264,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                         borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Text(
-                    'Apply Filters',
+                    context.l10n.filterApplyFilters,
                     style: GoogleFonts.inter(
                         fontSize: 15, fontWeight: FontWeight.w700),
                   ),
@@ -315,7 +316,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                           color: CommonColors.black,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'Search orders...',
+                          hintText: context.l10n.orderSearchHint,
                           hintStyle: GoogleFonts.inter(
                             color: CommonColors.greyText,
                             fontSize: 14,
@@ -411,7 +412,9 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                 children: [
                   if (hasSort)
                     _ActiveChip(
-                      label: _sort == '1' ? 'Oldest First' : 'Newest First',
+                      label: _sort == '1'
+                          ? context.l10n.quoteSortOldestFirst
+                          : context.l10n.filterSortNewest,
                       icon: _sort == '1'
                           ? Icons.arrow_upward_rounded
                           : Icons.arrow_downward_rounded,
@@ -421,7 +424,7 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                   if (hasSort && hasStatus) const SizedBox(width: 8),
                   if (hasStatus)
                     _ActiveChip(
-                      label: _statusLabel(_selectedStatus!),
+                      label: _statusLabel(context, _selectedStatus!),
                       onRemove: () =>
                           _applyFilter(status: null, sort: _sort),
                     ),
@@ -493,18 +496,18 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
     );
   }
 
-  static String _statusLabel(String status) {
+  String _statusLabel(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'processing':
-        return 'Processing';
+        return context.l10n.orderStatusProcessing;
       case 'packed':
-        return 'Packed';
+        return context.l10n.orderStatusPacked;
       case 'shipped':
-        return 'Shipped';
+        return context.l10n.orderStatusShipped;
       case 'delivered':
-        return 'Delivered';
+        return context.l10n.orderStatusDelivered;
       case 'cancelled':
-        return 'Cancelled';
+        return context.l10n.quoteStatusCancelled;
       default:
         return status;
     }
@@ -571,7 +574,8 @@ class _OrderCard extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    order.productSnapshot?.name ?? 'Order',
+                                    order.productSnapshot?.name ??
+                                        context.l10n.commonOrderFallback,
                                     style: GoogleFonts.inter(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
@@ -587,12 +591,12 @@ class _OrderCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 _StatusBadge(
-                                  label: _orderStatusLabel(order.orderStatus),
+                                  label: _orderStatusLabel(context, order.orderStatus),
                                   color: orderColor,
                                 ),
                                 const SizedBox(height: 4),
                                 _StatusBadge(
-                                  label: _paymentLabel(order.payment.status),
+                                  label: _paymentLabel(context, order.payment.status),
                                   color: payColor,
                                 ),
                               ],
@@ -605,7 +609,7 @@ class _OrderCard extends StatelessWidget {
                         if (order.variants.isNotEmpty)
                           _InfoRow(
                             icon: Icons.inventory_2_outlined,
-                            text: _variantsSummary(order.variants),
+                            text: _variantsSummary(context, order.variants),
                           ),
                         const SizedBox(height: 4),
                         _InfoRow(
@@ -655,20 +659,26 @@ class _OrderCard extends StatelessWidget {
     );
   }
 
-  String _variantsSummary(List<OrderVariant> variants) {
+  String _variantsSummary(BuildContext context, List<OrderVariant> variants) {
     final total = variants.fold(0, (s, v) => s + v.quantity);
-    return '$total units · ${variants.length} variant${variants.length > 1 ? 's' : ''}';
+    return context.l10n.orderVariantsSummary(total, variants.length);
   }
 
-  String _orderStatusLabel(String s) {
-    const map = {
-      'processing': 'Processing',
-      'packed': 'Packed',
-      'shipped': 'Shipped',
-      'delivered': 'Delivered',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _orderStatusLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'processing':
+        return context.l10n.orderStatusProcessing;
+      case 'packed':
+        return context.l10n.orderStatusPacked;
+      case 'shipped':
+        return context.l10n.orderStatusShipped;
+      case 'delivered':
+        return context.l10n.orderStatusDelivered;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
   Color _orderStatusColor(String s) {
@@ -688,15 +698,21 @@ class _OrderCard extends StatelessWidget {
     }
   }
 
-  String _paymentLabel(String s) {
-    const map = {
-      'pending': 'Unpaid',
-      'paid': 'Paid',
-      'failed': 'Failed',
-      'refunded': 'Refunded',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _paymentLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'pending':
+        return context.l10n.orderPaymentUnpaid;
+      case 'paid':
+        return context.l10n.quoteStatusPaid;
+      case 'failed':
+        return context.l10n.orderPaymentFailed;
+      case 'refunded':
+        return context.l10n.orderPaymentRefunded;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
   Color _paymentColor(String s) {
@@ -902,7 +918,7 @@ class _EmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'No Orders Yet',
+            context.l10n.orderEmptyTitle,
             style: GoogleFonts.inter(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -911,7 +927,7 @@ class _EmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Your placed orders will appear here.',
+            context.l10n.orderEmptySubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -954,7 +970,7 @@ class _ErrorView extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Retry',
+              context.l10n.commonRetry,
               style: GoogleFonts.inter(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,

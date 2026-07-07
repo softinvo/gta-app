@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class LogoutConfirmationDialog extends StatelessWidget {
   final VoidCallback onLogout;
@@ -45,7 +46,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
 
             // Title
             Text(
-              'Logout',
+              context.l10n.commonLogout,
               style: GoogleFonts.poppins(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -56,7 +57,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
 
             // Description
             Text(
-              'Are you sure you want to sign out?',
+              context.l10n.profileLogoutConfirmMessage,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 15,
@@ -79,7 +80,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Cancel',
+                      context.l10n.commonCancel,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -104,7 +105,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Logout',
+                      context.l10n.commonLogout,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

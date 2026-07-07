@@ -6,6 +6,7 @@ import 'package:gta_app/src/features/buyer/saved/controller/saved_products_contr
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class ProductGridCard extends ConsumerWidget {
   final ProductCollectionItem item;
@@ -178,7 +179,7 @@ class ProductGridCard extends ConsumerWidget {
                           textBaseline: TextBaseline.alphabetic,
                           children: [
                             Text(
-                              'From ',
+                              '${context.l10n.productFromPricePrefix} ',
                               style: GoogleFonts.inter(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w600,
@@ -212,7 +213,9 @@ class ProductGridCard extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  '${item.discountPercent.toInt()}% OFF',
+                                  context.l10n.productDiscountOff(
+                                    item.discountPercent.toInt().toString(),
+                                  ),
                                   style: GoogleFonts.inter(
                                     fontSize: 8,
                                     fontWeight: FontWeight.w700,
