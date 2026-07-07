@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -47,28 +41,50 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC43N9M0m9ZQ3T-M3mZIK968NC34suEC1E',
-    appId: '1:794037180140:web:xxxxxx', // Placeholder - Web App ID not in JSON
+    apiKey: 'AIzaSyBKidQwx74FPHy_yPv-0MRjJO9uxqetGJc',
+    appId: '1:794037180140:web:5426c69d9f3900efdcf7c9',
     messagingSenderId: '794037180140',
     projectId: 'project-gta-44e31',
     authDomain: 'project-gta-44e31.firebaseapp.com',
     storageBucket: 'project-gta-44e31.firebasestorage.app',
+    measurementId: 'G-TQW24F2RNB',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC43N9M0m9ZQ3T-M3mZIK968NC34suEC1E',
-    appId: '1:794037180140:android:d6e9813447300cd6dcf7c9',
+    appId: '1:794037180140:android:ff650ef113b58244dcf7c9',
     messagingSenderId: '794037180140',
     projectId: 'project-gta-44e31',
     storageBucket: 'project-gta-44e31.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC43N9M0m9ZQ3T-M3mZIK968NC34suEC1E',
-    appId: '1:794037180140:ios:xxxxxx', // Placeholder - iOS App ID not in JSON
+    apiKey: 'AIzaSyDbb4ad1lM7XL1RCxdnp0-PFy2Nt-6lBQU',
+    appId: '1:794037180140:ios:3ac29ac10d247793dcf7c9',
     messagingSenderId: '794037180140',
     projectId: 'project-gta-44e31',
     storageBucket: 'project-gta-44e31.firebasestorage.app',
-    iosBundleId: 'com.gta.app',
+    androidClientId: '794037180140-1p77urkrglvr2bthu9tthfgo6vbepqvf.apps.googleusercontent.com',
+    iosClientId: '794037180140-de5313h13m6el5e1o1rbi06ao5nkoa8e.apps.googleusercontent.com',
+    iosBundleId: 'com.softinvo.globaltextileaxis',
+  );
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDbb4ad1lM7XL1RCxdnp0-PFy2Nt-6lBQU',
+    appId: '1:794037180140:ios:eec1379fbe7e9056dcf7c9',
+    messagingSenderId: '794037180140',
+    projectId: 'project-gta-44e31',
+    storageBucket: 'project-gta-44e31.firebasestorage.app',
+    androidClientId: '794037180140-1p77urkrglvr2bthu9tthfgo6vbepqvf.apps.googleusercontent.com',
+    iosClientId: '794037180140-d8f975m6dr7vgirq6v14it9dlpr8oad2.apps.googleusercontent.com',
+    iosBundleId: 'com.example.gtaApp',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBKidQwx74FPHy_yPv-0MRjJO9uxqetGJc',
+    appId: '1:794037180140:web:5426c69d9f3900efdcf7c9',
+    messagingSenderId: '794037180140',
+    projectId: 'project-gta-44e31',
+    authDomain: 'project-gta-44e31.firebaseapp.com',
+    storageBucket: 'project-gta-44e31.firebasestorage.app',
+    measurementId: 'G-TQW24F2RNB',
   );
 }
