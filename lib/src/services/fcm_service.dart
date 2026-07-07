@@ -56,10 +56,14 @@ class FcmService {
     FirebaseMessaging.onMessage.listen(_showForegroundNotification);
 
     // Get FCM token and persist
-    final token = await messaging.getToken();
-    if (token != null) {
-      log('FCM Token obtained: $token', name: 'FCM');
-      await SharedPrefsRepo().setFcmToken(token);
+    try {
+      final token = await messaging.getToken();
+      if (token != null) {
+        log('FCM Token obtained: $token', name: 'FCM');
+        await SharedPrefsRepo().setFcmToken(token);
+      }
+    } catch (e) {
+      log('Failed to get FCM token (likely running on iOS Simulator): $e', name: 'FCM');
     }
 
     // Re-upload token on rotation

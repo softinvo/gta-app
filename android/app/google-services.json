@@ -37,6 +37,13 @@
             {
               "client_id": "794037180140-dg8h4lv8rcu3n8dig89nqe96r886u2qp.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "794037180140-d8f975m6dr7vgirq6v14it9dlpr8oad2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gtaApp"
+              }
             }
           ]
         }
@@ -90,6 +97,13 @@
             {
               "client_id": "794037180140-dg8h4lv8rcu3n8dig89nqe96r886u2qp.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "794037180140-d8f975m6dr7vgirq6v14it9dlpr8oad2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gtaApp"
+              }
             }
           ]
         }
