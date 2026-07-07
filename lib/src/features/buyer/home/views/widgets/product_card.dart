@@ -6,6 +6,7 @@ import 'package:gta_app/src/features/buyer/saved/controller/saved_products_contr
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 /// Horizontal-scroll product card (Flash Sale section).
 class ProductCard extends ConsumerWidget {
@@ -79,7 +80,9 @@ class ProductCard extends ConsumerWidget {
                   Positioned(
                     top: 10, left: 10,
                     child: _Badge(
-                      label: '${item.discountPercent.toInt()}% OFF',
+                      label: context.l10n.productDiscountOff(
+                        item.discountPercent.toInt().toString(),
+                      ),
                       color: Colors.red.shade600,
                     ),
                   ),
@@ -126,7 +129,7 @@ class ProductCard extends ConsumerWidget {
                   ],
                   const SizedBox(height: 10),
                   Text(
-                    'From',
+                    context.l10n.productFromPricePrefix,
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       color: CommonColors.greyText,

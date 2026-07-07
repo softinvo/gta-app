@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 /// The three-stat card shown on the buyer profile tab.
 class ProfileStatsCard extends StatelessWidget {
@@ -41,7 +42,7 @@ class ProfileStatsCard extends StatelessWidget {
         children: [
           _StatTile(
             icon: Icons.receipt_long_rounded,
-            label: 'Orders',
+            label: context.l10n.profileStatOrders,
             value: orderCount,
             accentColor: BuyerColors.primaryLight,
             bgColor: BuyerColors.surface,
@@ -49,7 +50,7 @@ class ProfileStatsCard extends StatelessWidget {
           _Divider(),
           _StatTile(
             icon: Icons.description_outlined,
-            label: 'Quotes',
+            label: context.l10n.profileStatQuotes,
             value: quoteCount,
             accentColor: const Color(0xFFE67E22),
             bgColor: const Color(0xFFFFF3E0),
@@ -57,7 +58,7 @@ class ProfileStatsCard extends StatelessWidget {
           _Divider(),
           _StatTile(
             icon: Icons.favorite_rounded,
-            label: 'Wishlist',
+            label: context.l10n.profileStatWishlist,
             value: wishlistCount,
             accentColor: Colors.red.shade500,
             bgColor: Colors.red.shade50,

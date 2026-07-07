@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/complaint/repository/complaint_repository.dart';
 import 'package:gta_app/src/models/complaint_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
 import 'package:intl/intl.dart';
 
@@ -85,7 +86,7 @@ class _ComplaintDetailsScreenState
         _messageController.clear();
         _fetchDetails(); // Refresh to get new messages
         if (mounted) {
-          SnackBarService.showSuccess(context, 'Message sent');
+          SnackBarService.showSuccess(context, context.l10n.complaintMessageSent);
         }
       },
     );
@@ -106,7 +107,7 @@ class _ComplaintDetailsScreenState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Complaint Details',
+          context.l10n.complaintDetailsTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -142,14 +143,14 @@ class _ComplaintDetailsScreenState
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            TextButton(onPressed: _fetchDetails, child: const Text('Retry')),
+            TextButton(onPressed: _fetchDetails, child: Text(context.l10n.commonRetry)),
           ],
         ),
       );
     }
 
     if (_complaint == null) {
-      return const Center(child: Text('No complaint found'));
+      return Center(child: Text(context.l10n.complaintNotFound));
     }
 
     return RefreshIndicator(
@@ -192,7 +193,7 @@ class _ComplaintDetailsScreenState
           Icon(_getStatusIcon(status), color: Colors.white, size: 14),
           const SizedBox(width: 6),
           Text(
-            status,
+            _statusLabel(status),
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -218,7 +219,7 @@ class _ComplaintDetailsScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Complaint Information',
+                context.l10n.complaintInfoTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -229,16 +230,16 @@ class _ComplaintDetailsScreenState
             ],
           ),
           const SizedBox(height: 16),
-          _buildInfoRow('Complaint ID', _complaint!.complaintID),
+          _buildInfoRow(context.l10n.complaintIdLabel, _complaint!.complaintID),
           const Divider(height: 24),
-          _buildInfoRow('Subject', _complaint!.subject),
+          _buildInfoRow(context.l10n.complaintSubjectLabel, _complaint!.subject),
           if (_complaint!.orderNumber != null) ...[
             const Divider(height: 24),
-            _buildInfoRow('Order Number', _complaint!.orderNumber!),
+            _buildInfoRow(context.l10n.complaintOrderNumberDisplayLabel, _complaint!.orderNumber!),
           ],
           const Divider(height: 24),
           _buildInfoRow(
-            'Created On',
+            context.l10n.complaintCreatedOnLabel,
             DateFormat('dd MMM yyyy, hh:mm a').format(_complaint!.createdAt),
           ),
         ],
@@ -288,7 +289,7 @@ class _ComplaintDetailsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Description',
+            context.l10n.complaintDescriptionTitle,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -297,7 +298,7 @@ class _ComplaintDetailsScreenState
           ),
           const SizedBox(height: 12),
           Text(
-            _complaint!.description ?? 'No description provided',
+            _complaint!.description ?? context.l10n.complaintNoDescription,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: CommonColors.greyText,
@@ -329,7 +330,7 @@ class _ComplaintDetailsScreenState
           Row(
             children: [
               Text(
-                'Messages',
+                context.l10n.complaintMessagesTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -415,7 +416,7 @@ class _ComplaintDetailsScreenState
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'ADMIN',
+                        context.l10n.complaintAdminBadge,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -482,7 +483,7 @@ class _ComplaintDetailsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Complaint Resolved',
+                  context.l10n.complaintResolvedTitle,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -490,7 +491,7 @@ class _ComplaintDetailsScreenState
                   ),
                 ),
                 Text(
-                  'This complaint has been resolved. Chat is now closed.',
+                  context.l10n.complaintResolvedMessage,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: Colors.green.shade600,
@@ -528,7 +529,7 @@ class _ComplaintDetailsScreenState
             child: TextField(
               controller: _messageController,
               decoration: InputDecoration(
-                hintText: 'Type your message...',
+                hintText: context.l10n.complaintMessageHint,
                 hintStyle: GoogleFonts.inter(
                   color: CommonColors.greyText,
                   fontSize: 14,
@@ -572,6 +573,23 @@ class _ComplaintDetailsScreenState
         ],
       ),
     );
+  }
+
+  // Translates the raw status value for display. The switches below must
+  // stay in English since they're matched against backend-provided values.
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'Pending':
+        return context.l10n.quoteStatusPending;
+      case 'Active':
+        return context.l10n.complaintStatusActive;
+      case 'Resolved':
+        return context.l10n.complaintStatusResolved;
+      case 'On Hold':
+        return context.l10n.complaintStatusOnHold;
+      default:
+        return status;
+    }
   }
 
   Color _getStatusColor(String status) {

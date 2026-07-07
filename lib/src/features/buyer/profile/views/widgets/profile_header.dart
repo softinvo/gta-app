@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class ProfileHeader extends StatelessWidget {
   final String name;
@@ -195,8 +196,8 @@ class ProfileHeader extends StatelessWidget {
                                   const SizedBox(width: 6),
                                   Text(
                                     isBuyer
-                                        ? 'Buyer Account'
-                                        : 'Seller Account',
+                                        ? context.l10n.profileBuyerAccountBadge
+                                        : context.l10n.profileSellerAccountBadge,
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,

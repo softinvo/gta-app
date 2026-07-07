@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
 import 'package:gta_app/src/models/buyer_model.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
 import 'package:gta_app/src/utils/upload_utils.dart';
 
@@ -74,7 +75,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Upload Profile Picture',
+              context.l10n.editProfileUploadTitle,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -84,10 +85,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildUploadOption(Icons.camera_alt, 'Camera', () {
+                _buildUploadOption(Icons.camera_alt, context.l10n.commonCamera, () {
                   Navigator.pop(context, ImageSource.camera);
                 }),
-                _buildUploadOption(Icons.photo_library, 'Gallery', () {
+                _buildUploadOption(Icons.photo_library, context.l10n.commonGallery, () {
                   Navigator.pop(context, ImageSource.gallery);
                 }),
               ],
@@ -127,9 +128,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
             if (mounted) {
               if (success) {
-                SnackBarService.showSuccess(context, 'Profile picture updated');
+                SnackBarService.showSuccess(context, context.l10n.editProfilePictureUpdated);
               } else {
-                SnackBarService.showError(context, 'Failed to update profile');
+                SnackBarService.showError(context, context.l10n.editProfileUpdateFailed);
               }
             }
           },
@@ -173,7 +174,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Edit Profile',
+          context.l10n.profileEditProfileTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -203,7 +204,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               .when(
                 data: (buyer) {
                   if (buyer == null) {
-                    return const Center(child: Text('Buyer data not found'));
+                    return Center(child: Text(context.l10n.editProfileDataNotFound));
                   }
                   return _buildBody(buyer);
                 },
@@ -216,13 +217,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Error: $error'),
+                      Text(context.l10n.commonErrorPrefix(error.toString())),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () => ref
                             .read(buyerProfileProvider.notifier)
                             .getProfile(),
-                        child: const Text('Retry'),
+                        child: Text(context.l10n.commonRetry),
                       ),
                     ],
                   ),
@@ -311,26 +312,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             const SizedBox(height: 32),
 
             // Form Fields
-            _buildLabel('First Name'),
+            _buildLabel(context.l10n.editProfileFirstNameLabel),
             const SizedBox(height: 8),
-            _buildTextField(_firstNameController, 'Enter first name'),
+            _buildTextField(_firstNameController, context.l10n.editProfileFirstNameHint),
 
             const SizedBox(height: 20),
-            _buildLabel('Last Name'),
+            _buildLabel(context.l10n.editProfileLastNameLabel),
             const SizedBox(height: 8),
-            _buildTextField(_lastNameController, 'Enter last name'),
+            _buildTextField(_lastNameController, context.l10n.editProfileLastNameHint),
 
             const SizedBox(height: 20),
-            _buildLabel('Email Address'),
+            _buildLabel(context.l10n.editProfileEmailLabel),
             const SizedBox(height: 8),
             _buildTextField(
               _emailController,
-              'Enter email address',
+              context.l10n.editProfileEmailHint,
               keyboardType: TextInputType.emailAddress,
             ),
 
             const SizedBox(height: 20),
-            _buildLabel('Gender'),
+            _buildLabel(context.l10n.editProfileGenderLabel),
             const SizedBox(height: 8),
             _buildGenderDropdown(),
 
@@ -359,13 +360,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           if (success && mounted) {
                             SnackBarService.showSuccess(
                               context,
-                              'Profile updated successfully',
+                              context.l10n.editProfileUpdateSuccess,
                             );
                             Navigator.pop(context);
                           } else if (mounted) {
                             SnackBarService.showError(
                               context,
-                              'Failed to update profile',
+                              context.l10n.editProfileUpdateFailed,
                             );
                           }
                         }
@@ -388,7 +389,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                       )
                     : Text(
-                        'Update Profile',
+                        context.l10n.editProfileUpdateCta,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -449,7 +450,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'This field is required';
+          return context.l10n.commonFieldRequired;
         }
         return null;
       },
@@ -470,8 +471,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           isExpanded: true,
           icon: Icon(Icons.keyboard_arrow_down, color: CommonColors.greyText),
           style: GoogleFonts.inter(fontSize: 15, color: CommonColors.black),
-          items: ['Male', 'Female', 'Other'].map((String value) {
-            return DropdownMenuItem<String>(value: value, child: Text(value));
+          items: {
+            'Male': context.l10n.genderMale,
+            'Female': context.l10n.genderFemale,
+            'Other': context.l10n.genderOther,
+          }.entries.map((e) {
+            return DropdownMenuItem<String>(value: e.key, child: Text(e.value));
           }).toList(),
           onChanged: (newValue) {
             setState(() {

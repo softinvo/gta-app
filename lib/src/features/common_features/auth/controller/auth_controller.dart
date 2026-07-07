@@ -1,7 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gta_app/src/commons/controller/shared_prefs_controller.dart';
 import 'package:gta_app/src/commons/providers/common_providers.dart';
+import 'package:gta_app/src/features/buyer/complaint/controller/complaint_controller.dart';
+import 'package:gta_app/src/features/buyer/orders/controller/buyer_order_controller.dart';
+import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
+import 'package:gta_app/src/features/buyer/quotation/controller/quotation_controller.dart';
+import 'package:gta_app/src/features/buyer/quotes/controller/buyer_quote_controller.dart';
+import 'package:gta_app/src/features/buyer/saved/controller/saved_products_controller.dart';
 import 'package:gta_app/src/features/common_features/auth/repository/auth_repository.dart';
+import 'package:gta_app/src/features/seller/complaint/controller/seller_complaint_controller.dart';
+import 'package:gta_app/src/features/seller/orders/controller/seller_order_controller.dart';
+import 'package:gta_app/src/features/seller/product/controllers/product_controller.dart';
+import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
+import 'package:gta_app/src/features/seller/profile/repository/seller_profile_stats_repository.dart';
+import 'package:gta_app/src/features/seller/quotes/controller/seller_quote_controller.dart';
 import 'package:gta_app/src/services/fcm_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -111,6 +123,7 @@ class VerifyOtpNotifier extends Notifier<AsyncValue<AuthState>> {
 
         // Update auth token provider
         ref.read(authTokenProvider.notifier).state = token;
+        _resetUserScopedProviders();
 
         // Upload FCM token to backend
         FcmService.uploadAfterLogin(authToken: token, userType: userType);
@@ -187,6 +200,7 @@ class VerifyOtpNotifier extends Notifier<AsyncValue<AuthState>> {
 
           // Update auth token provider
           ref.read(authTokenProvider.notifier).state = token;
+          _resetUserScopedProviders();
 
           // Upload FCM token to backend
           FcmService.uploadAfterLogin(authToken: token, userType: userType);
@@ -213,6 +227,50 @@ class VerifyOtpNotifier extends Notifier<AsyncValue<AuthState>> {
     state = const AsyncValue.data(
       AuthState(status: AuthStatus.unauthenticated),
     );
+  }
+
+  /// Riverpod's root [ProviderScope] lives for the whole app lifetime, so
+  /// providers that fetch data once (profile, orders, quotes, wishlist, etc.)
+  /// keep the previous account's data cached in memory until explicitly
+  /// invalidated. Without this, logging in as a different user shows the
+  /// previous user's data until those providers happen to be invalidated
+  /// some other way (e.g. app restart).
+  ///
+  /// This must run right after a successful login (token already set to the
+  /// new value), not at logout time: the screen that triggers logout is
+  /// often still mounted and actively watching these providers while logout()
+  /// runs, so invalidating them there causes an immediate rebuild with the
+  /// just-cleared (null) token — which fails and permanently caches an error
+  /// state until something invalidates them again. Invalidating post-login
+  /// instead means nothing is watching them yet (the user is still on the
+  /// login screen), so they cleanly rebuild with the valid new token the
+  /// first time the destination screens mount.
+  void _resetUserScopedProviders() {
+    // Buyer
+    ref.invalidate(buyerProfileProvider);
+    ref.invalidate(buyerAddressesProvider);
+    ref.invalidate(complaintsProvider);
+    ref.invalidate(complaintStatsProvider);
+    ref.invalidate(createComplaintProvider);
+    ref.invalidate(savedProductsProvider);
+    ref.invalidate(buyerOrdersProvider);
+    ref.invalidate(buyerQuotationsProvider);
+    ref.invalidate(buyerQuotationDetailsProvider);
+    ref.invalidate(buyerQuotationStatsProvider);
+    ref.invalidate(createQuotationProvider);
+
+    // Seller
+    ref.invalidate(sellerProfileProvider);
+    ref.invalidate(sellerProfileStatsProvider);
+    ref.invalidate(sellerComplaintsProvider);
+    ref.invalidate(createSellerComplaintProvider);
+    ref.invalidate(sellerOrdersProvider);
+    ref.invalidate(sellerOrderDetailsProvider);
+    ref.invalidate(sellerOrderStatsProvider);
+    ref.invalidate(sellerQuotationsProvider);
+    ref.invalidate(sellerQuotationDetailsProvider);
+    ref.invalidate(sellerQuotationStatsProvider);
+    ref.invalidate(productListProvider);
   }
 
   void reset() {

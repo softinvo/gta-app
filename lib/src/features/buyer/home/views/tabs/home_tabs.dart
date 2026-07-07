@@ -8,6 +8,7 @@ import 'package:gta_app/src/features/buyer/product/controller/buyer_product_cont
 import 'package:gta_app/src/features/buyer/quotes/views/buyer_quote_list_screen.dart';
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:shimmer/shimmer.dart';
 import '../widgets/home_widgets.dart';
 
@@ -54,7 +55,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Search products, categories...',
+                      context.l10n.homeSearchHint,
                       style: GoogleFonts.inter(
                         color: CommonColors.greyText,
                         fontSize: 14,
@@ -102,35 +103,35 @@ class _CollectionsBody extends StatelessWidget {
       children: [
         if (collections.flashSale.isNotEmpty)
           _HorizontalSection(
-            title: 'Flash Sale',
+            title: context.l10n.homeFlashSale,
             items: collections.flashSale,
           ),
         if (collections.bestSellers.isNotEmpty)
           _GridSection(
-            title: 'Best Sellers',
+            title: context.l10n.homeBestSellers,
             items: collections.bestSellers,
-            badge: 'BEST SELLER',
+            badge: context.l10n.homeBadgeBestSeller,
             badgeColor: BuyerColors.gridBadgeSale,
           ),
         if (collections.topRated.isNotEmpty)
           _GridSection(
-            title: 'Top Rated',
+            title: context.l10n.homeTopRated,
             items: collections.topRated,
-            badge: 'TOP RATED',
+            badge: context.l10n.homeBadgeTopRated,
             badgeColor: BuyerColors.gridBadgeTop,
           ),
         if (collections.newArrivals.isNotEmpty)
           _GridSection(
-            title: 'New Arrivals',
+            title: context.l10n.homeNewArrivals,
             items: collections.newArrivals,
-            badge: 'NEW',
+            badge: context.l10n.homeBadgeNew,
             badgeColor: BuyerColors.gridBadgeNew,
           ),
         if (collections.isEmpty)
           Padding(
             padding: const EdgeInsets.all(40),
             child: Text(
-              'No products available',
+              context.l10n.commonNoProductsAvailable,
               style: GoogleFonts.inter(
                   color: CommonColors.greyText, fontSize: 14),
             ),
@@ -313,7 +314,7 @@ class _CollectionsError extends StatelessWidget {
           Icon(Icons.error_outline, size: 48, color: CommonColors.error),
           const SizedBox(height: 12),
           Text(
-            'Failed to load products',
+            context.l10n.homeFailedToLoadProducts,
             style:
                 GoogleFonts.inter(color: CommonColors.greyText, fontSize: 14),
           ),
@@ -321,7 +322,7 @@ class _CollectionsError extends StatelessWidget {
           TextButton(
             onPressed: onRetry,
             child: Text(
-              'Retry',
+              context.l10n.commonRetry,
               style: GoogleFonts.inter(color: BuyerColors.primaryLight),
             ),
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class BuyerVerificationScreen extends ConsumerStatefulWidget {
   const BuyerVerificationScreen({super.key});
@@ -82,7 +83,7 @@ class _BuyerVerificationScreenState
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Verification details submitted successfully'),
+          content: Text(context.l10n.verificationSubmitSuccess),
           backgroundColor: CommonColors.success,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -106,7 +107,7 @@ class _BuyerVerificationScreenState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Verification',
+          context.l10n.verificationTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -128,7 +129,7 @@ class _BuyerVerificationScreenState
 
               // Section Title
               Text(
-                'KYC Documents',
+                context.l10n.verificationKycTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -137,7 +138,7 @@ class _BuyerVerificationScreenState
               ),
               const SizedBox(height: 8),
               Text(
-                'Submit your documents for verification to unlock all features',
+                context.l10n.verificationKycSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: CommonColors.greyText,
@@ -146,31 +147,31 @@ class _BuyerVerificationScreenState
               const SizedBox(height: 24),
 
               // Form Fields
-              _buildLabel('Name (as per documents)'),
+              _buildLabel(context.l10n.verificationNameLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _nameController,
-                'Enter name as per Aadhar/PAN',
+                context.l10n.verificationNameHint,
                 Icons.person_outline,
               ),
 
               const SizedBox(height: 20),
-              _buildLabel('Date of Birth'),
+              _buildLabel(context.l10n.verificationDobLabel),
               const SizedBox(height: 8),
               _buildDatePicker(),
 
               const SizedBox(height: 20),
-              _buildLabel('Address (as per documents)'),
+              _buildLabel(context.l10n.verificationAddressLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _addressController,
-                'Enter address as per Aadhar',
+                context.l10n.verificationAddressHint,
                 Icons.location_on_outlined,
                 maxLines: 3,
               ),
 
               const SizedBox(height: 20),
-              _buildLabel('Aadhar Number'),
+              _buildLabel(context.l10n.verificationAadharLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _aadharController,
@@ -184,18 +185,18 @@ class _BuyerVerificationScreenState
                 ],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter Aadhar number';
+                    return context.l10n.verificationAadharRequired;
                   }
                   final cleanValue = value.replaceAll(' ', '');
                   if (cleanValue.length != 12) {
-                    return 'Aadhar number must be 12 digits';
+                    return context.l10n.verificationAadharInvalid;
                   }
                   return null;
                 },
               ),
 
               const SizedBox(height: 20),
-              _buildLabel('PAN Number'),
+              _buildLabel(context.l10n.verificationPanLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _panController,
@@ -208,11 +209,11 @@ class _BuyerVerificationScreenState
                 ],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter PAN number';
+                    return context.l10n.verificationPanRequired;
                   }
                   final panRegex = RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$');
                   if (!panRegex.hasMatch(value)) {
-                    return 'Enter valid PAN (e.g., ABCDE1234F)';
+                    return context.l10n.verificationPanInvalid;
                   }
                   return null;
                 },
@@ -240,7 +241,7 @@ class _BuyerVerificationScreenState
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Your documents will be verified within 24-48 hours.',
+                        context.l10n.verificationInfoNote,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: BuyerColors.primaryLight,
@@ -277,7 +278,7 @@ class _BuyerVerificationScreenState
                           ),
                         )
                       : Text(
-                          'Submit for Verification',
+                          context.l10n.verificationSubmitCta,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -305,26 +306,26 @@ class _BuyerVerificationScreenState
       case 'pending':
         statusColor = Colors.orange;
         statusIcon = Icons.hourglass_top;
-        statusText = 'Verification Pending';
-        statusDescription = 'Your documents are under review';
+        statusText = context.l10n.verificationStatusPendingTitle;
+        statusDescription = context.l10n.verificationStatusPendingDesc;
         break;
       case 'approved':
         statusColor = CommonColors.success;
         statusIcon = Icons.verified;
-        statusText = 'Verified';
-        statusDescription = 'Your account is verified';
+        statusText = context.l10n.verificationStatusApprovedTitle;
+        statusDescription = context.l10n.verificationStatusApprovedDesc;
         break;
       case 'rejected':
         statusColor = CommonColors.error;
         statusIcon = Icons.cancel;
-        statusText = 'Verification Rejected';
-        statusDescription = 'Please resubmit your documents';
+        statusText = context.l10n.verificationStatusRejectedTitle;
+        statusDescription = context.l10n.verificationStatusRejectedDesc;
         break;
       default:
         statusColor = CommonColors.greyText;
         statusIcon = Icons.pending_actions;
-        statusText = 'Not Verified';
-        statusDescription = 'Submit documents to get verified';
+        statusText = context.l10n.verificationStatusNotSubmittedTitle;
+        statusDescription = context.l10n.verificationStatusNotSubmittedDesc;
     }
 
     return Container(
@@ -441,7 +442,7 @@ class _BuyerVerificationScreenState
           validator ??
           (value) {
             if (value == null || value.isEmpty) {
-              return 'This field is required';
+              return context.l10n.commonFieldRequired;
             }
             return null;
           },
@@ -469,7 +470,7 @@ class _BuyerVerificationScreenState
             Text(
               _selectedDob != null
                   ? '${_selectedDob!.day}/${_selectedDob!.month}/${_selectedDob!.year}'
-                  : 'Select date of birth',
+                  : context.l10n.verificationSelectDobHint,
               style: GoogleFonts.inter(
                 fontSize: 15,
                 color: _selectedDob != null

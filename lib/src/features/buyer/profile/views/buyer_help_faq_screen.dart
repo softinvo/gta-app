@@ -4,6 +4,7 @@ import 'package:gta_app/src/features/common_features/chatbot/views/chatbot_scree
 import 'package:gta_app/src/features/buyer/complaint/views/complaints_list_screen.dart';
 import 'package:gta_app/src/features/buyer/complaint/views/create_complaint_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class BuyerHelpFaqScreen extends StatelessWidget {
   const BuyerHelpFaqScreen({super.key});
@@ -23,7 +24,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Help & Support',
+          context.l10n.helpFaqTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -41,10 +42,10 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           _buildMyComplaintsCard(context),
           const SizedBox(height: 24),
 
-          _buildSectionTitle('Raise a Complaint'),
+          _buildSectionTitle(context.l10n.helpRaiseComplaintTitle),
           const SizedBox(height: 8),
           Text(
-            'Select a category to raise a new complaint',
+            context.l10n.helpRaiseComplaintSubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -59,7 +60,8 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.shopping_bag_outlined,
-                  'Orders',
+                  'orders',
+                  context.l10n.navOrders,
                   BuyerColors.primaryLight,
                 ),
               ),
@@ -68,7 +70,8 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.payment_outlined,
-                  'Payments',
+                  'payments',
+                  context.l10n.helpCategoryPayments,
                   const Color(0xFFE67E22),
                 ),
               ),
@@ -81,7 +84,8 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.local_shipping_outlined,
-                  'Shipping',
+                  'shipping',
+                  context.l10n.helpCategoryShipping,
                   const Color(0xFF2ECC71),
                 ),
               ),
@@ -90,7 +94,8 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.account_circle_outlined,
-                  'Profile',
+                  'profile',
+                  context.l10n.helpCategoryProfile,
                   const Color(0xFF9B59B6),
                 ),
               ),
@@ -103,7 +108,8 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.inventory_2_outlined,
-                  'Products',
+                  'products',
+                  context.l10n.helpCategoryProducts,
                   const Color(0xFF3498DB),
                 ),
               ),
@@ -112,7 +118,8 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.more_horiz,
-                  'Other',
+                  'other',
+                  context.l10n.helpCategoryOther,
                   const Color(0xFF34495E),
                 ),
               ),
@@ -120,27 +127,27 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          _buildSectionTitle('Frequently Asked Questions'),
+          _buildSectionTitle(context.l10n.helpFaqSectionTitle),
           const SizedBox(height: 16),
           _buildFaqItem(
-            'How do I track my order status?',
-            'You can track your order from the Orders tab. Click on any order to see its current status and tracking details.',
+            context.l10n.helpFaq1Q,
+            context.l10n.helpFaq1A,
           ),
           _buildFaqItem(
-            'What is the return policy?',
-            'Products can be returned within 7 days of delivery if they are unused and in original packaging. Check our Policies page for details.',
+            context.l10n.helpFaq2Q,
+            context.l10n.helpFaq2A,
           ),
           _buildFaqItem(
-            'How can I contact a seller directly?',
-            'You can message sellers directly from the product page or order details page using the Message button.',
+            context.l10n.helpFaq3Q,
+            context.l10n.helpFaq3A,
           ),
           _buildFaqItem(
-            'Can I cancel my quotation request?',
-            'Yes, you can cancel a quotation request from the Quotations tab as long as it hasn\'t been accepted by the seller.',
+            context.l10n.helpFaq4Q,
+            context.l10n.helpFaq4A,
           ),
           _buildFaqItem(
-            'How do I update my shipping address?',
-            'Go to Profile > Manage Addresses to add, edit, or remove shipping addresses.',
+            context.l10n.helpFaq5Q,
+            context.l10n.helpFaq5A,
           ),
           const SizedBox(height: 24),
 
@@ -192,7 +199,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Chat with GTA Assistant',
+                    context.l10n.helpChatbotTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -200,7 +207,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Get instant answers to your queries',
+                    context.l10n.helpChatbotSubtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: CommonColors.greyText,
@@ -259,7 +266,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'My Complaints',
+                    context.l10n.helpMyComplaintsTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -267,7 +274,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'View and track your previous complaints',
+                    context.l10n.helpMyComplaintsSubtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: Colors.white.withOpacity(0.9),
@@ -297,6 +304,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
   Widget _buildHelpCategory(
     BuildContext context,
     IconData icon,
+    String categoryKey,
     String title,
     Color color,
   ) {
@@ -304,7 +312,10 @@ class BuyerHelpFaqScreen extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => CreateComplaintScreen(category: title),
+          builder: (_) => CreateComplaintScreen(
+            categoryKey: categoryKey,
+            categoryLabel: title,
+          ),
         ),
       ),
       child: Container(
@@ -394,7 +405,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           Icon(Icons.support_agent, size: 48, color: BuyerColors.primaryLight),
           const SizedBox(height: 12),
           Text(
-            'Still need help?',
+            context.l10n.helpStillNeedHelp,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -403,7 +414,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Contact our support team',
+            context.l10n.helpContactSupportTeam,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -417,7 +428,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                   onPressed: () {},
                   icon: const Icon(Icons.email_outlined, size: 18),
                   label: Text(
-                    'Email',
+                    context.l10n.commonEmail,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                   style: OutlinedButton.styleFrom(
@@ -436,7 +447,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                   onPressed: () {},
                   icon: const Icon(Icons.call_outlined, size: 18),
                   label: Text(
-                    'Call',
+                    context.l10n.commonCall,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(

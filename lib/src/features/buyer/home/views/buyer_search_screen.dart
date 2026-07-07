@@ -7,6 +7,7 @@ import 'package:gta_app/src/features/buyer/home/views/widgets/product_grid_card.
 import 'package:gta_app/src/features/buyer/product/controller/buyer_product_controller.dart';
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class BuyerSearchScreen extends ConsumerStatefulWidget {
   // Pre-applied filters — used when arriving from a category card tap
@@ -246,7 +247,7 @@ class _SearchAppBarState extends State<_SearchAppBar> {
                     color: CommonColors.black,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Search products, categories...',
+                    hintText: context.l10n.homeSearchHint,
                     hintStyle: GoogleFonts.inter(
                       color: CommonColors.greyText,
                       fontSize: 14,
@@ -365,7 +366,7 @@ class _EmptyPrompt extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Search for products',
+            context.l10n.searchEmptyTitle,
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -374,7 +375,7 @@ class _EmptyPrompt extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Type and press enter to find what you need',
+            context.l10n.searchEmptySubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText.withOpacity(0.7),
@@ -452,12 +453,13 @@ class _ResultsGrid extends StatelessWidget {
     this.filterLabel,
   });
 
-  String get _headerText {
+  String _headerText(BuildContext context) {
     final count = items.length;
-    final plural = count == 1 ? '' : 's';
-    if (query.isNotEmpty) return '$count result$plural for "$query"';
-    if (filterLabel != null) return '$count product$plural in $filterLabel';
-    return '$count product$plural';
+    if (query.isNotEmpty) return context.l10n.searchResultsForQuery(count, query);
+    if (filterLabel != null) {
+      return context.l10n.searchResultsInFilter(count, filterLabel!);
+    }
+    return context.l10n.searchResultsCount(count);
   }
 
   @override
@@ -468,7 +470,7 @@ class _ResultsGrid extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
           child: Text(
-            _headerText,
+            _headerText(context),
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -503,10 +505,10 @@ class _NoResults extends StatelessWidget {
   final String? filterLabel;
   const _NoResults({required this.query, this.filterLabel});
 
-  String get _message {
-    if (query.isNotEmpty) return 'No results for "$query"';
-    if (filterLabel != null) return 'No products in $filterLabel';
-    return 'No products found';
+  String _message(BuildContext context) {
+    if (query.isNotEmpty) return context.l10n.searchNoResultsForQuery(query);
+    if (filterLabel != null) return context.l10n.searchNoProductsInFilter(filterLabel!);
+    return context.l10n.searchNoProductsFound;
   }
 
   @override
@@ -524,7 +526,7 @@ class _NoResults extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              _message,
+              _message(context),
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 16,
@@ -534,7 +536,7 @@ class _NoResults extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Try different keywords or remove filters',
+              context.l10n.searchTryDifferentKeywords,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,
@@ -561,7 +563,7 @@ class _ResultsError extends StatelessWidget {
           Icon(Icons.error_outline, size: 48, color: CommonColors.error),
           const SizedBox(height: 12),
           Text(
-            'Search failed',
+            context.l10n.searchFailed,
             style: GoogleFonts.inter(
                 color: CommonColors.greyText, fontSize: 14),
           ),
@@ -569,7 +571,7 @@ class _ResultsError extends StatelessWidget {
           TextButton(
             onPressed: onRetry,
             child: Text(
-              'Retry',
+              context.l10n.commonRetry,
               style: GoogleFonts.inter(color: BuyerColors.primaryLight),
             ),
           ),

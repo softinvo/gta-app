@@ -7,6 +7,7 @@ import 'package:gta_app/src/models/buyer_product_details_model.dart';
 import 'package:gta_app/src/models/product_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class BuyerProductDetailsScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -366,7 +367,7 @@ class _ProductHeader extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Verified',
+                        context.l10n.productVerifiedBadge,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -442,7 +443,7 @@ class _ProductHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${discount!.toInt()}% OFF',
+                        context.l10n.productDiscountOff(discount!.toInt().toString()),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -458,7 +459,7 @@ class _ProductHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Min. Order',
+                      context.l10n.productMinOrder,
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         color: CommonColors.greyText,
@@ -466,7 +467,9 @@ class _ProductHeader extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${product.minimumOrderQuantity} units',
+                      context.l10n.productUnitsCount(
+                        product.minimumOrderQuantity.toString(),
+                      ),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -479,7 +482,7 @@ class _ProductHeader extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Starting price · per unit',
+              context.l10n.productStartingPricePerUnit,
               style: GoogleFonts.inter(
                 fontSize: 11,
                 color: CommonColors.greyText,
@@ -573,7 +576,7 @@ class _RatingRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          '${rating.count} review${rating.count == 1 ? '' : 's'}',
+          context.l10n.productReviewsCount(rating.count),
           style: GoogleFonts.inter(
             fontSize: 12,
             color: CommonColors.greyText,
@@ -595,15 +598,15 @@ class _KeyAttributesStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final attrs = <_AttrItem>[
       if (product.gsm?.isNotEmpty == true)
-        _AttrItem(Icons.layers_outlined, 'GSM', product.gsm!),
+        _AttrItem(Icons.layers_outlined, context.l10n.productAttrGsm, product.gsm!),
       if (product.width?.isNotEmpty == true)
-        _AttrItem(Icons.straighten_outlined, 'Width', product.width!),
+        _AttrItem(Icons.straighten_outlined, context.l10n.productAttrWidth, product.width!),
       if (product.compositions?.isNotEmpty == true)
-        _AttrItem(Icons.texture_outlined, 'Fabric', product.compositions!),
+        _AttrItem(Icons.texture_outlined, context.l10n.productAttrFabric, product.compositions!),
       if (product.countryOfOrigin?.isNotEmpty == true)
-        _AttrItem(Icons.flag_outlined, 'Origin', product.countryOfOrigin!),
+        _AttrItem(Icons.flag_outlined, context.l10n.productAttrOrigin, product.countryOfOrigin!),
       if (product.sampleAvailable)
-        _AttrItem(Icons.science_outlined, 'Sample', 'Available'),
+        _AttrItem(Icons.science_outlined, context.l10n.productAttrSample, context.l10n.commonAvailable),
     ];
 
     if (attrs.isEmpty) return const SizedBox.shrink();
@@ -712,7 +715,7 @@ class _ColorSelector extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Color',
+                context.l10n.productColorLabel,
                 style: GoogleFonts.inter(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -721,7 +724,7 @@ class _ColorSelector extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '— ${_displayColorName(colorName)}',
+                '— ${_displayColorName(context, colorName)}',
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: const Color(0xFF5A5B6A),
@@ -786,8 +789,8 @@ class _ColorSelector extends StatelessWidget {
     );
   }
 
-  String _displayColorName(String code) {
-    if (code.startsWith('#')) return 'Custom';
+  String _displayColorName(BuildContext context, String code) {
+    if (code.startsWith('#')) return context.l10n.productColorCustom;
     return code
         .replaceAll('_', ' ')
         .split(' ')
@@ -833,7 +836,7 @@ class _SizePriceTable extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Size & Pricing',
+            context.l10n.productSizePricingTitle,
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -850,9 +853,9 @@ class _SizePriceTable extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Expanded(flex: 2, child: _TH('Size')),
-                Expanded(flex: 3, child: _TH('Price / unit')),
-                Expanded(flex: 2, child: _TH('Stock')),
+                Expanded(flex: 2, child: _TH(context.l10n.productTableSize)),
+                Expanded(flex: 3, child: _TH(context.l10n.productTablePricePerUnit)),
+                Expanded(flex: 2, child: _TH(context.l10n.productTableStock)),
               ],
             ),
           ),
@@ -960,7 +963,7 @@ class _SizeRow extends StatelessWidget {
               child: Text(
                 variant.stock.inStock
                     ? '${variant.stock.quantity} ${variant.stock.unit ?? ''}'
-                    : 'Out',
+                    : context.l10n.productStockOut,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -987,15 +990,20 @@ class _SpecsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final specs = <_SpecEntry>[
-      if (product.gsm?.isNotEmpty == true) _SpecEntry('GSM', product.gsm!),
+      if (product.gsm?.isNotEmpty == true)
+        _SpecEntry(context.l10n.productAttrGsm, product.gsm!),
       if (product.width?.isNotEmpty == true)
-        _SpecEntry('Width', product.width!),
+        _SpecEntry(context.l10n.productAttrWidth, product.width!),
       if (product.compositions?.isNotEmpty == true)
-        _SpecEntry('Composition', product.compositions!),
+        _SpecEntry(context.l10n.productSpecComposition, product.compositions!),
       if (product.countryOfOrigin?.isNotEmpty == true)
-        _SpecEntry('Origin', product.countryOfOrigin!),
-      _SpecEntry('MOQ', '${product.minimumOrderQuantity} units'),
-      if (product.isMultiColor) _SpecEntry('Multi-color', 'Yes'),
+        _SpecEntry(context.l10n.productAttrOrigin, product.countryOfOrigin!),
+      _SpecEntry(
+        context.l10n.productSpecMoq,
+        context.l10n.productUnitsCount(product.minimumOrderQuantity.toString()),
+      ),
+      if (product.isMultiColor)
+        _SpecEntry(context.l10n.productSpecMultiColor, context.l10n.commonYes),
     ];
 
     if (specs.isEmpty) return const SizedBox.shrink();
@@ -1019,7 +1027,7 @@ class _SpecsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Specifications',
+            context.l10n.productSpecificationsTitle,
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -1122,7 +1130,7 @@ class _DescriptionCardState extends State<_DescriptionCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Description',
+            context.l10n.productDescriptionTitle,
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -1159,7 +1167,7 @@ class _DescriptionCardState extends State<_DescriptionCard> {
             GestureDetector(
               onTap: () => setState(() => _expanded = !_expanded),
               child: Text(
-                _expanded ? 'Show less' : 'Read more',
+                _expanded ? context.l10n.commonShowLess : context.l10n.commonReadMore,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: BuyerColors.primaryLight,
@@ -1224,7 +1232,7 @@ class _SampleBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Sample Available',
+                    context.l10n.productSampleAvailableTitle,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -1234,8 +1242,10 @@ class _SampleBanner extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     product.sampleCost != null
-                        ? 'Request a sample for ₹${product.sampleCost!.toStringAsFixed(0)}'
-                        : 'Request a sample to check quality',
+                        ? context.l10n.productRequestSampleFor(
+                            product.sampleCost!.toStringAsFixed(0),
+                          )
+                        : context.l10n.productRequestSampleGeneric,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: const Color(0xFF7A6030),
@@ -1286,7 +1296,7 @@ class _SellerCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Seller Information',
+            context.l10n.productSellerInfoTitle,
             style: GoogleFonts.inter(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -1352,8 +1362,8 @@ class _SellerCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           isVerified
-                              ? 'Verified Seller'
-                              : 'Pending Verification',
+                              ? context.l10n.productVerifiedSeller
+                              : context.l10n.productPendingVerification,
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: isVerified
@@ -1378,7 +1388,7 @@ class _SellerCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Trusted',
+                    context.l10n.productTrustedBadge,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -1434,19 +1444,21 @@ class _BottomCtaState extends State<_BottomCta> {
               children: [
                 _InfoChip(
                   icon: Icons.bolt_rounded,
-                  label: 'Free to request',
+                  label: context.l10n.productFreeToRequest,
                   iconColor: const Color(0xFFFFAB00),
                 ),
                 const SizedBox(width: 12),
                 _InfoChip(
                   icon: Icons.verified_outlined,
-                  label: 'MOQ ${widget.product.minimumOrderQuantity} pcs',
+                  label: context.l10n.productMoqPcs(
+                    widget.product.minimumOrderQuantity.toString(),
+                  ),
                   iconColor: BuyerColors.primaryLight,
                 ),
                 const SizedBox(width: 12),
                 _InfoChip(
                   icon: Icons.handshake_outlined,
-                  label: 'Negotiate price',
+                  label: context.l10n.productNegotiatePrice,
                   iconColor: CommonColors.success,
                 ),
               ],
@@ -1493,7 +1505,7 @@ class _BottomCtaState extends State<_BottomCta> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Request Quote',
+                          context.l10n.productRequestQuoteCta,
                           style: GoogleFonts.inter(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -1503,7 +1515,7 @@ class _BottomCtaState extends State<_BottomCta> {
                           ),
                         ),
                         Text(
-                          'Get the best price from seller',
+                          context.l10n.productRequestQuoteSubtitle,
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             color: Colors.white.withOpacity(0.75),
@@ -1590,7 +1602,7 @@ class _ErrorView extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: BuyerColors.primaryLight,
             ),
-            child: const Text('Retry'),
+            child: Text(context.l10n.commonRetry),
           ),
         ],
       ),

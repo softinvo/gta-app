@@ -6,6 +6,7 @@ import 'package:gta_app/src/features/seller/product/controllers/category_control
 import 'package:gta_app/src/models/category_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 // ── Drill-down level ──────────────────────────────────────────────────────────
 
@@ -68,9 +69,12 @@ class _BuyerCategoriesScreenState
 
   String get _title {
     switch (_level) {
-      case _Level.categories:    return 'All Categories';
-      case _Level.subCategories: return _selectedCategory?.name ?? 'Sub-Categories';
-      case _Level.productTypes:  return _selectedSubCategory?.name ?? 'Product Types';
+      case _Level.categories:
+        return context.l10n.categoriesAllTitle;
+      case _Level.subCategories:
+        return _selectedCategory?.name ?? context.l10n.categoriesSubCategoriesFallback;
+      case _Level.productTypes:
+        return _selectedSubCategory?.name ?? context.l10n.categoriesProductTypesFallback;
     }
   }
 
@@ -140,7 +144,7 @@ class _BuyerCategoriesScreenState
                           onTap: () =>
                               setState(() => _level = _Level.categories),
                           child: Text(
-                            'Categories',
+                            context.l10n.commonCategories,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: BuyerColors.primaryLight,
@@ -215,7 +219,7 @@ class _CategoriesGrid extends ConsumerWidget {
           const Center(child: CircularProgressIndicator(color: BuyerColors.primaryLight)),
       error: (_, __) => _ErrorView(onRetry: () => ref.invalidate(categoriesProvider)),
       data: (items) => items.isEmpty
-          ? const _EmptyView(message: 'No categories available')
+          ? _EmptyView(message: context.l10n.categoriesEmptyCategories)
           : _Grid(
               count: items.length,
               builder: (i) => _GridItem(
@@ -249,7 +253,7 @@ class _SubCategoriesGrid extends ConsumerWidget {
     return Column(
       children: [
         _ViewAllBanner(
-          label: 'View all products in "$categoryName"',
+          label: context.l10n.categoriesViewAllIn(categoryName),
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -267,7 +271,7 @@ class _SubCategoriesGrid extends ConsumerWidget {
             error: (_, __) => _ErrorView(
                 onRetry: () => ref.invalidate(subCategoriesProvider(categoryId))),
             data: (items) => items.isEmpty
-                ? const _EmptyView(message: 'No sub-categories available')
+                ? _EmptyView(message: context.l10n.categoriesEmptySubCategories)
                 : _Grid(
                     count: items.length,
                     builder: (i) => _GridItem(
@@ -313,7 +317,7 @@ class _ProductTypesList extends ConsumerWidget {
     return Column(
       children: [
         _ViewAllBanner(
-          label: 'View all products in "$subCategoryName"',
+          label: context.l10n.categoriesViewAllIn(subCategoryName),
           onTap: () => _openResults(context),
         ),
         Expanded(
@@ -323,7 +327,7 @@ class _ProductTypesList extends ConsumerWidget {
             error: (_, __) => _ErrorView(
                 onRetry: () => ref.invalidate(productTypesProvider(subCategoryId))),
             data: (items) => items.isEmpty
-                ? const _EmptyView(message: 'No product types available')
+                ? _EmptyView(message: context.l10n.categoriesEmptyProductTypes)
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     itemCount: items.length,
@@ -557,12 +561,12 @@ class _ErrorView extends StatelessWidget {
           Icon(Icons.error_outline, size: 48, color: CommonColors.error),
           const SizedBox(height: 12),
           Text(
-            'Failed to load',
+            context.l10n.commonFailedToLoad,
             style: GoogleFonts.inter(color: CommonColors.greyText),
           ),
           TextButton(
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(context.l10n.commonRetry),
           ),
         ],
       ),

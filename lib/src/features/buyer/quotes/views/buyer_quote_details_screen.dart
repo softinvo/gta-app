@@ -14,6 +14,7 @@ import 'package:gta_app/src/features/buyer/quotes/controller/buyer_quote_control
 import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:intl/intl.dart';
 
 class BuyerQuoteDetailsScreen extends ConsumerWidget {
@@ -36,7 +37,7 @@ class BuyerQuoteDetailsScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Quotation Details',
+          context.l10n.quoteDetailsTitle,
           style: GoogleFonts.inter(
             fontSize: 17,
             fontWeight: FontWeight.w700,
@@ -63,7 +64,7 @@ class BuyerQuoteDetailsScreen extends ConsumerWidget {
               TextButton(
                 onPressed: () =>
                     ref.invalidate(buyerQuotationDetailsProvider(quotationId)),
-                child: const Text('Retry'),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -82,14 +83,25 @@ class _QuoteDetailsBody extends ConsumerWidget {
     'submitted', 'seller_reviewing', 'negotiation',
     'agreement_reached', 'payment_done', 'completed',
   ];
-  static const _stepNames = {
-    'submitted': 'Submitted',
-    'seller_reviewing': 'Under Review',
-    'negotiation': 'Negotiation',
-    'agreement_reached': 'Agreement Reached',
-    'payment_done': 'Payment Done',
-    'completed': 'Completed',
-  };
+
+  String _stepName(BuildContext context, String step) {
+    switch (step) {
+      case 'submitted':
+        return context.l10n.quoteStepSubmitted;
+      case 'seller_reviewing':
+        return context.l10n.quoteStepUnderReview;
+      case 'negotiation':
+        return context.l10n.quoteStepNegotiation;
+      case 'agreement_reached':
+        return context.l10n.quoteStepAgreementReached;
+      case 'payment_done':
+        return context.l10n.quoteStepPaymentDone;
+      case 'completed':
+        return context.l10n.quoteStatusCompleted;
+      default:
+        return step;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -98,8 +110,11 @@ class _QuoteDetailsBody extends ConsumerWidget {
 
     final timelineIdx = _stepOrder.indexOf(quotation.step);
     final timelineSubtitle = timelineIdx >= 0
-        ? 'Step ${timelineIdx + 1} of ${_stepOrder.length} · '
-            '${_stepNames[quotation.step] ?? quotation.step}'
+        ? context.l10n.quoteTimelineStepOf(
+            (timelineIdx + 1).toString(),
+            _stepOrder.length.toString(),
+            _stepName(context, quotation.step),
+          )
         : null;
 
     return SingleChildScrollView(
@@ -111,14 +126,15 @@ class _QuoteDetailsBody extends ConsumerWidget {
 
           if (quotation.sellerSnapshot != null) ...[
             _SectionCard(
-              title: 'Seller',
+              title: context.l10n.quoteSectionSeller,
               icon: Icons.store_outlined,
               child: _SellerInfo(
                 sellerSnapshot: quotation.sellerSnapshot!,
                 onChatTap: () {
                   final buyerId = ref.read(buyerProfileProvider).value?.id;
                   if (buyerId == null) return;
-                  final sellerName = quotation.sellerSnapshot?.name ?? 'Seller';
+                  final sellerName = quotation.sellerSnapshot?.name ??
+                      context.l10n.commonSellerFallback;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -140,7 +156,7 @@ class _QuoteDetailsBody extends ConsumerWidget {
 
           if (quotation.productSnapshot != null) ...[
             _SectionCard(
-              title: 'Product',
+              title: context.l10n.quoteSectionProduct,
               icon: Icons.inventory_2_outlined,
               child: _ProductInfo(quotation: quotation),
             ),
@@ -148,18 +164,18 @@ class _QuoteDetailsBody extends ConsumerWidget {
           ],
 
           _SectionCard(
-            title: 'Requested Variants',
+            title: context.l10n.quoteSectionRequestedVariants,
             icon: Icons.list_alt_outlined,
             child: _VariantList(
               variants: quotation.selectedVariants,
-              label: 'Quoted',
+              label: context.l10n.quoteVariantLabelQuoted,
             ),
           ),
           const SizedBox(height: 14),
 
           if (quotation.finalAgreedVariants.isNotEmpty) ...[
             _SectionCard(
-              title: 'Final Agreed Variants',
+              title: context.l10n.quoteSectionFinalAgreedVariants,
               icon: Icons.check_circle_outline,
               iconColor: const Color(0xFF27AE60),
               child: _FinalVariantList(variants: quotation.finalAgreedVariants),
@@ -169,7 +185,7 @@ class _QuoteDetailsBody extends ConsumerWidget {
 
           if ((quotation.totalAgreedAmount ?? 0) > 0) ...[
             _SectionCard(
-              title: 'Pricing',
+              title: context.l10n.quoteSectionPricing,
               icon: Icons.account_balance_wallet_outlined,
               iconColor: const Color(0xFF27AE60),
               child: _PricingSection(quotation: quotation),
@@ -178,7 +194,7 @@ class _QuoteDetailsBody extends ConsumerWidget {
           ],
 
           _SectionCard(
-            title: 'Delivery Address',
+            title: context.l10n.quoteDeliveryAddressTitle,
             icon: Icons.location_on_outlined,
             child: Text(
               quotation.deliveryAddress.fullAddress,
@@ -193,7 +209,7 @@ class _QuoteDetailsBody extends ConsumerWidget {
 
           if (quotation.workflowTimeline.isNotEmpty) ...[
             _SectionCard(
-              title: 'Timeline',
+              title: context.l10n.quoteSectionTimeline,
               subtitle: timelineSubtitle,
               icon: Icons.show_chart_rounded,
               child: _WorkflowTimeline(quotation: quotation),
@@ -269,7 +285,7 @@ class _StatusHeaderCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      quotation.productSnapshot?.name ?? 'Quotation',
+                      quotation.productSnapshot?.name ?? context.l10n.quoteFallbackName,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -291,7 +307,7 @@ class _StatusHeaderCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  _statusLabel(quotation.status),
+                  _statusLabel(context, quotation.status),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -313,7 +329,7 @@ class _StatusHeaderCard extends StatelessWidget {
               const SizedBox(width: 16),
               _MetaChip(
                 icon: Icons.swap_horiz_outlined,
-                text: _stepLabel(quotation.step),
+                text: _stepLabel(context, quotation.step),
               ),
             ],
           ),
@@ -322,30 +338,46 @@ class _StatusHeaderCard extends StatelessWidget {
     );
   }
 
-  static String _statusLabel(String s) {
-    const map = {
-      'pending': 'Pending',
-      'in-progress': 'In Progress',
-      'agreed': 'Agreed',
-      'invoiced': 'Invoiced',
-      'paid': 'Paid',
-      'completed': 'Completed',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _statusLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'pending':
+        return context.l10n.quoteStatusPending;
+      case 'in-progress':
+        return context.l10n.quoteStatusInProgress;
+      case 'agreed':
+        return context.l10n.quoteStatusAgreed;
+      case 'invoiced':
+        return context.l10n.quoteStatusInvoiced;
+      case 'paid':
+        return context.l10n.quoteStatusPaid;
+      case 'completed':
+        return context.l10n.quoteStatusCompleted;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
-  static String _stepLabel(String s) {
-    const map = {
-      'submitted': 'Submitted',
-      'seller_reviewing': 'Under Review',
-      'negotiation': 'Negotiation',
-      'agreement_reached': 'Agreement Reached',
-      'payment_done': 'Payment Done',
-      'completed': 'Completed',
-      'cancelled': 'Cancelled',
-    };
-    return map[s] ?? s;
+  String _stepLabel(BuildContext context, String s) {
+    switch (s) {
+      case 'submitted':
+        return context.l10n.quoteStepSubmitted;
+      case 'seller_reviewing':
+        return context.l10n.quoteStepUnderReview;
+      case 'negotiation':
+        return context.l10n.quoteStepNegotiation;
+      case 'agreement_reached':
+        return context.l10n.quoteStepAgreementReached;
+      case 'payment_done':
+        return context.l10n.quoteStepPaymentDone;
+      case 'completed':
+        return context.l10n.quoteStatusCompleted;
+      case 'cancelled':
+        return context.l10n.quoteStatusCancelled;
+      default:
+        return s;
+    }
   }
 
   static Color _statusColor(String status) {
@@ -379,9 +411,9 @@ class _SellerInfo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (sellerSnapshot.name != null)
-                _DetailRow(label: 'Name', value: sellerSnapshot.name!),
+                _DetailRow(label: context.l10n.commonNameLabel, value: sellerSnapshot.name!),
               if (sellerSnapshot.phone != null)
-                _DetailRow(label: 'Phone', value: sellerSnapshot.phone!),
+                _DetailRow(label: context.l10n.commonPhoneLabel, value: sellerSnapshot.phone!),
             ],
           ),
         ),
@@ -420,10 +452,10 @@ class _ProductInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _DetailRow(label: 'Name', value: p.name),
-        if (p.category != null) _DetailRow(label: 'Category', value: p.category!),
+        _DetailRow(label: context.l10n.commonNameLabel, value: p.name),
+        if (p.category != null) _DetailRow(label: context.l10n.filterCategory, value: p.category!),
         if (p.subCategory != null)
-          _DetailRow(label: 'Sub-Category', value: p.subCategory!),
+          _DetailRow(label: context.l10n.quoteSubCategoryLabel, value: p.subCategory!),
       ],
     );
   }
@@ -440,7 +472,7 @@ class _VariantList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (variants.isEmpty) {
       return Text(
-        'No variants',
+        context.l10n.quoteNoVariantsLabel,
         style: GoogleFonts.inter(fontSize: 13, color: CommonColors.greyText),
       );
     }
@@ -489,7 +521,7 @@ class _VariantList extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
-                          'Size: ${v.size}',
+                          context.l10n.quoteSizeLabel(v.size!),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: CommonColors.greyText,
@@ -499,7 +531,9 @@ class _VariantList extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
-                        'Qty: ${v.quantity}${v.unit != null ? ' ${v.unit}' : ''}',
+                        context.l10n.quoteQtyLabel(
+                          '${v.quantity}${v.unit != null ? ' ${v.unit}' : ''}',
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           color: CommonColors.greyText,
@@ -521,7 +555,7 @@ class _VariantList extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '$label / unit',
+                    context.l10n.quotePerUnitLabel(label),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       color: CommonColors.greyText,
@@ -529,7 +563,7 @@ class _VariantList extends StatelessWidget {
                   ),
                   if (v.totalPrice != null)
                     Text(
-                      'Total: ₹${_nf.format(v.totalPrice!)}',
+                      context.l10n.quoteTotalLabel(_nf.format(v.totalPrice!)),
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -584,7 +618,7 @@ class _FinalVariantList extends StatelessWidget {
                   children: [
                     if (v.variantColorCode != null)
                       Text(
-                        'Color: ${v.variantColorCode}',
+                        context.l10n.quoteColorLabel(v.variantColorCode!),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -593,14 +627,14 @@ class _FinalVariantList extends StatelessWidget {
                       ),
                     if (v.size != null)
                       Text(
-                        'Size: ${v.size}',
+                        context.l10n.quoteSizeLabel(v.size!),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           color: CommonColors.greyText,
                         ),
                       ),
                     Text(
-                      'Qty: ${v.quantity}',
+                      context.l10n.quoteQtyLabel(v.quantity.toString()),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: CommonColors.greyText,
@@ -621,14 +655,14 @@ class _FinalVariantList extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Final / unit',
+                    context.l10n.quotePerUnitLabel(context.l10n.quoteFinalLabel),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       color: CommonColors.greyText,
                     ),
                   ),
                   Text(
-                    'Total: ₹${_nf.format(v.totalAmount)}',
+                    context.l10n.quoteTotalLabel(_nf.format(v.totalAmount)),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -658,22 +692,22 @@ class _PricingSection extends StatelessWidget {
 
     return Column(
       children: [
-        if (p.subtotal > 0) _PricingRow(label: 'Subtotal', amount: p.subtotal),
+        if (p.subtotal > 0) _PricingRow(label: context.l10n.pricingSubtotal, amount: p.subtotal),
         if (p.discountAmount > 0)
           _PricingRow(
-            label: 'Discount',
+            label: context.l10n.pricingDiscount,
             amount: -p.discountAmount,
             color: const Color(0xFF27AE60),
           ),
-        if (p.totalGst > 0) _PricingRow(label: 'GST', amount: p.totalGst),
+        if (p.totalGst > 0) _PricingRow(label: context.l10n.pricingGst, amount: p.totalGst),
         if (p.deliveryCharges > 0)
-          _PricingRow(label: 'Delivery', amount: p.deliveryCharges),
+          _PricingRow(label: context.l10n.pricingDelivery, amount: p.deliveryCharges),
         const Divider(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Total Agreed',
+              context.l10n.quoteTotalAgreedLabel,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
@@ -892,39 +926,49 @@ class _WorkflowTimeline extends StatelessWidget {
   final Quotation quotation;
   const _WorkflowTimeline({required this.quotation});
 
+  List<(String, String, String, IconData)> _steps(BuildContext context) => [
+        ('submitted', context.l10n.quoteStepSubmitted, context.l10n.quoteStepDescSubmitted, Icons.send_outlined),
+        ('seller_reviewing', context.l10n.quoteStepUnderReview, context.l10n.quoteStepDescReviewing, Icons.manage_search_outlined),
+        ('negotiation', context.l10n.quoteStepNegotiation, context.l10n.quoteStepDescNegotiation, Icons.forum_outlined),
+        ('agreement_reached', context.l10n.quoteStepAgreementReached, context.l10n.quoteStepDescAgreement, Icons.handshake_outlined),
+        ('payment_done', context.l10n.quoteStepPaymentDone, context.l10n.quoteStepDescPayment, Icons.payment_outlined),
+        ('completed', context.l10n.quoteStatusCompleted, context.l10n.quoteStepDescCompleted, Icons.done_all_rounded),
+      ];
+
+  String _hintFor(BuildContext context, String key) {
+    switch (key) {
+      case 'submitted':
+        return context.l10n.quoteHintSubmitted;
+      case 'seller_reviewing':
+        return context.l10n.quoteHintReviewing;
+      case 'negotiation':
+        return context.l10n.quoteHintNegotiation;
+      case 'agreement_reached':
+        return context.l10n.quoteHintAgreement;
+      case 'payment_done':
+        return context.l10n.quoteHintPayment;
+      case 'completed':
+        return context.l10n.quoteHintCompleted;
+      default:
+        return '';
+    }
+  }
+
   static const _kGreen = Color(0xFF27AE60);
-
-  static const List<(String, String, String, IconData)> _steps = [
-    ('submitted', 'Submitted', 'Quotation sent to seller', Icons.send_outlined),
-    ('seller_reviewing', 'Under Review', 'Seller is reviewing your request', Icons.manage_search_outlined),
-    ('negotiation', 'Negotiation', 'Price negotiation in progress', Icons.forum_outlined),
-    ('agreement_reached', 'Agreement Reached', 'Terms agreed, ready to place order', Icons.handshake_outlined),
-    ('payment_done', 'Payment Done', 'Payment completed successfully', Icons.payment_outlined),
-    ('completed', 'Completed', 'Order fulfilled and delivered', Icons.done_all_rounded),
-  ];
-
-  static final Map<String, String> _hints = {
-    'submitted': 'Waiting for the seller to start reviewing your quotation.',
-    'seller_reviewing': 'Seller is reviewing - you may receive a counter-offer soon.',
-    'negotiation': 'Review any counter-offer from the seller and respond to agree on a price.',
-    'agreement_reached': 'Both parties agreed. Proceed to place your order and complete payment.',
-    'payment_done': 'Payment received. Seller is now preparing your order for delivery.',
-    'completed': 'Your order has been completed. Thank you!',
-  };
-
   static const _kRed = Color(0xFFE74C3C);
 
   @override
   Widget build(BuildContext context) {
     final isCancelled = quotation.status == 'cancelled';
-    final currentIndex = _steps.indexWhere((s) => s.$1 == quotation.step);
+    final steps = _steps(context);
+    final currentIndex = steps.indexWhere((s) => s.$1 == quotation.step);
 
     // When cancelled only show steps that actually completed
     final visibleSteps = isCancelled
-        ? _steps
+        ? steps
             .where((s) => quotation.workflowTimeline.containsKey(s.$1))
             .toList()
-        : _steps.toList();
+        : steps.toList();
 
     return Column(
       children: [
@@ -1011,7 +1055,7 @@ class _WorkflowTimeline extends StatelessWidget {
                             if (isCurrent) ...[
                               const SizedBox(width: 8),
                               _Badge(
-                                label: 'ACTIVE',
+                                label: context.l10n.quoteBadgeActive,
                                 bg: const Color(0xFFDCF0E5),
                                 fg: _kGreen,
                               ),
@@ -1019,7 +1063,7 @@ class _WorkflowTimeline extends StatelessWidget {
                             if (isNext) ...[
                               const SizedBox(width: 8),
                               _Badge(
-                                label: 'Next',
+                                label: context.l10n.quoteBadgeNext,
                                 bg: const Color(0xFFF1F5F9),
                                 fg: const Color(0xFF64748B),
                               ),
@@ -1088,7 +1132,7 @@ class _WorkflowTimeline extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      _hints[key] ?? '',
+                                      _hintFor(context, key),
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
                                         height: 1.5,
@@ -1109,12 +1153,12 @@ class _WorkflowTimeline extends StatelessWidget {
             ),
           );
         }),
-        if (isCancelled) _buildCancelledRow(),
+        if (isCancelled) _buildCancelledRow(context),
       ],
     );
   }
 
-  Widget _buildCancelledRow() {
+  Widget _buildCancelledRow(BuildContext context) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1156,7 +1200,7 @@ class _WorkflowTimeline extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Cancelled',
+                        context.l10n.quoteStatusCancelled,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -1165,7 +1209,7 @@ class _WorkflowTimeline extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       _Badge(
-                        label: 'CANCELLED',
+                        label: context.l10n.quoteBadgeCancelled,
                         bg: const Color(0xFFFFEBEB),
                         fg: _kRed,
                       ),
@@ -1173,7 +1217,7 @@ class _WorkflowTimeline extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'This quotation has been cancelled.',
+                    context.l10n.quoteCancelledMessage,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       height: 1.4,
@@ -1210,21 +1254,21 @@ class _CancelButtonState extends ConsumerState<_CancelButton> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          'Cancel Quotation',
+          context.l10n.quoteCancelDialogTitle,
           style: GoogleFonts.inter(fontWeight: FontWeight.w700),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Are you sure you want to cancel this quotation?',
+              context.l10n.quoteCancelConfirmMessage,
               style: GoogleFonts.inter(fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
-              decoration: const InputDecoration(
-                hintText: 'Reason (optional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: context.l10n.quoteCancelReasonHint,
+                border: const OutlineInputBorder(),
               ),
               onChanged: (v) => reason = v,
             ),
@@ -1233,12 +1277,12 @@ class _CancelButtonState extends ConsumerState<_CancelButton> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('No'),
+            child: Text(context.l10n.commonNo),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'Yes, Cancel',
+              context.l10n.quoteYesCancelBtn,
               style: GoogleFonts.inter(color: CommonColors.error),
             ),
           ),
@@ -1280,7 +1324,7 @@ class _CancelButtonState extends ConsumerState<_CancelButton> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Text(
-                'Cancel Quotation',
+                context.l10n.quoteCancelDialogTitle,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   color: CommonColors.error,
@@ -1315,7 +1359,7 @@ class _PlaceOrderButtonState extends ConsumerState<_PlaceOrderButton> {
     setState(() => _loading = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(errorResponse.getMessage() ?? 'Payment failed'),
+        content: Text(errorResponse.getMessage() ?? context.l10n.quotePaymentFailed),
         backgroundColor: CommonColors.error,
       ),
     );
@@ -1356,7 +1400,7 @@ class _PlaceOrderButtonState extends ConsumerState<_PlaceOrderButton> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                data['message']?.toString() ?? 'Payment could not be verified',
+                data['message']?.toString() ?? context.l10n.quotePaymentNotVerified,
               ),
               backgroundColor: CommonColors.error,
             ),
@@ -1474,7 +1518,7 @@ class _PlaceOrderButtonState extends ConsumerState<_PlaceOrderButton> {
                 ),
               )
             : Text(
-                'Place Order & Pay  ₹${_nf.format(amount)}',
+                context.l10n.quotePlaceOrderPay(_nf.format(amount)),
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,

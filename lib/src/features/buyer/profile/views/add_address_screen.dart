@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
 import 'package:gta_app/src/models/address_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class AddAddressScreen extends ConsumerStatefulWidget {
   const AddAddressScreen({super.key});
@@ -69,13 +70,13 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Address added successfully')),
+        SnackBar(content: Text(context.l10n.addressAddedSuccess)),
       );
       Navigator.pop(context);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to add address'),
+        SnackBar(
+          content: Text(context.l10n.addressAddFailed),
           backgroundColor: Colors.red,
         ),
       );
@@ -94,7 +95,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Add New Address',
+          context.l10n.addressAddNewCta,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -110,12 +111,12 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLabel('Full Name'),
+              _buildLabel(context.l10n.addressFullNameLabel),
               const SizedBox(height: 8),
-              _buildTextField(_nameController, 'Receiver\'s name'),
+              _buildTextField(_nameController, context.l10n.addressReceiverNameHint),
 
               const SizedBox(height: 20),
-              _buildLabel('Phone Number'),
+              _buildLabel(context.l10n.addressPhoneLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _phoneController,
@@ -124,21 +125,21 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
               ),
 
               const SizedBox(height: 20),
-              _buildLabel('Flat / House No. / Building'),
+              _buildLabel(context.l10n.addressFlatLabel),
               const SizedBox(height: 8),
-              _buildTextField(_addressController, 'Enter address details'),
+              _buildTextField(_addressController, context.l10n.addressDetailsHint),
 
               const SizedBox(height: 20),
-              _buildLabel('Locality / Area'),
+              _buildLabel(context.l10n.addressLocalityLabel),
               const SizedBox(height: 8),
-              _buildTextField(_localityController, 'Enter locality'),
+              _buildTextField(_localityController, context.l10n.addressLocalityHint),
 
               const SizedBox(height: 20),
-              _buildLabel('Landmark (Optional)'),
+              _buildLabel(context.l10n.addressLandmarkLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _landmarkController,
-                'E.g. Near Apollo Hospital',
+                context.l10n.addressLandmarkHint,
                 required: false,
               ),
 
@@ -149,7 +150,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Pincode'),
+                        _buildLabel(context.l10n.addressPincodeLabel),
                         const SizedBox(height: 8),
                         _buildTextField(
                           _pincodeController,
@@ -164,9 +165,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('City'),
+                        _buildLabel(context.l10n.addressCityLabel),
                         const SizedBox(height: 8),
-                        _buildTextField(_cityController, 'Enter city'),
+                        _buildTextField(_cityController, context.l10n.addressCityHint),
                       ],
                     ),
                   ),
@@ -174,15 +175,15 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
               ),
 
               const SizedBox(height: 20),
-              _buildLabel('State'),
+              _buildLabel(context.l10n.addressStateLabel),
               const SizedBox(height: 8),
-              _buildTextField(_stateController, 'Enter state'),
+              _buildTextField(_stateController, context.l10n.addressStateHint),
 
               const SizedBox(height: 20),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(
-                  'Set as Primary Address',
+                  context.l10n.addressSetPrimaryLabel,
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
@@ -220,7 +221,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                           ),
                         )
                       : Text(
-                          'Save Address',
+                          context.l10n.addressSaveCta,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -284,7 +285,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
       ),
       validator: (value) {
         if (required && (value == null || value.isEmpty)) {
-          return 'This field is required';
+          return context.l10n.commonFieldRequired;
         }
         return null;
       },

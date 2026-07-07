@@ -5,6 +5,7 @@ import 'package:gta_app/src/features/buyer/complaint/controller/complaint_contro
 import 'package:gta_app/src/features/buyer/complaint/views/complaint_details_screen.dart';
 import 'package:gta_app/src/models/complaint_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:intl/intl.dart';
 
 class ComplaintsListScreen extends ConsumerWidget {
@@ -25,7 +26,7 @@ class ComplaintsListScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'My Complaints',
+          context.l10n.helpMyComplaintsTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -39,7 +40,7 @@ class ComplaintsListScreen extends ConsumerWidget {
         child: complaintsAsync.when(
           data: (complaints) {
             if (complaints.isEmpty) {
-              return _buildEmptyState();
+              return _buildEmptyState(context);
             }
             return ListView.builder(
               padding: const EdgeInsets.all(20),
@@ -59,12 +60,12 @@ class ComplaintsListScreen extends ConsumerWidget {
                 Icon(Icons.error_outline, size: 48, color: CommonColors.error),
                 const SizedBox(height: 16),
                 Text(
-                  'Failed to load complaints',
+                  context.l10n.complaintsFailedToLoad,
                   style: GoogleFonts.inter(color: CommonColors.greyText),
                 ),
                 TextButton(
                   onPressed: () => ref.invalidate(complaintsProvider),
-                  child: const Text('Retry'),
+                  child: Text(context.l10n.commonRetry),
                 ),
               ],
             ),
@@ -74,7 +75,7 @@ class ComplaintsListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -93,7 +94,7 @@ class ComplaintsListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'No Complaints Yet',
+            context.l10n.complaintsEmptyTitle,
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -102,7 +103,7 @@ class ComplaintsListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'You haven\'t raised any complaints.\nWe hope your experience is great!',
+            context.l10n.complaintsEmptySubtitle,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 14,
@@ -198,7 +199,7 @@ class _ComplaintCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _buildStatusBadge(complaint.status),
+                  _buildStatusBadge(context, complaint.status),
                 ],
               ),
             ),
@@ -247,7 +248,7 @@ class _ComplaintCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${complaint.messageCount} messages',
+                          context.l10n.complaintsMessagesCount(complaint.messageCount!),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: CommonColors.greyText,
@@ -265,7 +266,7 @@ class _ComplaintCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(String status) {
+  Widget _buildStatusBadge(BuildContext context, String status) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -273,7 +274,7 @@ class _ComplaintCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        status,
+        _statusLabel(context, status),
         style: GoogleFonts.inter(
           fontSize: 11,
           fontWeight: FontWeight.w600,
@@ -281,6 +282,23 @@ class _ComplaintCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Translates the raw status value for display. The switch keys below must
+  // stay in English since they're matched against backend-provided values.
+  String _statusLabel(BuildContext context, String status) {
+    switch (status) {
+      case 'Pending':
+        return context.l10n.quoteStatusPending;
+      case 'Active':
+        return context.l10n.complaintStatusActive;
+      case 'Resolved':
+        return context.l10n.complaintStatusResolved;
+      case 'On Hold':
+        return context.l10n.complaintStatusOnHold;
+      default:
+        return status;
+    }
   }
 
   Color _getStatusColor(String status) {
