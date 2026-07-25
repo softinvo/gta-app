@@ -12,6 +12,7 @@ import 'package:gta_app/src/features/seller/profile/repository/seller_profile_st
 import 'seller_personal_details_screen.dart';
 import 'seller_business_address_screen.dart';
 import 'seller_onboarding_screen.dart';
+import 'seller_store_setup_details_screen.dart';
 import 'seller_help_center_screen.dart';
 import 'seller_policies_screen.dart';
 import 'package:gta_app/src/features/seller/earnings/views/seller_earnings_screen.dart';
@@ -139,8 +140,16 @@ class SellerProfileTab extends ConsumerWidget {
                         subtitleTextColor: _verificationStatusText(
                           sellerAsync.asData?.value?.verificationStatus,
                         ),
-                        onTap: () =>
-                            context.push(SellerOnboardingScreen.routePath),
+                        onTap: () {
+                          final seller = sellerAsync.asData?.value;
+                          if (seller?.isVerified == true) {
+                            context.push(
+                              SellerStoreSetupDetailsScreen.routePath,
+                            );
+                          } else {
+                            context.push(SellerOnboardingScreen.routePath);
+                          }
+                        },
                       ),
                     ],
                   ),

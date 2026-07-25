@@ -18,6 +18,14 @@ class BuyerHomeScreen extends ConsumerStatefulWidget {
 
 class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
   int _currentIndex = 0;
+  final Set<int> _visitedTabs = {0};
+
+  void _selectTab(int index) {
+    setState(() {
+      _currentIndex = index;
+      _visitedTabs.add(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +44,20 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          HomeTab(),
-          QuotationsTab(),
-          OrdersTab(),
-          ChatListTab(userType: 'buyer'),
-          BuyerProfileTab(),
+        children: [
+          const HomeTab(),
+          _visitedTabs.contains(1)
+              ? const QuotationsTab()
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(2)
+              ? const OrdersTab()
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(3)
+              ? const ChatListTab(userType: 'buyer')
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(4)
+              ? const BuyerProfileTab()
+              : const SizedBox.shrink(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -71,35 +87,35 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
                 activeIcon: Icons.home,
                 label: context.l10n.navHome,
                 isActive: _currentIndex == 0,
-                onTap: () => setState(() => _currentIndex = 0),
+                onTap: () => _selectTab(0),
               ),
               _NavItem(
                 icon: Icons.request_quote_outlined,
                 activeIcon: Icons.request_quote,
                 label: context.l10n.navQuotations,
                 isActive: _currentIndex == 1,
-                onTap: () => setState(() => _currentIndex = 1),
+                onTap: () => _selectTab(1),
               ),
               _NavItem(
                 icon: Icons.receipt_long_outlined,
                 activeIcon: Icons.receipt_long,
                 label: context.l10n.navOrders,
                 isActive: _currentIndex == 2,
-                onTap: () => setState(() => _currentIndex = 2),
+                onTap: () => _selectTab(2),
               ),
               _NavItem(
                 icon: Icons.chat_bubble_outline_rounded,
                 activeIcon: Icons.chat_bubble_rounded,
                 label: context.l10n.navChat,
                 isActive: _currentIndex == 3,
-                onTap: () => setState(() => _currentIndex = 3),
+                onTap: () => _selectTab(3),
               ),
               _NavItem(
                 icon: Icons.person_outline,
                 activeIcon: Icons.person,
                 label: context.l10n.navProfile,
                 isActive: _currentIndex == 4,
-                onTap: () => setState(() => _currentIndex = 4),
+                onTap: () => _selectTab(4),
               ),
             ],
           ),

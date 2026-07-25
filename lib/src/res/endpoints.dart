@@ -129,6 +129,8 @@ class Endpoints {
       "${baseUrl}quotation/seller/$id";
   static String finalizeQuotation(String id) =>
       "${baseUrl}quotation/seller/$id/finalize";
+  static String startNegotiation(String id) =>
+      "${baseUrl}quotation/seller/$id/start-negotiation";
   static const String cancelQuotation = "${baseUrl}quotation/seller/cancel";
 
   // Buyer Quotations

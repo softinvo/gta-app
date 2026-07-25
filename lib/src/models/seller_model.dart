@@ -229,7 +229,10 @@ class Seller {
       case 'ACTIVE':
         return 'Verified';
       case 'IN_BANK_VALIDATION':
+      case 'IN_BENE_CREATION':
         return 'Under Verification';
+      case 'ACTION_REQUIRED':
+        return 'Action Required';
       case 'BLOCKED':
         return 'Blocked';
       case 'DELETED':

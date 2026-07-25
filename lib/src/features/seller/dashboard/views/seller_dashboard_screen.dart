@@ -25,6 +25,14 @@ class SellerDashboardScreen extends ConsumerStatefulWidget {
 
 class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
   int _currentIndex = 0;
+  final Set<int> _visitedTabs = {0};
+
+  void _selectTab(int index) {
+    setState(() {
+      _currentIndex = index;
+      _visitedTabs.add(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,13 +51,23 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          _DashboardTab(),
-          _ProductsTab(),
-          _QuotationsTab(),
-          _OrdersTab(),
-          ChatListTab(userType: 'seller'),
-          SellerProfileTab(),
+        children: [
+          const _DashboardTab(),
+          _visitedTabs.contains(1)
+              ? const _ProductsTab()
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(2)
+              ? const _QuotationsTab()
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(3)
+              ? const _OrdersTab()
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(4)
+              ? const ChatListTab(userType: 'seller')
+              : const SizedBox.shrink(),
+          _visitedTabs.contains(5)
+              ? const SellerProfileTab()
+              : const SizedBox.shrink(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -121,7 +139,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
                 activeIcon: item.activeIcon,
                 label: item.label,
                 isActive: _currentIndex == i,
-                onTap: () => setState(() => _currentIndex = i),
+                onTap: () => _selectTab(i),
               );
             }),
           ),

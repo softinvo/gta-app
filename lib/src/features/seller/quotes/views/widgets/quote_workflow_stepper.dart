@@ -7,9 +7,18 @@ import 'package:intl/intl.dart';
 class QuoteWorkflowStepper extends StatelessWidget {
   final Quotation quote;
 
-  const QuoteWorkflowStepper({super.key, required this.quote});
+  /// Shown inline on the "Under Review" step while the quote is in review.
+  final VoidCallback? onStartNegotiation;
 
-  static const _kGreen = Color(0xFF27AE60);
+  /// Shown inline on the "Negotiation" step while negotiating.
+  final VoidCallback? onFinalize;
+
+  const QuoteWorkflowStepper({
+    super.key,
+    required this.quote,
+    this.onStartNegotiation,
+    this.onFinalize,
+  });
 
   static const List<(String, String, String, IconData)> _steps = [
     ('submitted', 'Submitted', 'Quotation sent to buyer', Icons.send_outlined),
@@ -135,6 +144,28 @@ class QuoteWorkflowStepper extends StatelessWidget {
             final isNext = isPending && i == currentIndex + 1;
             final isLast = !isCancelled && i == visibleSteps.length - 1;
 
+            Widget? action;
+            if (!isCancelled) {
+              if (key == 'seller_reviewing' &&
+                  (quote.step == 'submitted' ||
+                      quote.step == 'seller_reviewing') &&
+                  onStartNegotiation != null) {
+                action = _StepActionButton(
+                  label: 'Start Negotiation',
+                  icon: Icons.forum_outlined,
+                  onTap: onStartNegotiation!,
+                );
+              } else if (key == 'negotiation' &&
+                  quote.step == 'negotiation' &&
+                  onFinalize != null) {
+                action = _StepActionButton(
+                  label: 'Finalize Agreement',
+                  icon: Icons.check_circle_outline,
+                  onTap: onFinalize!,
+                );
+              }
+            }
+
             return _QuoteTimelineStep(
               label: label,
               description: description,
@@ -145,6 +176,7 @@ class QuoteWorkflowStepper extends StatelessWidget {
               isPending: isPending,
               isNext: isNext,
               isLast: isLast,
+              action: action,
             );
           }),
 
@@ -180,6 +212,7 @@ class _QuoteTimelineStep extends StatelessWidget {
   final bool isNext;
   final bool isLast;
   final bool isCancelStep;
+  final Widget? action;
 
   const _QuoteTimelineStep({
     required this.label,
@@ -192,20 +225,13 @@ class _QuoteTimelineStep extends StatelessWidget {
     required this.isNext,
     required this.isLast,
     this.isCancelStep = false,
+    this.action,
   });
 
   static const _kGreen = Color(0xFF27AE60);
 
   @override
   Widget build(BuildContext context) {
-    final dotColor = isCancelStep
-        ? CommonColors.error
-        : isCompleted
-            ? _kGreen
-            : isCurrent
-                ? SellerColors.primaryLight
-                : const Color(0xFFCCCCCC);
-
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,11 +322,50 @@ class _QuoteTimelineStep extends StatelessWidget {
                           : CommonColors.greyText,
                     ),
                   ),
+                  if (action != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: action!,
+                    ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StepActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _StepActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 16),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: SellerColors.primaryLight,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        textStyle: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
     );
   }

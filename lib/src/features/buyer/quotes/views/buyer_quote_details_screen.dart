@@ -69,7 +69,14 @@ class BuyerQuoteDetailsScreen extends ConsumerWidget {
             ],
           ),
         ),
-        data: (q) => _QuoteDetailsBody(quotation: q),
+        data: (q) => RefreshIndicator(
+          color: BuyerColors.primaryLight,
+          // On failure the provider's error state renders instead.
+          onRefresh: () => ref
+              .refresh(buyerQuotationDetailsProvider(quotationId).future)
+              .catchError((_) => q),
+          child: _QuoteDetailsBody(quotation: q),
+        ),
       ),
     );
   }
@@ -118,6 +125,7 @@ class _QuoteDetailsBody extends ConsumerWidget {
         : null;
 
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [

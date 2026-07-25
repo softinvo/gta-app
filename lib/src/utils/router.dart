@@ -16,6 +16,7 @@ import 'package:gta_app/src/features/seller/profile/views/seller_help_center_scr
 import 'package:gta_app/src/features/seller/profile/views/seller_policies_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_bank_details_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_store_profile_screen.dart';
+import 'package:gta_app/src/features/seller/profile/views/seller_store_setup_details_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_onboarding_screen.dart';
 import 'package:gta_app/src/features/seller/earnings/views/seller_earnings_screen.dart';
 import 'package:gta_app/src/features/seller/product/views/seller_product_details_screen.dart';
@@ -178,6 +179,10 @@ final GoRouter router = GoRouter(
           initialPage: extra?['initialPage'] as int? ?? 0,
         );
       },
+    ),
+    GoRoute(
+      path: SellerStoreSetupDetailsScreen.routePath,
+      builder: (context, state) => const SellerStoreSetupDetailsScreen(),
     ),
     GoRoute(
       path: SellerEarningsScreen.routePath,

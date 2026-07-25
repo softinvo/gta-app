@@ -1,0 +1,765 @@
+{
+  "@@locale": "ru",
+  "commonRetry": "Повторить",
+  "commonReset": "Сбросить",
+  "commonSeeAll": "Смотреть все",
+  "commonCancel": "Отмена",
+  "commonSave": "Сохранить",
+  "commonApply": "Применить",
+  "commonDelete": "Удалить",
+  "commonEdit": "Редактировать",
+  "commonClose": "Закрыть",
+  "commonDone": "Готово",
+  "commonSubmit": "Отправить",
+  "commonYes": "Да",
+  "commonNo": "Нет",
+  "commonOk": "ОК",
+  "commonFailedToLoad": "Не удалось загрузить",
+  "commonNoProductsAvailable": "Нет доступных товаров",
+  "commonCategories": "Категории",
+  "commonSomethingWentWrong": "Что-то пошло не так",
+  "commonLoading": "Загрузка...",
+  "navHome": "Главная",
+  "navQuotations": "Котировки",
+  "navOrders": "Заказы",
+  "navChat": "Чат",
+  "navProfile": "Профиль",
+  "homeSearchHint": "Поиск товаров, категорий...",
+  "homeFlashSale": "Быстрая распродажа",
+  "homeBestSellers": "Хиты продаж",
+  "homeBadgeBestSeller": "ХИТ ПРОДАЖ",
+  "homeTopRated": "Высокий рейтинг",
+  "homeBadgeTopRated": "ВЫСОКИЙ РЕЙТИНГ",
+  "homeNewArrivals": "Новые поступления",
+  "homeBadgeNew": "НОВИНКА",
+  "homeFailedToLoadProducts": "Не удалось загрузить товары",
+  "homeFailedToLoadCategories": "Не удалось загрузить категории",
+  "homeGreeting": "Здравствуйте, покупатель!",
+  "homeGreetingSubtitle": "Найдите лучшие текстильные товары",
+  "productFromPricePrefix": "От",
+  "productDiscountOff": "Скидка {percent}%",
+  "@productDiscountOff": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "categoriesAllTitle": "Все категории",
+  "categoriesSubCategoriesFallback": "Подкатегории",
+  "categoriesProductTypesFallback": "Типы товаров",
+  "categoriesEmptyCategories": "Нет доступных категорий",
+  "categoriesEmptySubCategories": "Нет доступных подкатегорий",
+  "categoriesEmptyProductTypes": "Нет доступных типов товаров",
+  "categoriesViewAllIn": "Смотреть все товары в категории «{name}»",
+  "@categoriesViewAllIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTitle": "Фильтр и сортировка",
+  "filterSortBy": "Сортировать по",
+  "filterSortNewest": "Сначала новые",
+  "filterSortPriceLowHigh": "Цена: по возрастанию",
+  "filterSortPriceHighLow": "Цена: по убыванию",
+  "filterSortRelevance": "По релевантности",
+  "filterCategory": "Категория",
+  "filterAllCategories": "Все",
+  "filterPriceRange": "Диапазон цен",
+  "filterPriceRangeTo": "до",
+  "filterApplyFilters": "Применить фильтры",
+  "searchResultsForQuery": "{count, plural, one{{count} результат по запросу «{query}»} other{{count} результатов по запросу «{query}»}}",
+  "@searchResultsForQuery": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsInFilter": "{count, plural, one{{count} товар в {filter}} other{{count} товаров в {filter}}}",
+  "@searchResultsInFilter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsCount": "{count, plural, one{{count} товар} other{{count} товаров}}",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchEmptyTitle": "Поиск товаров",
+  "searchEmptySubtitle": "Введите запрос и нажмите Enter, чтобы найти нужный товар",
+  "searchNoResultsForQuery": "Нет результатов по запросу «{query}»",
+  "@searchNoResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoProductsInFilter": "Нет товаров в категории {filter}",
+  "@searchNoProductsInFilter": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoProductsFound": "Товары не найдены",
+  "searchTryDifferentKeywords": "Попробуйте другие ключевые слова или снимите фильтры",
+  "searchFailed": "Не удалось выполнить поиск",
+  "languageMenuTitle": "Язык",
+  "languagePickerSubtitle": "Выберите предпочитаемый язык",
+  "commonShowLess": "Скрыть",
+  "commonReadMore": "Читать далее",
+  "commonAvailable": "Доступно",
+  "productVerifiedBadge": "Проверено",
+  "productMinOrder": "Мин. заказ",
+  "productUnitsCount": "{count} шт.",
+  "@productUnitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "productStartingPricePerUnit": "Начальная цена · за единицу",
+  "productAttrGsm": "Плотность (GSM)",
+  "productAttrWidth": "Ширина",
+  "productAttrFabric": "Ткань",
+  "productAttrOrigin": "Происхождение",
+  "productAttrSample": "Образец",
+  "productSpecComposition": "Состав",
+  "productSpecMoq": "MOQ",
+  "productSpecMultiColor": "Разные цвета",
+  "productSpecificationsTitle": "Характеристики",
+  "productColorLabel": "Цвет",
+  "productColorCustom": "На заказ",
+  "productSizePricingTitle": "Размер и цена",
+  "productTableSize": "Размер",
+  "productTablePricePerUnit": "Цена / ед.",
+  "productTableStock": "Остаток",
+  "productStockOut": "Нет в наличии",
+  "productDescriptionTitle": "Описание",
+  "productSampleAvailableTitle": "Образец доступен",
+  "productRequestSampleFor": "Заказать образец за ₹{cost}",
+  "@productRequestSampleFor": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "productRequestSampleGeneric": "Закажите образец, чтобы проверить качество",
+  "productSellerInfoTitle": "Информация о продавце",
+  "productVerifiedSeller": "Проверенный продавец",
+  "productPendingVerification": "Проверка не завершена",
+  "productTrustedBadge": "Надёжный",
+  "productFreeToRequest": "Бесплатный запрос",
+  "productMoqPcs": "MOQ {count} шт.",
+  "@productMoqPcs": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "productNegotiatePrice": "Договориться о цене",
+  "productRequestQuoteCta": "Запросить котировку",
+  "productRequestQuoteSubtitle": "Получите лучшую цену от продавца",
+  "productReviewsCount": "{count, plural, one{{count} отзыв} other{{count} отзывов}}",
+  "@productReviewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "productSizeFallback": "Один размер",
+  "quoteErrorSelectVariant": "Пожалуйста, выберите хотя бы один вариант",
+  "quoteErrorInvalidPrice": "Введите корректную цену для размера {size}",
+  "@quoteErrorInvalidPrice": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteSizeFallbackLower": "один размер",
+  "quoteMinOrderQtyMsg": "Минимальное количество заказа — {moq} шт.",
+  "@quoteMinOrderQtyMsg": {
+    "placeholders": {
+      "moq": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteErrorSelectAddress": "Пожалуйста, выберите адрес доставки",
+  "quoteErrorNoSellerInfo": "Информация о продавце недоступна",
+  "quoteSentSuccess": "Запрос котировки успешно отправлен!",
+  "quoteContactInfoTitle": "Контактная информация",
+  "quotePrefilledSubtitle": "Заполнено из вашего профиля",
+  "quoteFullNameLabel": "Полное имя",
+  "quoteFullNameHint": "Ваше полное имя",
+  "quoteNameRequired": "Имя обязательно",
+  "quoteMobileLabel": "Номер мобильного телефона",
+  "quoteMobileHint": "10-значный номер мобильного телефона",
+  "quotePhoneRequired": "Телефон обязателен",
+  "quoteInvalidPhone": "Введите корректный 10-значный номер",
+  "quoteAltMobileLabel": "Дополнительный номер (необязательно)",
+  "quoteAltMobileHint": "Ещё один контактный номер",
+  "quoteEmailLabel": "Эл. почта (необязательно)",
+  "quoteEmailHint": "Для уведомлений о заказе",
+  "quoteInvalidEmail": "Введите корректный адрес эл. почты",
+  "quoteDeliveryAddressTitle": "Адрес доставки",
+  "quoteVariantsTitle": "Варианты и количество",
+  "quoteVariantsSubtitle": "MOQ: {moq} шт. · Договоритесь о цене",
+  "@quoteVariantsSubtitle": {
+    "placeholders": {
+      "moq": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteNoVariantsForColor": "Нет доступных вариантов для выбранного цвета.",
+  "quoteTableVariant": "Вариант",
+  "quoteTableQuantity": "Количество",
+  "quoteTableYourPrice": "Ваша цена",
+  "quoteOrderSummaryTitle": "Сводка заказа",
+  "quoteOrderSummaryLine": "{count, plural, one{{count} вариант} other{{count} вариантов}} · всего {totalQty} шт.",
+  "@quoteOrderSummaryLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "totalQty": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteQuotedTotalLabel": "Итоговая котируемая сумма",
+  "quoteSendRequestCta": "Отправить запрос котировки",
+  "quoteFailedLoadAddresses": "Не удалось загрузить адреса",
+  "addressPrimaryBadge": "Основной",
+  "quoteNoSavedAddresses": "Нет сохранённых адресов",
+  "quoteAddAddressToContinue": "Добавьте адрес доставки, чтобы продолжить",
+  "quoteAddAddressCta": "+ Добавить адрес",
+  "quoteListPriceDiscounted": "Прайс: ₹{price} (скидка {discount}%)",
+  "@quoteListPriceDiscounted": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "discount": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteListPrice": "Прайс: ₹{price}",
+  "@quoteListPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "quotePriceFieldLabel": "₹ Цена",
+  "quoteMinOrderQtyWarning": "Мин. количество заказа — {moq} шт.",
+  "@quoteMinOrderQtyWarning": {
+    "placeholders": {
+      "moq": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteStatusAll": "Все",
+  "quoteStatusPending": "В ожидании",
+  "quoteStatusInProgress": "В процессе",
+  "quoteStatusAgreed": "Согласовано",
+  "quoteStatusCompleted": "Завершено",
+  "quoteStatusCancelled": "Отменено",
+  "quoteStatusInvoiced": "Выставлен счёт",
+  "quoteStatusPaid": "Оплачено",
+  "quoteSortBySection": "СОРТИРОВАТЬ ПО",
+  "quoteSortOldestFirst": "Сначала старые",
+  "quoteStatusSection": "СТАТУС",
+  "quoteSearchHint": "Поиск котировок...",
+  "quoteEmptyTitle": "Пока нет котировок",
+  "quoteEmptySubtitle": "Здесь будут отображаться ваши запросы котировок.",
+  "commonProductFallback": "Товар",
+  "quoteUnitsRequested": "Запрошено {count} шт.",
+  "@quoteUnitsRequested": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteDetailsTitle": "Детали котировки",
+  "quoteSectionSeller": "Продавец",
+  "quoteSectionProduct": "Товар",
+  "quoteSectionRequestedVariants": "Запрошенные варианты",
+  "quoteSectionFinalAgreedVariants": "Итоговые согласованные варианты",
+  "quoteSectionPricing": "Ценообразование",
+  "quoteSectionTimeline": "Хронология",
+  "quoteVariantLabelQuoted": "Указано в котировке",
+  "quoteTimelineStepOf": "Шаг {index} из {total} · {stepName}",
+  "@quoteTimelineStepOf": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      },
+      "stepName": {
+        "type": "String"
+      }
+    }
+  },
+  "commonSellerFallback": "Продавец",
+  "commonNameLabel": "Имя",
+  "commonPhoneLabel": "Телефон",
+  "quoteSubCategoryLabel": "Подкатегория",
+  "quoteFallbackName": "Котировка",
+  "quoteStepSubmitted": "Отправлено",
+  "quoteStepUnderReview": "На рассмотрении",
+  "quoteStepNegotiation": "Переговоры",
+  "quoteStepAgreementReached": "Соглашение достигнуто",
+  "quoteStepPaymentDone": "Оплата произведена",
+  "quoteNoVariantsLabel": "Нет вариантов",
+  "quoteSizeLabel": "Размер: {size}",
+  "@quoteSizeLabel": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteQtyLabel": "Кол-во: {qty}",
+  "@quoteQtyLabel": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "quotePerUnitLabel": "{label} / ед.",
+  "@quotePerUnitLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteTotalLabel": "Итого: ₹{amount}",
+  "@quoteTotalLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteColorLabel": "Цвет: {code}",
+  "@quoteColorLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteFinalLabel": "Итоговый",
+  "pricingSubtotal": "Промежуточный итог",
+  "pricingDiscount": "Скидка",
+  "pricingGst": "GST",
+  "pricingDelivery": "Доставка",
+  "quoteTotalAgreedLabel": "Итоговая согласованная сумма",
+  "quoteStepDescSubmitted": "Котировка отправлена продавцу",
+  "quoteStepDescReviewing": "Продавец рассматривает ваш запрос",
+  "quoteStepDescNegotiation": "Идут переговоры о цене",
+  "quoteStepDescAgreement": "Условия согласованы, можно оформлять заказ",
+  "quoteStepDescPayment": "Оплата успешно завершена",
+  "quoteStepDescCompleted": "Заказ выполнен и доставлен",
+  "quoteHintSubmitted": "Ожидание, пока продавец начнёт рассматривать вашу котировку.",
+  "quoteHintReviewing": "Продавец рассматривает запрос — вскоре вы можете получить встречное предложение.",
+  "quoteHintNegotiation": "Просмотрите встречное предложение продавца и ответьте, чтобы согласовать цену.",
+  "quoteHintAgreement": "Обе стороны согласны. Оформите заказ и завершите оплату.",
+  "quoteHintPayment": "Оплата получена. Продавец готовит ваш заказ к доставке.",
+  "quoteHintCompleted": "Ваш заказ выполнен. Спасибо!",
+  "quoteBadgeActive": "АКТИВНО",
+  "quoteBadgeNext": "Далее",
+  "quoteBadgeCancelled": "ОТМЕНЕНО",
+  "quoteCancelledMessage": "Эта котировка была отменена.",
+  "quoteCancelDialogTitle": "Отменить котировку",
+  "quoteCancelConfirmMessage": "Вы уверены, что хотите отменить эту котировку?",
+  "quoteCancelReasonHint": "Причина (необязательно)",
+  "quoteYesCancelBtn": "Да, отменить",
+  "quotePaymentFailed": "Оплата не прошла",
+  "quotePaymentNotVerified": "Не удалось подтвердить оплату",
+  "quotePlaceOrderPay": "Оформить заказ и оплатить  ₹{amount}",
+  "@quotePlaceOrderPay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSearchHint": "Поиск заказов...",
+  "orderStatusProcessing": "В обработке",
+  "orderStatusPacked": "Упаковано",
+  "orderStatusShipped": "Отправлено",
+  "orderStatusDelivered": "Доставлено",
+  "commonOrderFallback": "Заказ",
+  "orderEmptyTitle": "Пока нет заказов",
+  "orderEmptySubtitle": "Здесь будут отображаться оформленные вами заказы.",
+  "orderVariantsSummary": "{totalQty} шт. · {count, plural, one{{count} вариант} other{{count} вариантов}}",
+  "@orderVariantsSummary": {
+    "placeholders": {
+      "totalQty": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderPaymentUnpaid": "Не оплачено",
+  "orderPaymentFailed": "Не удалось",
+  "orderPaymentRefunded": "Возвращено",
+  "orderDetailsTitle": "Детали заказа",
+  "orderItemsTitle": "Товары заказа",
+  "orderUnitFallback": "ед.",
+  "orderSizeTag": "Размер {size}",
+  "@orderSizeTag": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "orderQtyTag": "Кол-во {qty} {unit}",
+  "@orderQtyTag": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPerUnitLabel": "за {unit}",
+  "@orderPerUnitLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPriceBreakdownTitle": "Детализация цены",
+  "orderDiscountWithPercent": "Скидка ({percent}%)",
+  "@orderDiscountWithPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "orderCgstLabel": "CGST ({percent}%)",
+  "@orderCgstLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSgstLabel": "SGST ({percent}%)",
+  "@orderSgstLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTotalGstLabel": "Итого GST",
+  "orderFreeLabel": "Бесплатно",
+  "orderTotalPayableLabel": "Итого к оплате",
+  "orderPaymentTitle": "Оплата",
+  "orderPaymentSuccessful": "Оплата прошла успешно",
+  "orderPaymentFailedStatus": "Оплата не прошла",
+  "orderPaymentPendingStatus": "Оплата ожидается",
+  "orderAmountReceived": "Получено ₹{amount}",
+  "@orderAmountReceived": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAmountPaid": "Оплачено ₹{amount}",
+  "@orderAmountPaid": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAmountDue": "К оплате ₹{amount}",
+  "@orderAmountDue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderMethodLabel": "Способ",
+  "orderPaidOnLabel": "Дата оплаты",
+  "orderReferenceIdLabel": "Номер транзакции",
+  "orderTrackingTitle": "Отслеживание заказа",
+  "orderStepPlaced": "Заказ оформлен",
+  "orderStepDescPlaced": "Заказ подтверждён и принят",
+  "orderStepDescProcessing": "Продавец готовит ваш заказ",
+  "orderStepDescPacked": "Товары упакованы и готовы к отправке",
+  "orderStepDescShipped": "Заказ уже в пути к вам",
+  "orderStepDescDelivered": "Заказ доставлен по вашему адресу",
+  "orderStepCounter": "Шаг {completed} из {total}",
+  "@orderStepCounter": {
+    "placeholders": {
+      "completed": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "orderInProgressLabel": "В процессе...",
+  "orderStepCancelledLabel": "Заказ отменён",
+  "orderStepDescCancelled": "Этот заказ был отменён",
+  "orderCancelDialogTitle": "Отменить заказ",
+  "orderCancelConfirmMessage": "Вы уверены, что хотите отменить этот заказ?",
+  "profileGuestUser": "Гость",
+  "profileErrorLoading": "Ошибка загрузки",
+  "profileSectionMyAccount": "Мой аккаунт",
+  "profileEditProfileTitle": "Редактировать профиль",
+  "profileEditProfileSubtitle": "Обновите имя, эл. почту и фото",
+  "profileManageAddressesTitle": "Управление адресами",
+  "profileManageAddressesSubtitle": "Добавляйте и редактируйте адреса доставки",
+  "profileVerificationStatusTitle": "Статус верификации",
+  "profileVerificationStatusSubtitle": "Пройдите верификацию KYC",
+  "profileSectionSupport": "Поддержка",
+  "profileHelpFaqTitle": "Помощь и FAQ",
+  "profileHelpFaqSubtitle": "Просмотр часто задаваемых вопросов",
+  "profileContactSupportTitle": "Связаться с поддержкой",
+  "profileContactSupportSubtitle": "Напишите в чат или подайте жалобу",
+  "profileRateAppTitle": "Оценить приложение",
+  "profileRateAppSubtitle": "Поделитесь своим мнением",
+  "profileSectionSettings": "Настройки",
+  "profileNotificationsTitle": "Уведомления",
+  "profileNotificationsSubtitle": "Управление оповещениями и обновлениями",
+  "profileLegalPoliciesTitle": "Правовая информация",
+  "profileLegalPoliciesSubtitle": "Условия использования, конфиденциальность и возврат",
+  "profileVersionLabel": "Версия {version}",
+  "@profileVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileBuyerAccountBadge": "Аккаунт покупателя",
+  "profileSellerAccountBadge": "Аккаунт продавца",
+  "profileStatOrders": "Заказы",
+  "profileStatQuotes": "Котировки",
+  "profileStatWishlist": "Избранное",
+  "commonLogout": "Выйти",
+  "profileLogoutConfirmMessage": "Вы уверены, что хотите выйти из аккаунта?",
+  "commonCamera": "Камера",
+  "commonGallery": "Галерея",
+  "commonFieldRequired": "Это поле обязательно",
+  "commonErrorPrefix": "Ошибка: {error}",
+  "@commonErrorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editProfileUploadTitle": "Загрузить фото профиля",
+  "editProfileDataNotFound": "Данные покупателя не найдены",
+  "editProfilePictureUpdated": "Фото профиля обновлено",
+  "editProfileUpdateFailed": "Не удалось обновить профиль",
+  "editProfileFirstNameLabel": "Имя",
+  "editProfileFirstNameHint": "Введите имя",
+  "editProfileLastNameLabel": "Фамилия",
+  "editProfileLastNameHint": "Введите фамилию",
+  "editProfileEmailLabel": "Адрес эл. почты",
+  "editProfileEmailHint": "Введите адрес эл. почты",
+  "editProfileGenderLabel": "Пол",
+  "editProfileUpdateCta": "Обновить профиль",
+  "editProfileUpdateSuccess": "Профиль успешно обновлён",
+  "genderMale": "Мужской",
+  "genderFemale": "Женский",
+  "genderOther": "Другое",
+  "commonConfirm": "Подтвердить",
+  "addressEmptyTitle": "Нет сохранённых адресов",
+  "addressEmptySubtitle": "Добавьте свой первый адрес, чтобы начать",
+  "addressMarkPrimaryTitle": "Сделать основным",
+  "addressMarkPrimaryConfirm": "Хотите сделать этот адрес основным?",
+  "addressMarkedPrimarySuccess": "Адрес отмечен как основной",
+  "addressMarkPrimaryFailed": "Не удалось сделать адрес основным",
+  "addressDeleteDialogTitle": "Удалить адрес",
+  "addressDeleteConfirm": "Вы уверены, что хотите удалить этот адрес?",
+  "addressDeleteFailed": "Не удалось удалить адрес",
+  "addressAddNewCta": "Добавить новый адрес",
+  "addressFullNameLabel": "Полное имя",
+  "addressReceiverNameHint": "Имя получателя",
+  "addressPhoneLabel": "Номер телефона",
+  "addressFlatLabel": "Квартира / дом / строение",
+  "addressDetailsHint": "Введите детали адреса",
+  "addressLocalityLabel": "Район / местность",
+  "addressLocalityHint": "Введите район",
+  "addressLandmarkLabel": "Ориентир (необязательно)",
+  "addressLandmarkHint": "Например, рядом с больницей «Аполло»",
+  "addressPincodeLabel": "Почтовый индекс",
+  "addressCityLabel": "Город",
+  "addressCityHint": "Введите город",
+  "addressStateLabel": "Штат",
+  "addressStateHint": "Введите штат",
+  "addressSetPrimaryLabel": "Сделать основным адресом",
+  "addressSaveCta": "Сохранить адрес",
+  "addressAddedSuccess": "Адрес успешно добавлен",
+  "addressAddFailed": "Не удалось добавить адрес",
+  "addressEditTitle": "Редактировать адрес",
+  "addressUpdateFailed": "Не удалось обновить адрес",
+  "addressUpdatedSuccess": "Адрес успешно обновлён",
+  "addressUpdateCta": "Обновить адрес",
+  "verificationTitle": "Верификация",
+  "verificationKycTitle": "Документы KYC",
+  "verificationKycSubtitle": "Отправьте документы на проверку, чтобы открыть все функции",
+  "verificationNameLabel": "Имя (как в документах)",
+  "verificationNameHint": "Введите имя как в Aadhar/PAN",
+  "verificationDobLabel": "Дата рождения",
+  "verificationAddressLabel": "Адрес (как в документах)",
+  "verificationAddressHint": "Введите адрес как в Aadhar",
+  "verificationAadharLabel": "Номер Aadhar",
+  "verificationAadharRequired": "Пожалуйста, введите номер Aadhar",
+  "verificationAadharInvalid": "Номер Aadhar должен содержать 12 цифр",
+  "verificationPanLabel": "Номер PAN",
+  "verificationPanRequired": "Пожалуйста, введите номер PAN",
+  "verificationPanInvalid": "Введите корректный номер PAN (например, ABCDE1234F)",
+  "verificationInfoNote": "Ваши документы будут проверены в течение 24-48 часов.",
+  "verificationSubmitCta": "Отправить на проверку",
+  "verificationSubmitSuccess": "Данные для верификации успешно отправлены",
+  "verificationStatusPendingTitle": "Верификация в процессе",
+  "verificationStatusPendingDesc": "Ваши документы находятся на рассмотрении",
+  "verificationStatusApprovedTitle": "Проверено",
+  "verificationStatusApprovedDesc": "Ваш аккаунт верифицирован",
+  "verificationStatusRejectedTitle": "Верификация отклонена",
+  "verificationStatusRejectedDesc": "Пожалуйста, отправьте документы повторно",
+  "verificationStatusNotSubmittedTitle": "Не верифицировано",
+  "verificationStatusNotSubmittedDesc": "Отправьте документы для верификации",
+  "verificationSelectDobHint": "Выберите дату рождения",
+  "helpFaqTitle": "Помощь и поддержка",
+  "helpChatbotTitle": "Чат с ассистентом GTA",
+  "helpChatbotSubtitle": "Получите мгновенные ответы на ваши вопросы",
+  "helpMyComplaintsTitle": "Мои жалобы",
+  "helpMyComplaintsSubtitle": "Просматривайте и отслеживайте свои прежние жалобы",
+  "helpRaiseComplaintTitle": "Подать жалобу",
+  "helpRaiseComplaintSubtitle": "Выберите категорию, чтобы подать новую жалобу",
+  "helpCategoryPayments": "Платежи",
+  "helpCategoryShipping": "Доставка",
+  "helpCategoryProfile": "Профиль",
+  "helpCategoryProducts": "Товары",
+  "helpCategoryOther": "Другое",
+  "helpFaqSectionTitle": "Часто задаваемые вопросы",
+  "helpFaq1Q": "Как отследить статус моего заказа?",
+  "helpFaq1A": "Вы можете отследить заказ во вкладке «Заказы». Нажмите на любой заказ, чтобы увидеть его текущий статус и данные отслеживания.",
+  "helpFaq2Q": "Какова политика возврата?",
+  "helpFaq2A": "Товары можно вернуть в течение 7 дней после доставки, если они не использовались и находятся в оригинальной упаковке. Подробности см. на странице «Политики».",
+  "helpFaq3Q": "Как связаться с продавцом напрямую?",
+  "helpFaq3A": "Вы можете написать продавцу напрямую со страницы товара или страницы деталей заказа с помощью кнопки «Сообщение».",
+  "helpFaq4Q": "Могу ли я отменить запрос котировки?",
+  "helpFaq4A": "Да, вы можете отменить запрос котировки во вкладке «Котировки», пока он не принят продавцом.",
+  "helpFaq5Q": "Как обновить адрес доставки?",
+  "helpFaq5A": "Перейдите в раздел «Профиль» → «Управление адресами», чтобы добавить, изменить или удалить адреса доставки.",
+  "helpStillNeedHelp": "Всё ещё нужна помощь?",
+  "helpContactSupportTeam": "Свяжитесь с нашей службой поддержки",
+  "commonEmail": "Эл. почта",
+  "commonCall": "Позвонить",
+  "complaintSubjectTemplate": "Проблема: {category}",
+  "@complaintSubjectTemplate": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintSubjectLabel": "Тема",
+  "complaintSubjectHint": "Краткая тема вашей жалобы",
+  "complaintSubjectRequired": "Тема обязательна",
+  "complaintOrderNumberLabel": "Номер заказа (необязательно)",
+  "complaintOrderNumberHint": "Введите номер заказа, если применимо",
+  "complaintDescriptionLabel": "Описание",
+  "complaintDescriptionHint": "Подробно опишите вашу проблему...",
+  "complaintDescriptionRequired": "Описание обязательно",
+  "complaintSubmitCta": "Отправить жалобу",
+  "complaintSubmitSuccess": "Жалоба успешно отправлена!",
+  "complaintSubmitFailed": "Не удалось отправить жалобу. Попробуйте снова.",
+  "policyTermsTitle": "Условия использования",
+  "policyTermsDesc": "Ознакомьтесь с условиями обслуживания и правилами использования.",
+  "policyPrivacyTitle": "Политика конфиденциальности",
+  "policyPrivacyDesc": "Как мы собираем, используем и защищаем ваши данные.",
+  "policyRefundTitle": "Политика возврата средств и товаров",
+  "policyRefundDesc": "Информация о возврате средств и товаров.",
+  "policyShippingTitle": "Политика доставки",
+  "policyShippingDesc": "Сроки доставки и информация о перевозке.",
+  "policyTermsContent": "Условия использования\n\nПоследнее обновление: январь 2026 г.\n\n1. Принятие условий\nИспользуя приложение Global Textile Axis (GTA), вы соглашаетесь соблюдать настоящие Условия использования. Если вы не согласны с этими условиями, пожалуйста, не пользуйтесь нашими услугами.\n\n2. Учётные записи пользователей\n- Для создания учётной записи вам должно быть не менее 18 лет.\n- Вы несёте ответственность за сохранение конфиденциальности данных вашей учётной записи.\n- При создании учётной записи вы обязаны предоставить точную и полную информацию.\n\n3. Использование сервиса\n- Наша платформа соединяет покупателей с продавцами текстильной продукции.\n- Вы соглашаетесь использовать платформу только в законных целях.\n- Запрещается использовать платформу для мошеннических действий.\n\n4. Заказы и платежи\n- Все цены указаны в индийских рупиях (INR).\n- Оплата должна быть произведена до обработки заказа.\n- Мы оставляем за собой право отменять заказы в случае ошибок в ценах.\n\n5. Интеллектуальная собственность\n- Весь контент на платформе защищён авторским правом.\n- Запрещается копировать, воспроизводить или распространять любой контент без разрешения.\n\n6. Ограничение ответственности\n- Мы не несём ответственности за какие-либо косвенные или побочные убытки.\n- Наша ответственность ограничена суммой, уплаченной за конкретную транзакцию.\n\n7. Изменения условий\nМы оставляем за собой право изменять настоящие условия в любое время. Дальнейшее использование платформы означает принятие изменённых условий.\n\n8. Свяжитесь с нами\nПо вопросам, касающимся настоящих условий, пожалуйста, обращайтесь к нам по адресу support@texax.in",
+  "policyPrivacyContent": "Политика конфиденциальности\n\nПоследнее обновление: январь 2026 г.\n\n1. Информация, которую мы собираем\nМы собираем информацию, которую вы предоставляете нам напрямую, включая:\n- Личную информацию (имя, эл. почта, номер телефона)\n- Адресную информацию для целей доставки\n- Платёжную информацию для обработки заказов\n- Информацию об устройстве и использовании\n\n2. Как мы используем вашу информацию\nМы используем собранную информацию для того, чтобы:\n- Обрабатывать и выполнять ваши заказы\n- Отправлять уведомления об обновлениях заказа\n- Улучшать наши услуги и пользовательский опыт\n- Сообщать об акциях и новых функциях\n- Обеспечивать безопасность платформы\n\n3. Передача информации\nМы не продаём вашу личную информацию. Мы можем передавать вашу информацию:\n- Продавцам для выполнения ваших заказов\n- Платёжным системам для обработки транзакций\n- Партнёрам по доставке для отправки заказов\n- Государственным органам, если этого требует закон\n\n4. Безопасность данных\nМы применяем соответствующие меры безопасности для защиты вашей личной информации, включая шифрование и надёжное хранение данных.\n\n5. Ваши права\nВы имеете право:\n- Получать доступ к своей личной информации\n- Исправлять неточную информацию\n- Удалить свою учётную запись и связанные с ней данные\n- Отказаться от маркетинговых рассылок\n\n6. Файлы cookie\nМы используем файлы cookie для улучшения работы с платформой и анализа её использования.\n\n7. Свяжитесь с нами\nПо вопросам конфиденциальности, пожалуйста, обращайтесь к нам по адресу privacy@texax.in",
+  "policyRefundContent": "Политика возврата средств и товаров\n\nПоследнее обновление: январь 2026 г.\n\n1. Право на возврат\n- Товары должны быть возвращены в течение 7 дней после доставки.\n- Товары должны быть неиспользованными и в оригинальной упаковке.\n- Товары, изготовленные на заказ или персонализированные, возврату не подлежат.\n\n2. Процесс возврата\n- Оформите запрос на возврат через приложение.\n- Надёжно упакуйте товар в оригинальную упаковку.\n- Наш партнёр по доставке заберёт товар.\n- Возврат средств будет обработан в течение 5-7 рабочих дней.\n\n3. Способы возврата средств\n- Средства будут возвращены на первоначальный способ оплаты.\n- Банковские переводы могут занять дополнительно 3-5 рабочих дней.\n- Возврат на кошелёк происходит мгновенно.\n\n4. Товары, не подлежащие возврату\n- Нижнее бельё\n- Товары, отмеченные как «Финальная распродажа»\n- Товары, повреждённые из-за неправильного использования покупателем\n- Товары со снятыми бирками\n\n5. Повреждённые или бракованные товары\n- Сообщите о проблеме в течение 24 часов после доставки, приложив фотографии.\n- Мы организуем забор товара бесплатно.\n- Будет предоставлен полный возврат средств или замена товара.\n\n6. Политика отмены заказа\n- Заказы можно отменить до отправки.\n- Полный возврат средств за отменённые заказы.\n- Частичный возврат средств за заказы, уже находящиеся в пути.\n\n7. Свяжитесь с нами\nПо вопросам возврата средств обращайтесь по адресу support@texax.in",
+  "policyShippingContent": "Политика доставки\n\nПоследнее обновление: январь 2026 г.\n\n1. Зона доставки\n- Мы осуществляем доставку по всей Индии.\n- Наличие доставки по почтовому индексу можно проверить при оформлении заказа.\n- В некоторых удалённых районах обслуживание может быть ограничено.\n\n2. Сроки доставки\n- Города-миллионники: 3-5 рабочих дней\n- Города второго уровня: 5-7 рабочих дней\n- Другие районы: 7-10 рабочих дней\n\n3. Стоимость доставки\n- Бесплатная доставка при заказе на сумму свыше ₹999.\n- Стандартная доставка: ₹49 для заказов на сумму менее ₹999.\n- Экспресс-доставка доступна за дополнительную плату.\n\n4. Отслеживание заказа\n- Ссылка для отслеживания отправляется по SMS и эл. почте.\n- Отслеживание в реальном времени доступно в приложении.\n- Уведомления о ключевых этапах доставки.\n\n5. Попытки доставки\n- Будет предпринято до 3 попыток доставки.\n- Неудачные попытки доставки приведут к возврату товара продавцу.\n- Покупатель будет уведомлён перед каждой попыткой.\n\n6. Точность адреса\n- Убедитесь, что адрес доставки указан верно.\n- Мы не несём ответственности за задержки, вызванные неверным адресом.\n- Изменения адреса должны быть запрошены до отправки заказа.\n\n7. Свяжитесь с нами\nПо вопросам доставки обращайтесь по адресу support@texax.in",
+
+  "complaintsFailedToLoad": "Не удалось загрузить жалобы",
+  "complaintsEmptyTitle": "Пока нет жалоб",
+  "complaintsEmptySubtitle": "Вы ещё не подавали жалоб.\nНадеемся, что у вас всё отлично!",
+  "complaintsMessagesCount": "{count, plural, one{{count} сообщение} other{{count} сообщений}}",
+  "@complaintsMessagesCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "complaintStatusActive": "Активна",
+  "complaintStatusResolved": "Решена",
+  "complaintStatusOnHold": "Приостановлена",
+
+  "complaintDetailsTitle": "Детали жалобы",
+  "complaintNotFound": "Жалоба не найдена",
+  "complaintInfoTitle": "Информация о жалобе",
+  "complaintIdLabel": "ID жалобы",
+  "complaintOrderNumberDisplayLabel": "Номер заказа",
+  "complaintCreatedOnLabel": "Дата создания",
+  "complaintDescriptionTitle": "Описание",
+  "complaintNoDescription": "Описание не предоставлено",
+  "complaintMessagesTitle": "Сообщения",
+  "complaintAdminBadge": "АДМИН",
+  "complaintResolvedTitle": "Жалоба решена",
+  "complaintResolvedMessage": "Эта жалоба решена. Чат теперь закрыт.",
+  "complaintMessageHint": "Введите сообщение...",
+  "complaintMessageSent": "Сообщение отправлено",
+
+  "wishlistTitle": "Мой список желаний",
+  "wishlistEmptyTitle": "Ваш список желаний пуст",
+  "wishlistEmptySubtitle": "Сохраняйте понравившиеся товары, чтобы найти их здесь.",
+  "wishlistBrowseCta": "Просмотреть товары"
+}

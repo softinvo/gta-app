@@ -1186,24 +1186,24 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
       return _ApprovedBanner(onFinish: widget.onDone);
     }
 
-    if (status == VerificationStatus.pending) {
-      return const _PendingBanner();
-    }
-
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (status == VerificationStatus.pending) ...[
+            const _PendingBanner(),
+            const SizedBox(height: 16),
+          ],
           if (status == VerificationStatus.rejected &&
               seller?.rejectionReason != null) ...[
             _RejectionBanner(reason: seller!.rejectionReason!),
             const SizedBox(height: 16),
           ],
           Text(
-            status == VerificationStatus.rejected
-                ? 'Update Documents'
-                : 'Required Documents',
+            status == VerificationStatus.notSubmitted
+                ? 'Required Documents'
+                : 'Update Documents',
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -1961,42 +1961,46 @@ class _PendingBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFF8E1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.hourglass_top_rounded,
-                  color: Color(0xFFF57F17), size: 48),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Under Review',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: SellerColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Your documents are being reviewed.\nThis usually takes 24–48 hours.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: CommonColors.greyText,
-                height: 1.5,
-              ),
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: StatusColors.pendingBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: StatusColors.pendingDot.withValues(alpha: 0.3),
         ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.hourglass_top_rounded,
+              color: StatusColors.pendingDot, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Under Review',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: StatusColors.pendingText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Your documents are being reviewed. This usually takes 24–48 hours. You can still update and resubmit them below.',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: StatusColors.pendingText,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

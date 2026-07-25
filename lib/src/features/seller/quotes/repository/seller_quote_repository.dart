@@ -87,14 +87,19 @@ class SellerQuotationRepository {
     });
   }
 
-  /// Finalize a quotation.
+  /// Finalize a quotation. The server expects the seller's response variants
+  /// as `sellerResponse` and computes pricing/final variants from it.
   FutureEither<void> finalizeQuotation(
     String id,
-    List<Map<String, dynamic>> finalAgreedVariants,
-  ) async {
+    List<Map<String, dynamic>> sellerResponse, {
+    double deliveryCharges = 0,
+  }) async {
     final response = await _api.patchRequest(
       url: Endpoints.finalizeQuotation(id),
-      body: {'finalAgreedVariants': finalAgreedVariants},
+      body: {
+        'sellerResponse': sellerResponse,
+        'deliveryCharges': deliveryCharges,
+      },
     );
 
     return response.fold((l) => Left(l), (r) {
@@ -109,6 +114,33 @@ class SellerQuotationRepository {
         }
       } catch (e) {
         return Left(Failure(message: 'Failed to parse finalize response'));
+      }
+    });
+  }
+
+  /// Move the quotation from review into negotiation.
+  FutureEither<void> startNegotiation(String id) async {
+    final response = await _api.patchRequest(
+      url: Endpoints.startNegotiation(id),
+      body: {},
+    );
+
+    return response.fold((l) => Left(l), (r) {
+      try {
+        final Map<String, dynamic> data = jsonDecode(r.body);
+        if (data['success'] == true) {
+          return const Right(null);
+        } else {
+          return Left(
+            Failure(
+              message: data['message'] ?? 'Failed to start negotiation',
+            ),
+          );
+        }
+      } catch (e) {
+        return Left(
+          Failure(message: 'Failed to parse start negotiation response'),
+        );
       }
     });
   }

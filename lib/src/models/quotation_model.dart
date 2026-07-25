@@ -244,9 +244,15 @@ class QuotationVariant {
   factory QuotationVariant.fromJson(Map<String, dynamic> json) {
     // Buyer details API returns flat pricePerUnit; DB shape uses quotedPrice: {value, currency}
     final rawPrice = json['quotedPrice'];
+    // Seller details API returns buyerPricePerUnit instead of pricePerUnit.
     final double price = rawPrice is Map
         ? ((rawPrice['value'] ?? 0) as num).toDouble()
-        : ((rawPrice ?? json['pricePerUnit'] ?? 0) as num).toDouble();
+        : ((rawPrice ??
+                  json['pricePerUnit'] ??
+                  json['buyerPricePerUnit'] ??
+                  0)
+              as num)
+              .toDouble();
 
     final String currency = rawPrice is Map
         ? (rawPrice['currency'] ?? 'INR')
