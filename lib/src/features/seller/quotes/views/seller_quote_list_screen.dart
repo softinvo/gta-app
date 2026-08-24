@@ -741,9 +741,6 @@ class _QuoteListItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Left accent bar
-                Container(width: 4, color: color),
-
                 // Card body
                 Expanded(
                   child: Padding(

@@ -6,6 +6,16 @@ class QuoteUIHelpers {
     switch (status.toLowerCase()) {
       case 'pending':
         return const Color(0xFFF1C40F);
+      case 'submitted':
+        return SellerColors.primaryLight;
+      case 'in-progress':
+      case 'negotiating':
+      case 'negotiation':
+        return const Color(0xFFE67E22);
+      case 'agreed':
+      case 'completed':
+      case 'paid':
+        return const Color(0xFF27AE60);
       case 'open':
         return SellerColors.primary;
       case 'accepted':

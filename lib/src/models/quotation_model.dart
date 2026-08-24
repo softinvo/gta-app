@@ -242,15 +242,14 @@ class QuotationVariant {
   });
 
   factory QuotationVariant.fromJson(Map<String, dynamic> json) {
-    // Buyer details API returns flat pricePerUnit; DB shape uses quotedPrice: {value, currency}
-    final rawPrice = json['quotedPrice'];
-    final double price = rawPrice is Map
-        ? ((rawPrice['value'] ?? 0) as num).toDouble()
-        : ((rawPrice ?? json['pricePerUnit'] ?? 0) as num).toDouble();
-
-    final String currency = rawPrice is Map
-        ? (rawPrice['currency'] ?? 'INR')
-        : (json['currency'] ?? 'INR');
+    // Responses use a mix of price shapes: {value, currency}, {amount},
+    // a flat pricePerUnit/price field, or a numeric string.
+    final rawPrice =
+        json['quotedPrice'] ?? json['pricePerUnit'] ?? json['price'];
+    final price = _parseAmount(rawPrice);
+    final currency = rawPrice is Map
+        ? (rawPrice['currency'] ?? json['currency'] ?? 'INR').toString()
+        : (json['currency'] ?? 'INR').toString();
 
     return QuotationVariant(
       variantId: json['variantId'] ?? json['_id'],
@@ -260,10 +259,19 @@ class QuotationVariant {
       currency: currency,
       unit: json['unit'],
       quantity: (json['quantity'] ?? 0) as int,
-      totalPrice: json['totalPrice'] != null
-          ? (json['totalPrice'] as num).toDouble()
+      totalPrice: json['totalPrice'] != null || json['totalAmount'] != null
+          ? _parseAmount(json['totalPrice'] ?? json['totalAmount'])
           : null,
     );
+  }
+
+  static double _parseAmount(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0;
+    if (value is Map) {
+      return _parseAmount(value['value'] ?? value['amount'] ?? value['price']);
+    }
+    return 0;
   }
 }
 
@@ -285,20 +293,18 @@ class QuotationFinalVariant {
   });
 
   factory QuotationFinalVariant.fromJson(Map<String, dynamic> json) {
+    final rawPrice = json['finalPrice'] ?? json['quotedPrice'] ?? json['price'];
     return QuotationFinalVariant(
       variantColorCode: json['variantColorCode'],
       size: json['size'],
-      finalPrice:
-          ((json['finalPrice'] is Map
-                      ? json['finalPrice']['value']
-                      : json['finalPrice']) ??
-                  0)
-              .toDouble(),
-      currency: json['finalPrice'] is Map
-          ? (json['finalPrice']['currency'] ?? 'INR')
-          : 'INR',
+      finalPrice: QuotationVariant._parseAmount(rawPrice),
+      currency: rawPrice is Map
+          ? (rawPrice['currency'] ?? json['currency'] ?? 'INR').toString()
+          : (json['currency'] ?? 'INR').toString(),
       quantity: json['quantity'] ?? 0,
-      totalAmount: (json['totalAmount'] ?? 0).toDouble(),
+      totalAmount: QuotationVariant._parseAmount(
+        json['totalAmount'] ?? json['totalPrice'],
+      ),
     );
   }
 }

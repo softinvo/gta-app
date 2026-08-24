@@ -560,9 +560,6 @@ class _OrderListCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Left accent bar
-                Container(width: 4, color: statusColor),
-
                 // Card body
                 Expanded(
                   child: Padding(
