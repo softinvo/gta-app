@@ -1,16 +1,22 @@
 {
     "folders": [
         {
-            "path": "../gta-server"
-        },
-        {
             "path": "."
         },
         {
-            "path": "../gta-chat-server"
+            "path": "../global-textile-axis-admin-dashboard"
         },
         {
-            "path": "../global-textile-axis-admin-dashboard"
+            "path": "../global-textile-axis-backend-new"
+        },
+        {
+            "path": "../global-textile-axis-chat-backend"
+        },
+        {
+            "path": "../global-textile-axis-seller-dashboard"
+        },
+        {
+            "path": "../global-textile-axis-frontend"
         }
     ],
     "settings": {}
