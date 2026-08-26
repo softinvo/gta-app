@@ -6,10 +6,10 @@ import '../../../../res/colors.dart';
 import '../../common/widgets/seller_app_bar.dart';
 import '../../orders/controller/seller_order_controller.dart';
 import '../../orders/views/seller_order_list_screen.dart';
-import '../../product/views/add_product_screen.dart';
 import '../../product/views/seller_product_list_screen.dart';
 import '../../profile/views/seller_profile_tab.dart';
 import '../../profile/controller/seller_profile_controller.dart';
+import '../../profile/repository/seller_profile_stats_repository.dart';
 import '../../quotes/controller/seller_quote_controller.dart';
 import '../../quotes/views/seller_quote_list_screen.dart';
 import 'package:gta_app/src/features/chat/views/chat_list_tab.dart';
@@ -213,35 +213,56 @@ class _NavItem extends StatelessWidget {
 class _DashboardTab extends ConsumerWidget {
   const _DashboardTab();
 
+  Future<void> _refresh(WidgetRef ref) async {
+    // Invalidate every cached range so cards that are currently filtered also
+    // reload, then await the default dashboard requests for the refresh UI.
+    ref.invalidate(sellerProfileStatsProvider);
+    ref.invalidate(sellerOrderStatsProvider);
+    ref.invalidate(sellerQuotationStatsProvider);
+    await Future.wait([
+      ref.read(sellerProfileProvider.notifier).getProfile(),
+      ref.read(sellerProfileStatsProvider.future),
+      ref.read(sellerOrderStatsProvider('today').future),
+      ref.read(sellerQuotationStatsProvider('today').future),
+      ref.read(sellerOrderStatsProvider('all').future),
+      ref.read(sellerQuotationStatsProvider('all').future),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Hero banner
-          const _HeroBanner(),
+    return RefreshIndicator(
+      color: SellerColors.primaryLight,
+      onRefresh: () => _refresh(ref),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Hero banner
+            const _HeroBanner(),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // Stats row
-          _SectionHeader(title: "Today's Overview"),
-          const SizedBox(height: 14),
-          const _StatsRow(),
+            // Stats row
+            _SectionHeader(title: "Today's Overview"),
+            const SizedBox(height: 14),
+            const _StatsRow(),
 
-          const SizedBox(height: 28),
+            const SizedBox(height: 28),
 
-          // Orders & Quotes Overview (real API data)
-          _SectionHeader(title: 'Orders Overview'),
-          const SizedBox(height: 14),
-          const _OrdersStatsCard(),
-          const SizedBox(height: 28),
-          _SectionHeader(title: 'Quotes Overview'),
-          const SizedBox(height: 14),
-          const _QuotesStatsCard(),
+            // Orders & Quotes Overview (real API data)
+            _SectionHeader(title: 'Orders Overview'),
+            const SizedBox(height: 14),
+            const _OrdersStatsCard(),
+            const SizedBox(height: 28),
+            _SectionHeader(title: 'Quotes Overview'),
+            const SizedBox(height: 14),
+            const _QuotesStatsCard(),
 
-          const SizedBox(height: 32),
-        ],
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
@@ -1293,7 +1314,6 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
-
 
 // ─── Tab Wrappers ─────────────────────────────────────────────────────────────
 

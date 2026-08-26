@@ -44,7 +44,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
   void _onSearchChanged() {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      ref.read(sellerOrdersProvider.notifier).fetchOrders(
+      ref
+          .read(sellerOrdersProvider.notifier)
+          .fetchOrders(
             refresh: true,
             search: _searchController.text.trim(),
             orderStatus: _selectedStatus,
@@ -56,7 +58,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.9) {
-      ref.read(sellerOrdersProvider.notifier).loadMore(
+      ref
+          .read(sellerOrdersProvider.notifier)
+          .loadMore(
             search: _searchController.text.trim(),
             orderStatus: _selectedStatus,
             sort: _sort,
@@ -69,7 +73,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
       _selectedStatus = status;
       if (sort != null) _sort = sort;
     });
-    ref.read(sellerOrdersProvider.notifier).fetchOrders(
+    ref
+        .read(sellerOrdersProvider.notifier)
+        .fetchOrders(
           refresh: true,
           search: _searchController.text.trim(),
           orderStatus: status,
@@ -137,8 +143,11 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                       color: SellerColors.surface,
                       borderRadius: BorderRadius.circular(9),
                     ),
-                    child: const Icon(Icons.tune_rounded,
-                        size: 16, color: SellerColors.primaryLight),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      size: 16,
+                      color: SellerColors.primaryLight,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -225,7 +234,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? SellerColors.primaryLight
@@ -243,7 +254,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.white : CommonColors.greyText,
+                          color: isSelected
+                              ? Colors.white
+                              : CommonColors.greyText,
                         ),
                       ),
                     ),
@@ -267,7 +280,8 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   child: Text(
                     'Apply Filters',
@@ -385,8 +399,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                   if (hasStatus)
                     _ActiveChip(
                       label: OrderUIHelpers.getStatusLabel(_selectedStatus!),
-                      onRemove: () =>
-                          _applyFilter(status: null, sort: _sort),
+                      onRemove: () => _applyFilter(status: null, sort: _sort),
                     ),
                 ],
               ),
@@ -396,84 +409,96 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
 
           // Order List
           Expanded(
-            child: orderState.isLoading && orderState.orders.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : orderState.error != null && orderState.orders.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 48, color: CommonColors.error),
-                        const SizedBox(height: 12),
-                        Text(
-                          orderState.error!,
-                          style: GoogleFonts.inter(
-                              fontSize: 14, color: CommonColors.greyText),
-                          textAlign: TextAlign.center,
+            child: RefreshIndicator(
+              color: SellerColors.primaryLight,
+              onRefresh: () => ref
+                  .read(sellerOrdersProvider.notifier)
+                  .fetchOrders(
+                    refresh: true,
+                    search: _searchController.text.trim(),
+                    orderStatus: _selectedStatus,
+                    sort: _sort,
+                  ),
+              child: orderState.isLoading && orderState.orders.isEmpty
+                  ? const _OrderPullToRefreshState(
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : orderState.error != null && orderState.orders.isEmpty
+                  ? _OrderPullToRefreshState(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: CommonColors.error,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              orderState.error!,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: CommonColors.greyText,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () => ref
+                                  .read(sellerOrdersProvider.notifier)
+                                  .fetchOrders(refresh: true),
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(120, 44),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () => ref
-                              .read(sellerOrdersProvider.notifier)
-                              .fetchOrders(refresh: true),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Retry'),
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(120, 44),
-                          ),
+                      ),
+                    )
+                  : orders.isEmpty
+                  ? _OrderPullToRefreshState(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.local_shipping_outlined,
+                              size: 64,
+                              color: Colors.grey.withAlpha(100),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No orders found',
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: CommonColors.greyText,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Orders will appear here once placed',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: CommonColors.greyText,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
-                : orders.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.local_shipping_outlined,
-                          size: 64,
-                          color: Colors.grey.withAlpha(100),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No orders found',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: CommonColors.greyText,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Orders will appear here once placed',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: CommonColors.greyText,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : RefreshIndicator(
-                    color: SellerColors.primaryLight,
-                    onRefresh: () => ref
-                        .read(sellerOrdersProvider.notifier)
-                        .fetchOrders(
-                          refresh: true,
-                          search: _searchController.text.trim(),
-                          orderStatus: _selectedStatus,
-                          sort: _sort,
-                        ),
-                    child: ListView.separated(
+                      ),
+                    )
+                  : ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 8,
                       ),
-                      itemCount: orders.length +
-                          (orderState.isLoadingMore ? 1 : 0),
+                      itemCount:
+                          orders.length + (orderState.isLoadingMore ? 1 : 0),
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 12),
                       itemBuilder: (context, index) {
@@ -488,12 +513,24 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                         return _OrderListCard(order: orders[index]);
                       },
                     ),
-                  ),
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+class _OrderPullToRefreshState extends StatelessWidget {
+  final Widget child;
+
+  const _OrderPullToRefreshState({required this.child});
+
+  @override
+  Widget build(BuildContext context) => ListView(
+    physics: const AlwaysScrollableScrollPhysics(),
+    children: [const SizedBox(height: 180), child],
+  );
 }
 
 class _OrderListCard extends StatelessWidget {
@@ -633,9 +670,7 @@ class _OrderListCard extends StatelessWidget {
                                       height: 52,
                                       fit: BoxFit.cover,
                                       errorWidget: (context, url, error) =>
-                                          _OrderPlaceholder(
-                                            color: statusColor,
-                                          ),
+                                          _OrderPlaceholder(color: statusColor),
                                     )
                                   : _OrderPlaceholder(color: statusColor),
                             ),
@@ -866,9 +901,11 @@ class _SortChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon,
-                size: 14,
-                color: isSelected ? Colors.white : CommonColors.greyText),
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? Colors.white : CommonColors.greyText,
+            ),
             const SizedBox(width: 6),
             Text(
               label,
@@ -892,11 +929,7 @@ class _ActiveChip extends StatelessWidget {
   final IconData? icon;
   final VoidCallback onRemove;
 
-  const _ActiveChip({
-    required this.label,
-    this.icon,
-    required this.onRemove,
-  });
+  const _ActiveChip({required this.label, this.icon, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -927,8 +960,11 @@ class _ActiveChip extends StatelessWidget {
           const SizedBox(width: 5),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.close_rounded,
-                size: 13, color: SellerColors.primaryLight),
+            child: const Icon(
+              Icons.close_rounded,
+              size: 13,
+              color: SellerColors.primaryLight,
+            ),
           ),
         ],
       ),

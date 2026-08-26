@@ -37,14 +37,18 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
     _searchController.addListener(_onSearchChanged);
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(sellerQuotationsProvider.notifier).fetchQuotations(refresh: true);
+      ref
+          .read(sellerQuotationsProvider.notifier)
+          .fetchQuotations(refresh: true);
     });
   }
 
   void _onSearchChanged() {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      ref.read(sellerQuotationsProvider.notifier).fetchQuotations(
+      ref
+          .read(sellerQuotationsProvider.notifier)
+          .fetchQuotations(
             refresh: true,
             search: _searchController.text.trim(),
             status: _selectedStatus,
@@ -56,7 +60,9 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.9) {
-      ref.read(sellerQuotationsProvider.notifier).loadMore(
+      ref
+          .read(sellerQuotationsProvider.notifier)
+          .loadMore(
             search: _searchController.text.trim(),
             status: _selectedStatus,
             sort: _sort,
@@ -69,13 +75,24 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
       _selectedStatus = status;
       if (sort != null) _sort = sort;
     });
-    ref.read(sellerQuotationsProvider.notifier).fetchQuotations(
+    ref
+        .read(sellerQuotationsProvider.notifier)
+        .fetchQuotations(
           refresh: true,
           search: _searchController.text.trim(),
           status: status,
           sort: sort ?? _sort,
         );
   }
+
+  Future<void> _refresh() => ref
+      .read(sellerQuotationsProvider.notifier)
+      .fetchQuotations(
+        refresh: true,
+        search: _searchController.text.trim(),
+        status: _selectedStatus,
+        sort: _sort,
+      );
 
   @override
   void dispose() {
@@ -136,8 +153,11 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                       color: SellerColors.surface,
                       borderRadius: BorderRadius.circular(9),
                     ),
-                    child: const Icon(Icons.tune_rounded,
-                        size: 16, color: SellerColors.primaryLight),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      size: 16,
+                      color: SellerColors.primaryLight,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -226,7 +246,9 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? SellerColors.primaryLight
@@ -270,7 +292,8 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   child: Text(
                     'Apply Filters',
@@ -388,8 +411,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                   if (hasStatus)
                     _ActiveChip(
                       label: _statusLabel(_selectedStatus!),
-                      onRemove: () =>
-                          _applyFilter(status: null, sort: _sort),
+                      onRemove: () => _applyFilter(status: null, sort: _sort),
                     ),
                 ],
               ),
@@ -405,87 +427,97 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                 final sorted = quoteState.quotations;
 
                 if (quoteState.isLoading && quoteState.quotations.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return _QuotePullToRefreshState(
+                    onRefresh: _refresh,
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
                 }
 
                 if (quoteState.error != null && quoteState.quotations.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 48, color: CommonColors.error),
-                        const SizedBox(height: 12),
-                        Text(
-                          quoteState.error!,
-                          style: GoogleFonts.inter(
-                              fontSize: 14, color: CommonColors.greyText),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () => ref
-                              .read(sellerQuotationsProvider.notifier)
-                              .fetchQuotations(refresh: true),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Retry'),
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(120, 44),
+                  return _QuotePullToRefreshState(
+                    onRefresh: _refresh,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: CommonColors.error,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          Text(
+                            quoteState.error!,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: CommonColors.greyText,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () => ref
+                                .read(sellerQuotationsProvider.notifier)
+                                .fetchQuotations(refresh: true),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Retry'),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(120, 44),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }
 
                 if (sorted.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.inventory_2_outlined,
+                  return _QuotePullToRefreshState(
+                    onRefresh: _refresh,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
                             size: 64,
-                            color: Colors.grey.withValues(alpha: 0.4)),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No quotations found',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: CommonColors.greyText,
+                            color: Colors.grey.withValues(alpha: 0.4),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Quotations will appear here once submitted',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: CommonColors.greyText,
+                          const SizedBox(height: 16),
+                          Text(
+                            'No quotations found',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: CommonColors.greyText,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          Text(
+                            'Quotations will appear here once submitted',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: CommonColors.greyText,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }
 
                 return RefreshIndicator(
                   color: SellerColors.primaryLight,
-                  onRefresh: () => ref
-                      .read(sellerQuotationsProvider.notifier)
-                      .fetchQuotations(
-                        refresh: true,
-                        search: _searchController.text.trim(),
-                        status: _selectedStatus,
-                        sort: _sort,
-                      ),
+                  onRefresh: _refresh,
                   child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 8,
                     ),
-                    itemCount: sorted.length +
-                        (quoteState.isLoadingMore ? 1 : 0),
+                    itemCount:
+                        sorted.length + (quoteState.isLoadingMore ? 1 : 0),
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (_, index) {
                       if (index == sorted.length) {
@@ -524,6 +556,26 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
   }
 }
 
+class _QuotePullToRefreshState extends StatelessWidget {
+  final Future<void> Function() onRefresh;
+  final Widget child;
+
+  const _QuotePullToRefreshState({
+    required this.onRefresh,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) => RefreshIndicator(
+    color: SellerColors.primaryLight,
+    onRefresh: onRefresh,
+    child: ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [const SizedBox(height: 180), child],
+    ),
+  );
+}
+
 // ─── Sort Chip ────────────────────────────────────────────────────────────────
 
 class _SortChip extends StatelessWidget {
@@ -550,7 +602,9 @@ class _SortChip extends StatelessWidget {
           color: isSelected ? SellerColors.primaryLight : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected ? SellerColors.primaryLight : Colors.grey.shade200,
+            color: isSelected
+                ? SellerColors.primaryLight
+                : Colors.grey.shade200,
             width: 1.5,
           ),
         ),
@@ -585,11 +639,7 @@ class _ActiveChip extends StatelessWidget {
   final IconData? icon;
   final VoidCallback onRemove;
 
-  const _ActiveChip({
-    required this.label,
-    this.icon,
-    required this.onRemove,
-  });
+  const _ActiveChip({required this.label, this.icon, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -620,8 +670,11 @@ class _ActiveChip extends StatelessWidget {
           const SizedBox(width: 5),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.close_rounded,
-                size: 13, color: SellerColors.primaryLight),
+            child: const Icon(
+              Icons.close_rounded,
+              size: 13,
+              color: SellerColors.primaryLight,
+            ),
           ),
         ],
       ),
@@ -707,14 +760,12 @@ class _QuoteListItem extends StatelessWidget {
       0,
       (sum, v) => sum + v.quantity,
     );
-    final thumbUrl =
-        quote.productSnapshot?.variants?.isNotEmpty == true
-            ? quote.productSnapshot!.variants!.first.thumbnail?.fileUrl
-            : null;
-    final buyerDisplay =
-        quote.buyerSnapshot?.name?.isNotEmpty == true
-            ? quote.buyerSnapshot!.name!
-            : quote.buyerName;
+    final thumbUrl = quote.productSnapshot?.variants?.isNotEmpty == true
+        ? quote.productSnapshot!.variants!.first.thumbnail?.fileUrl
+        : null;
+    final buyerDisplay = quote.buyerSnapshot?.name?.isNotEmpty == true
+        ? quote.buyerSnapshot!.name!
+        : quote.buyerName;
 
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -832,9 +883,11 @@ class _QuoteListItem extends StatelessWidget {
                                   const SizedBox(height: 3),
                                   Row(
                                     children: [
-                                      const Icon(Icons.person_outline,
-                                          size: 12,
-                                          color: CommonColors.greyText),
+                                      const Icon(
+                                        Icons.person_outline,
+                                        size: 12,
+                                        color: CommonColors.greyText,
+                                      ),
                                       const SizedBox(width: 3),
                                       Expanded(
                                         child: Text(
@@ -852,9 +905,11 @@ class _QuoteListItem extends StatelessWidget {
                                   const SizedBox(height: 3),
                                   Row(
                                     children: [
-                                      const Icon(Icons.inventory_2_outlined,
-                                          size: 12,
-                                          color: CommonColors.greyText),
+                                      const Icon(
+                                        Icons.inventory_2_outlined,
+                                        size: 12,
+                                        color: CommonColors.greyText,
+                                      ),
                                       const SizedBox(width: 3),
                                       Text(
                                         '$totalQty units requested',
@@ -869,8 +924,11 @@ class _QuoteListItem extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.chevron_right_rounded,
-                                color: CommonColors.greyText, size: 20),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              color: CommonColors.greyText,
+                              size: 20,
+                            ),
                           ],
                         ),
 
@@ -882,7 +940,9 @@ class _QuoteListItem extends StatelessWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
                                 color: SellerColors.surface,
                                 borderRadius: BorderRadius.circular(6),

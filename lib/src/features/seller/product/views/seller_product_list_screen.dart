@@ -67,7 +67,9 @@ class _SellerProductListScreenState
 
   void _onSearch(String query) {
     setState(() => _searchQuery = query);
-    ref.read(productListProvider.notifier).fetchProducts(search: query, refresh: true);
+    ref
+        .read(productListProvider.notifier)
+        .fetchProducts(search: query, refresh: true);
   }
 
   @override
@@ -103,38 +105,46 @@ class _SellerProductListScreenState
 
           // ── Body ───────────────────────────────────────────────────
           Expanded(
-            child: productState.isLoading && productState.products.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : productState.error != null && productState.products.isEmpty
-                ? _buildErrorState(productState.error!)
-                : productState.products.isEmpty
-                ? _buildEmptyState(context)
-                : RefreshIndicator(
-                    onRefresh: () async {
-                      await ref
-                          .read(productListProvider.notifier)
-                          .fetchProducts(search: _searchQuery, refresh: true);
-                    },
-                    child: ListView.builder(
+            child: RefreshIndicator(
+              color: SellerColors.primaryLight,
+              onRefresh: () => ref
+                  .read(productListProvider.notifier)
+                  .fetchProducts(search: _searchQuery, refresh: true),
+              child: productState.isLoading && productState.products.isEmpty
+                  ? const _PullToRefreshState(
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : productState.error != null && productState.products.isEmpty
+                  ? _PullToRefreshState(
+                      child: _buildErrorState(productState.error!),
+                    )
+                  : productState.products.isEmpty
+                  ? _PullToRefreshState(child: _buildEmptyState(context))
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                      itemCount: productState.products.length +
+                      itemCount:
+                          productState.products.length +
                           (productState.isLoadingMore ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index == productState.products.length) {
                           return const Padding(
                             padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           );
                         }
                         final productCard = productState.products[index];
                         return SellerProductCard(
                           product: productCard,
-                          onTap: () => context.push('/seller/product/${productCard.id}'),
+                          onTap: () =>
+                              context.push('/seller/product/${productCard.id}'),
                         );
                       },
                     ),
-                  ),
+            ),
           ),
         ],
       ),
@@ -179,23 +189,40 @@ class _SellerProductListScreenState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline_rounded, size: 56, color: Colors.red.withValues(alpha: 0.5)),
+            Icon(
+              Icons.error_outline_rounded,
+              size: 56,
+              color: Colors.red.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 16),
             Text(
               error,
-              style: GoogleFonts.inter(color: CommonColors.greyText, fontSize: 14),
+              style: GoogleFonts.inter(
+                color: CommonColors.greyText,
+                fontSize: 14,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             OutlinedButton.icon(
-              onPressed: () => ref.read(productListProvider.notifier).fetchProducts(refresh: true),
+              onPressed: () => ref
+                  .read(productListProvider.notifier)
+                  .fetchProducts(refresh: true),
               icon: const Icon(Icons.refresh_rounded),
-              label: Text('Retry', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+              label: Text(
+                'Retry',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: SellerColors.primaryLight,
                 side: const BorderSide(color: SellerColors.primaryLight),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
           ],
@@ -244,26 +271,41 @@ class _SellerProductListScreenState
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.inventory_2_rounded, size: 36, color: CommonColors.white),
+                  child: const Icon(
+                    Icons.inventory_2_rounded,
+                    size: 36,
+                    color: CommonColors.white,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 28),
             Text(
               'No Products Yet',
-              style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF1A1A2E)),
+              style: GoogleFonts.poppins(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1A1A2E),
+              ),
             ),
             const SizedBox(height: 10),
             Text(
               'Add your first product and start\nreaching buyers across the platform.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, height: 1.6, color: CommonColors.greyText),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                height: 1.6,
+                color: CommonColors.greyText,
+              ),
             ),
             const SizedBox(height: 36),
             GestureDetector(
               onTap: () => context.push(AddProductScreen.routePath),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
                   gradient: const LinearGradient(
@@ -280,11 +322,19 @@ class _SellerProductListScreenState
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add_rounded, color: CommonColors.white, size: 20),
+                    const Icon(
+                      Icons.add_rounded,
+                      color: CommonColors.white,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Add Your First Product',
-                      style: GoogleFonts.poppins(color: CommonColors.white, fontWeight: FontWeight.w600, fontSize: 15),
+                      style: GoogleFonts.poppins(
+                        color: CommonColors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
@@ -293,6 +343,20 @@ class _SellerProductListScreenState
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PullToRefreshState extends StatelessWidget {
+  final Widget child;
+
+  const _PullToRefreshState({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [const SizedBox(height: 180), child],
     );
   }
 }
@@ -329,7 +393,11 @@ class _ProductCountHeader extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: hasMore ? '+ products' : count == 1 ? ' product' : ' products',
+                  text: hasMore
+                      ? '+ products'
+                      : count == 1
+                      ? ' product'
+                      : ' products',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -362,7 +430,11 @@ class _ProductCountHeader extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.add_rounded, size: 16, color: CommonColors.white),
+                  const Icon(
+                    Icons.add_rounded,
+                    size: 16,
+                    color: CommonColors.white,
+                  ),
                   const SizedBox(width: 5),
                   Text(
                     'Add New',

@@ -4,21 +4,27 @@ class ProductCollectionItem {
   final String id;
   final String name;
   final String? shortDescription;
+  final String? category;
   final Attachment? thumbnail;
   final double price;
   final double discountPercent;
   final double? ratingAvg;
   final int? ratingCount;
+  final int? minimumOrderQuantity;
+  final bool sampleAvailable;
 
   ProductCollectionItem({
     required this.id,
     required this.name,
     this.shortDescription,
+    this.category,
     this.thumbnail,
     required this.price,
     this.discountPercent = 0,
     this.ratingAvg,
     this.ratingCount,
+    this.minimumOrderQuantity,
+    this.sampleAvailable = false,
   });
 
   String? get thumbnailUrl => thumbnail?.fileUrl;
@@ -30,14 +36,18 @@ class ProductCollectionItem {
 
   factory ProductCollectionItem.fromJson(Map<String, dynamic> json) {
     final priceMap = (json['price'] as Map<String, dynamic>?) ?? {};
-    final descRaw = json['description']; // may be Map or String depending on endpoint
+    final descRaw =
+        json['description']; // may be Map or String depending on endpoint
     final ratingMap = json['rating'] as Map<String, dynamic>?;
     final rawCount = (ratingMap?['count'] as num? ?? 0).toInt();
     final rawAvg = (ratingMap?['avg'] as num? ?? 0).toDouble();
     return ProductCollectionItem(
       id: (json['_id'] ?? '').toString(),
       name: json['name'] ?? '',
-      shortDescription: descRaw is Map ? descRaw['short'] as String? : descRaw as String?,
+      shortDescription: descRaw is Map
+          ? descRaw['short'] as String?
+          : descRaw as String?,
+      category: json['category']?.toString(),
       thumbnail: json['thumbnail'] != null
           ? Attachment.fromJson(json['thumbnail'])
           : null,
@@ -45,6 +55,8 @@ class ProductCollectionItem {
       discountPercent: (priceMap['discountPercent'] ?? 0).toDouble(),
       ratingAvg: rawCount > 0 ? rawAvg : null,
       ratingCount: rawCount > 0 ? rawCount : null,
+      minimumOrderQuantity: (json['minimumOrderQuantity'] as num?)?.toInt(),
+      sampleAvailable: json['sampleAvailable'] == true,
     );
   }
 }
@@ -66,8 +78,7 @@ class ProductCollections {
     List<ProductCollectionItem> parseList(String key) {
       final list = json[key] as List<dynamic>? ?? [];
       return list
-          .map((e) =>
-              ProductCollectionItem.fromJson(e as Map<String, dynamic>))
+          .map((e) => ProductCollectionItem.fromJson(e as Map<String, dynamic>))
           .toList();
     }
 

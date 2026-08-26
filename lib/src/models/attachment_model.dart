@@ -33,7 +33,6 @@ class Attachment {
       if (fileName != null) 'fileName': fileName,
       if (fileType != null) 'fileType': fileType,
       if (fileExtension != null) 'fileExtension': fileExtension,
-      if (uploadedAt != null) 'uploadedAt': uploadedAt!.toIso8601String(),
     };
   }
 

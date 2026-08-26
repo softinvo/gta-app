@@ -132,6 +132,23 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
     }
   }
 
+  Future<void> _refresh() async {
+    final userId =
+        _currentUserId ??
+        (widget.userType == 'buyer'
+            ? ref.read(buyerProfileProvider).value?.id
+            : ref.read(sellerProfileProvider).value?.id);
+    if (userId == null) {
+      _tryInit();
+      return;
+    }
+    if (_currentUserId == null) {
+      _currentUserId = userId;
+      _setupSocket(userId);
+    }
+    await _loadConversations(userId);
+  }
+
   List<ChatConversation> get _filtered {
     if (_query.isEmpty) return _conversations;
     final q = _query.toLowerCase();
@@ -222,88 +239,108 @@ class _ChatListTabState extends ConsumerState<ChatListTab> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return _refreshableState(
+        const Center(child: CircularProgressIndicator()),
+      );
     }
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 48,
-              color: CommonColors.greyText,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Failed to load chats',
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: CommonColors.black,
+      return _refreshableState(
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: CommonColors.greyText,
               ),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () {
-                if (_currentUserId != null) {
-                  _loadConversations(_currentUserId!);
-                }
-              },
-              child: Text(
-                'Retry',
-                style: GoogleFonts.inter(color: _primaryColor),
+              const SizedBox(height: 12),
+              Text(
+                'Failed to load chats',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: CommonColors.black,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  if (_currentUserId != null) {
+                    _loadConversations(_currentUserId!);
+                  }
+                },
+                child: Text(
+                  'Retry',
+                  style: GoogleFonts.inter(color: _primaryColor),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
     final items = _filtered;
     if (_conversations.isEmpty) {
-      return _buildEmptyState();
+      return _refreshableState(_buildEmptyState());
     }
     if (items.isEmpty) {
-      return Center(
-        child: Text(
-          'No results for "$_query"',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: CommonColors.greyText,
+      return _refreshableState(
+        Center(
+          child: Text(
+            'No results for "$_query"',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: CommonColors.greyText,
+            ),
           ),
         ),
       );
     }
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: items.length,
-      separatorBuilder: (context, idx) => const SizedBox(height: 10),
-      itemBuilder: (context, i) {
-        final convo = items[i];
-        return _ConvoTile(
-          convo: convo,
-          primaryColor: _primaryColor,
-          onTap: () {
-            if (_currentUserId == null) return;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChatDetailScreen(
-                  otherUserId: convo.otherUserId,
-                  otherUserType: convo.otherUserType,
-                  otherUserName: convo.otherUserName,
-                  otherUserAvatar: convo.otherUserAvatar,
-                  currentUserId: _currentUserId!,
-                  currentUserType: widget.userType,
-                  otherLastActiveAt: convo.lastActiveAt ?? convo.lastSentAt,
+    return RefreshIndicator(
+      color: _primaryColor,
+      onRefresh: _refresh,
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: items.length,
+        separatorBuilder: (context, idx) => const SizedBox(height: 10),
+        itemBuilder: (context, i) {
+          final convo = items[i];
+          return _ConvoTile(
+            convo: convo,
+            primaryColor: _primaryColor,
+            onTap: () {
+              if (_currentUserId == null) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChatDetailScreen(
+                    otherUserId: convo.otherUserId,
+                    otherUserType: convo.otherUserType,
+                    otherUserName: convo.otherUserName,
+                    otherUserAvatar: convo.otherUserAvatar,
+                    currentUserId: _currentUserId!,
+                    currentUserType: widget.userType,
+                    otherLastActiveAt: convo.lastActiveAt ?? convo.lastSentAt,
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-      },
+              );
+            },
+          );
+        },
+      ),
     );
   }
+
+  Widget _refreshableState(Widget child) => RefreshIndicator(
+    color: _primaryColor,
+    onRefresh: _refresh,
+    child: ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [const SizedBox(height: 180), child],
+    ),
+  );
 
   Widget _buildEmptyState() {
     return Center(
@@ -378,7 +415,8 @@ class _ConvoTile extends ConsumerWidget {
 
   Color _avatarColor() {
     if (convo.otherUserName.isEmpty) return _avatarPalette[0];
-    return _avatarPalette[convo.otherUserName.codeUnitAt(0) % _avatarPalette.length];
+    return _avatarPalette[convo.otherUserName.codeUnitAt(0) %
+        _avatarPalette.length];
   }
 
   Widget _buildInitialsAvatar(String initials, Color color) {
@@ -425,8 +463,13 @@ class _ConvoTile extends ConsumerWidget {
     final isOnline = presence?.isOnline ?? convo.isOnline;
 
     final name = convo.otherUserName;
-    final initials = name.trim().split(' ').where((w) => w.isNotEmpty).take(2)
-        .map((w) => w[0].toUpperCase()).join();
+    final initials = name
+        .trim()
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0].toUpperCase())
+        .join();
     final avatarColor = _avatarColor();
     final hasUnread = convo.unreadCount > 0;
     final isBlocked = convo.isBlocked;
@@ -443,9 +486,7 @@ class _ConvoTile extends ConsumerWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: primaryColor.withValues(
-                alpha: hasUnread ? 0.45 : 0.15,
-              ),
+              color: primaryColor.withValues(alpha: hasUnread ? 0.45 : 0.15),
             ),
             boxShadow: [
               BoxShadow(
@@ -469,9 +510,8 @@ class _ConvoTile extends ConsumerWidget {
                             width: 52,
                             height: 52,
                             fit: BoxFit.cover,
-                            errorWidget: (_, _, _) => _buildInitialsAvatar(
-                              initials, avatarColor,
-                            ),
+                            errorWidget: (_, _, _) =>
+                                _buildInitialsAvatar(initials, avatarColor),
                           )
                         : _buildInitialsAvatar(initials, avatarColor),
                   ),
@@ -587,15 +627,15 @@ class _ConvoTile extends ConsumerWidget {
                             isBlocked
                                 ? 'Chat blocked by admin'
                                 : (convo.lastMessage?.isNotEmpty == true
-                                    ? convo.lastMessage!
-                                    : 'No messages yet'),
+                                      ? convo.lastMessage!
+                                      : 'No messages yet'),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: isBlocked
                                   ? Colors.red.shade400
                                   : (hasUnread
-                                      ? const Color(0xFF374151)
-                                      : const Color(0xFF6B7280)),
+                                        ? const Color(0xFF374151)
+                                        : const Color(0xFF6B7280)),
                               fontWeight: hasUnread
                                   ? FontWeight.w500
                                   : FontWeight.w400,

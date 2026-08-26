@@ -536,6 +536,7 @@ class _OrderCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: BuyerColors.cardBorder),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -550,7 +551,6 @@ class _OrderCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(width: 4, color: orderColor),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(14),

@@ -65,7 +65,10 @@ class ProductGridCard extends ConsumerWidget {
                   ),
                   // Top scrim
                   Positioned(
-                    left: 0, right: 0, top: 0, height: 72,
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    height: 72,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.vertical(
@@ -84,7 +87,10 @@ class ProductGridCard extends ConsumerWidget {
                   ),
                   // Bottom scrim
                   Positioned(
-                    left: 0, right: 0, bottom: 0, height: 36,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 36,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -100,20 +106,31 @@ class ProductGridCard extends ConsumerWidget {
                   ),
                   if (badge != null)
                     Positioned(
-                      top: 10, left: 12,
+                      top: 10,
+                      left: 12,
                       child: _BadgePill(
                         label: badge!,
                         color: badgeColor ?? BuyerColors.gridBadgeNew,
                       ),
                     ),
                   Positioned(
-                    top: 8, right: 8,
+                    top: 8,
+                    right: 8,
                     child: _HeartButton(
                       isSaved: isSaved,
                       onTap: () =>
                           ref.read(savedProductsProvider.notifier).toggle(item),
                     ),
                   ),
+                  if (item.sampleAvailable)
+                    const Positioned(
+                      left: 10,
+                      bottom: 8,
+                      child: _BadgePill(
+                        label: 'Sample available',
+                        color: BuyerColors.gridBadgeTop,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -158,11 +175,25 @@ class ProductGridCard extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                        const SizedBox(height: 4),
-                        _RatingRow(
-                          rating: item.ratingAvg ?? 0.0,
-                          reviewCount: item.ratingCount ?? 0,
-                        ),
+                        if (item.ratingCount != null) ...[
+                          const SizedBox(height: 4),
+                          _RatingRow(
+                            rating: item.ratingAvg ?? 0.0,
+                            reviewCount: item.ratingCount!,
+                          ),
+                        ] else if (item.category?.isNotEmpty == true) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            item.category!,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: BuyerColors.gridCardTextHint,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
 
                         // ── Spacer pushes price to bottom ──────────────
                         const Expanded(child: SizedBox()),
@@ -312,7 +343,11 @@ class _RatingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      const Icon(Icons.star_rounded, size: 12, color: BuyerColors.gridCardAmber),
+      const Icon(
+        Icons.star_rounded,
+        size: 12,
+        color: BuyerColors.gridCardAmber,
+      ),
       const SizedBox(width: 3),
       Text(
         rating.toStringAsFixed(1),
@@ -325,7 +360,10 @@ class _RatingRow extends StatelessWidget {
       const SizedBox(width: 3),
       Text(
         '($reviewCount)',
-        style: GoogleFonts.inter(fontSize: 9, color: BuyerColors.gridCardTextHint),
+        style: GoogleFonts.inter(
+          fontSize: 9,
+          color: BuyerColors.gridCardTextHint,
+        ),
       ),
     ],
   );

@@ -55,9 +55,15 @@ Color _verificationStatusText(VerificationStatus? status) {
   }
 }
 
-
 class SellerProfileTab extends ConsumerWidget {
   const SellerProfileTab({super.key});
+
+  Future<void> _refresh(WidgetRef ref) async {
+    await Future.wait([
+      ref.read(sellerProfileProvider.notifier).getProfile(),
+      ref.refresh(sellerProfileStatsProvider.future),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,143 +71,153 @@ class SellerProfileTab extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // Gradient header banner
-          SliverToBoxAdapter(
-            child: sellerAsync.when(
-              data: (seller) => _ProfileHeader(
-                name: seller?.name ?? 'Textile Seller',
-                phone: seller?.phone ?? '+91 9876543210',
-                businessName: seller?.businessName ?? 'Global Textiles Co.',
-                avatarUrl: seller?.avatar?.fileUrl,
-                verificationStatus: seller?.verificationStatus,
-                onEditTap: () =>
-                    context.push(SellerPersonalDetailsScreen.routePath),
-              ),
-              loading: () => const _ProfileHeaderSkeleton(),
-              error: (_, __) => _ProfileHeader(
-                name: 'Error Loading',
-                phone: '',
-                businessName: '',
-                onEditTap: () {},
+      body: RefreshIndicator(
+        color: SellerColors.primaryLight,
+        onRefresh: () => _refresh(ref),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // Gradient header banner
+            SliverToBoxAdapter(
+              child: sellerAsync.when(
+                data: (seller) => _ProfileHeader(
+                  name: seller?.name ?? 'Textile Seller',
+                  phone: seller?.phone ?? '+91 9876543210',
+                  businessName: seller?.businessName ?? 'Global Textiles Co.',
+                  avatarUrl: seller?.avatar?.fileUrl,
+                  verificationStatus: seller?.verificationStatus,
+                  onEditTap: () =>
+                      context.push(SellerPersonalDetailsScreen.routePath),
+                ),
+                loading: () => const _ProfileHeaderSkeleton(),
+                error: (_, __) => _ProfileHeader(
+                  name: 'Error Loading',
+                  phone: '',
+                  businessName: '',
+                  onEditTap: () {},
+                ),
               ),
             ),
-          ),
 
-          // Stats row
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
-              child: _StatsRow(),
+            // Stats row
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+                child: _StatsRow(),
+              ),
             ),
-          ),
 
-          // Menu sections
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _MenuSection(
-                    title: 'Business',
-                    items: [
-                      _MenuItem(
-                        icon: Icons.person_rounded,
-                        iconColor: const Color(0xFF3F51B5),
-                        iconBg: const Color(0xFFE8EAF6),
-                        title: 'Personal Details',
-                        onTap: () =>
-                            context.push(SellerPersonalDetailsScreen.routePath),
-                      ),
-                      _MenuItem(
-                        icon: Icons.location_on_rounded,
-                        iconColor: const Color(0xFFE53935),
-                        iconBg: const Color(0xFFFFEBEE),
-                        title: 'Business Address',
-                        onTap: () =>
-                            context.push(SellerBusinessAddressScreen.routePath),
-                      ),
-                      _MenuItem(
-                        icon: Icons.storefront_rounded,
-                        iconColor: const Color(0xFF5C6BC0),
-                        iconBg: const Color(0xFFE8EAF6),
-                        title: 'Store Setup',
-                        subtitle: sellerAsync.asData?.value
-                            ?.verificationStatus.displayName,
-                        subtitleColor: _verificationStatusDot(
-                          sellerAsync.asData?.value?.verificationStatus,
+            // Menu sections
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _MenuSection(
+                      title: 'Business',
+                      items: [
+                        _MenuItem(
+                          icon: Icons.person_rounded,
+                          iconColor: const Color(0xFF3F51B5),
+                          iconBg: const Color(0xFFE8EAF6),
+                          title: 'Personal Details',
+                          onTap: () => context.push(
+                            SellerPersonalDetailsScreen.routePath,
+                          ),
                         ),
-                        subtitleBgColor: _verificationStatusBg(
-                          sellerAsync.asData?.value?.verificationStatus,
+                        _MenuItem(
+                          icon: Icons.location_on_rounded,
+                          iconColor: const Color(0xFFE53935),
+                          iconBg: const Color(0xFFFFEBEE),
+                          title: 'Business Address',
+                          onTap: () => context.push(
+                            SellerBusinessAddressScreen.routePath,
+                          ),
                         ),
-                        subtitleTextColor: _verificationStatusText(
-                          sellerAsync.asData?.value?.verificationStatus,
+                        _MenuItem(
+                          icon: Icons.storefront_rounded,
+                          iconColor: const Color(0xFF5C6BC0),
+                          iconBg: const Color(0xFFE8EAF6),
+                          title: 'Store Setup',
+                          subtitle: sellerAsync
+                              .asData
+                              ?.value
+                              ?.verificationStatus
+                              .displayName,
+                          subtitleColor: _verificationStatusDot(
+                            sellerAsync.asData?.value?.verificationStatus,
+                          ),
+                          subtitleBgColor: _verificationStatusBg(
+                            sellerAsync.asData?.value?.verificationStatus,
+                          ),
+                          subtitleTextColor: _verificationStatusText(
+                            sellerAsync.asData?.value?.verificationStatus,
+                          ),
+                          onTap: () =>
+                              context.push(SellerOnboardingScreen.routePath),
                         ),
-                        onTap: () =>
-                            context.push(SellerOnboardingScreen.routePath),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  _MenuSection(
-                    title: 'Management',
-                    items: [
-                      _MenuItem(
-                        icon: Icons.currency_rupee_rounded,
-                        iconColor: const Color(0xFFFF7043),
-                        iconBg: const Color(0xFFFBE9E7),
-                        title: 'Earnings',
-                        onTap: () =>
-                            context.push(SellerEarningsScreen.routePath),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  _MenuSection(
-                    title: 'Support',
-                    items: [
-                      _MenuItem(
-                        icon: Icons.help_rounded,
-                        iconColor: const Color(0xFF00ACC1),
-                        iconBg: const Color(0xFFE0F7FA),
-                        title: 'Seller Help Center',
-                        onTap: () =>
-                            context.push(SellerHelpCenterScreen.routePath),
-                      ),
-                      _MenuItem(
-                        icon: Icons.policy_rounded,
-                        iconColor: const Color(0xFF546E7A),
-                        iconBg: const Color(0xFFECEFF1),
-                        title: 'Seller Policies',
-                        onTap: () =>
-                            context.push(SellerPoliciesScreen.routePath),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 28),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _MenuSection(
+                      title: 'Management',
+                      items: [
+                        _MenuItem(
+                          icon: Icons.currency_rupee_rounded,
+                          iconColor: const Color(0xFFFF7043),
+                          iconBg: const Color(0xFFFBE9E7),
+                          title: 'Earnings',
+                          onTap: () =>
+                              context.push(SellerEarningsScreen.routePath),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _MenuSection(
+                      title: 'Support',
+                      items: [
+                        _MenuItem(
+                          icon: Icons.help_rounded,
+                          iconColor: const Color(0xFF00ACC1),
+                          iconBg: const Color(0xFFE0F7FA),
+                          title: 'Seller Help Center',
+                          onTap: () =>
+                              context.push(SellerHelpCenterScreen.routePath),
+                        ),
+                        _MenuItem(
+                          icon: Icons.policy_rounded,
+                          iconColor: const Color(0xFF546E7A),
+                          iconBg: const Color(0xFFECEFF1),
+                          title: 'Seller Policies',
+                          onTap: () =>
+                              context.push(SellerPoliciesScreen.routePath),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
 
-                  // Logout
-                  _LogoutButton(),
+                    // Logout
+                    _LogoutButton(),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  Center(
-                    child: Text(
-                      'Version 1.0.0',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: CommonColors.greyText,
+                    Center(
+                      child: Text(
+                        'Version 1.0.0',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: CommonColors.greyText,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 28),
-                ],
+                    const SizedBox(height: 28),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -394,7 +410,7 @@ class _AvatarInitials extends StatelessWidget {
 class _Badge extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color color;     // icon color
+  final Color color; // icon color
   final Color bgColor;
   final Color? textColor; // defaults to color when null
 
@@ -479,7 +495,13 @@ class _VerificationBadge extends StatelessWidget {
         label = 'Not Verified';
     }
 
-    return _Badge(icon: icon, label: label, color: color, bgColor: bg, textColor: text);
+    return _Badge(
+      icon: icon,
+      label: label,
+      color: color,
+      bgColor: bg,
+      textColor: text,
+    );
   }
 }
 
@@ -534,9 +556,7 @@ class _StatsRow extends ConsumerWidget {
       child: statsAsync.when(
         loading: () => const SizedBox(
           height: 72,
-          child: Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
         error: (_, __) => Row(
           children: [
@@ -653,11 +673,7 @@ class _StatItem extends StatelessWidget {
 class _StatDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 56,
-      color: Colors.grey.shade100,
-    );
+    return Container(width: 1, height: 56, color: Colors.grey.shade100);
   }
 }
 
@@ -740,8 +756,8 @@ class _MenuItem extends StatelessWidget {
   final Color iconBg;
   final String title;
   final String? subtitle;
-  final Color? subtitleColor;     // dot / border color
-  final Color? subtitleBgColor;   // badge background
+  final Color? subtitleColor; // dot / border color
+  final Color? subtitleBgColor; // badge background
   final Color? subtitleTextColor; // badge text
   final VoidCallback onTap;
 
@@ -790,9 +806,11 @@ class _MenuItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: subtitleBgColor ??
-                      (subtitleColor ?? CommonColors.success)
-                          .withValues(alpha: 0.1),
+                  color:
+                      subtitleBgColor ??
+                      (subtitleColor ?? CommonColors.success).withValues(
+                        alpha: 0.1,
+                      ),
                   borderRadius: BorderRadius.circular(8),
                   border: subtitleBgColor != null
                       ? Border.all(
@@ -806,7 +824,8 @@ class _MenuItem extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: subtitleTextColor ??
+                    color:
+                        subtitleTextColor ??
                         subtitleColor ??
                         CommonColors.success,
                   ),
@@ -853,9 +872,7 @@ class _LogoutButton extends ConsumerWidget {
         decoration: BoxDecoration(
           color: CommonColors.error.withValues(alpha: 0.07),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: CommonColors.error.withValues(alpha: 0.25),
-          ),
+          border: Border.all(color: CommonColors.error.withValues(alpha: 0.25)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -866,7 +883,11 @@ class _LogoutButton extends ConsumerWidget {
                 color: CommonColors.error.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.logout_rounded, color: CommonColors.error, size: 18),
+              child: Icon(
+                Icons.logout_rounded,
+                color: CommonColors.error,
+                size: 18,
+              ),
             ),
             const SizedBox(width: 10),
             Text(

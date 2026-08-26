@@ -33,8 +33,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             child: GestureDetector(
               onTap: () => context.push(BuyerSearchScreen.routePath),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: CommonColors.white,
                   borderRadius: BorderRadius.circular(18),
@@ -79,9 +81,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             error: (_, __) => _CollectionsError(
               onRetry: () => ref.invalidate(productCollectionsProvider),
             ),
-            data: (collections) => _CollectionsBody(
-              collections: collections,
-            ),
+            data: (collections) => _CollectionsBody(collections: collections),
           ),
         ),
 
@@ -133,7 +133,9 @@ class _CollectionsBody extends StatelessWidget {
             child: Text(
               context.l10n.commonNoProductsAvailable,
               style: GoogleFonts.inter(
-                  color: CommonColors.greyText, fontSize: 14),
+                color: CommonColors.greyText,
+                fontSize: 14,
+              ),
             ),
           ),
       ],
@@ -157,7 +159,7 @@ class _HorizontalSection extends StatelessWidget {
           SectionHeader(title: title, onSeeAll: () {}),
           const SizedBox(height: 16),
           SizedBox(
-            height: 264,
+            height: 288,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: items.length,
@@ -236,7 +238,7 @@ class _CollectionsSkeleton extends StatelessWidget {
             const SizedBox(height: 14),
             // Horizontal card row
             SizedBox(
-              height: 264,
+              height: 288,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 physics: const NeverScrollableScrollPhysics(),
@@ -283,8 +285,11 @@ class _SkeletonBox extends StatelessWidget {
   final double width;
   final double height;
   final double radius;
-  const _SkeletonBox(
-      {required this.width, required this.height, this.radius = 4});
+  const _SkeletonBox({
+    required this.width,
+    required this.height,
+    this.radius = 4,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -315,8 +320,10 @@ class _CollectionsError extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             context.l10n.homeFailedToLoadProducts,
-            style:
-                GoogleFonts.inter(color: CommonColors.greyText, fontSize: 14),
+            style: GoogleFonts.inter(
+              color: CommonColors.greyText,
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 8),
           TextButton(

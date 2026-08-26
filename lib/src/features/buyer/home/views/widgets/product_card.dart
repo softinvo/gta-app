@@ -58,7 +58,10 @@ class ProductCard extends ConsumerWidget {
                 ),
                 // Top gradient for badge readability
                 Positioned(
-                  left: 0, right: 0, top: 0, height: 56,
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: 56,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.vertical(
@@ -78,7 +81,8 @@ class ProductCard extends ConsumerWidget {
                 // Discount badge – top left
                 if (hasDiscount)
                   Positioned(
-                    top: 10, left: 10,
+                    top: 10,
+                    left: 10,
                     child: _Badge(
                       label: context.l10n.productDiscountOff(
                         item.discountPercent.toInt().toString(),
@@ -88,7 +92,8 @@ class ProductCard extends ConsumerWidget {
                   ),
                 // Heart – top right
                 Positioned(
-                  top: 6, right: 6,
+                  top: 6,
+                  right: 6,
                   child: _HeartButton(
                     isSaved: isSaved,
                     onTap: () =>
@@ -127,7 +132,25 @@ class ProductCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 7),
+                  Wrap(
+                    spacing: 5,
+                    runSpacing: 4,
+                    children: [
+                      if (item.category?.isNotEmpty == true)
+                        _InfoPill(
+                          icon: Icons.category_outlined,
+                          label: item.category!,
+                        ),
+                      if (item.minimumOrderQuantity != null &&
+                          item.minimumOrderQuantity! > 1)
+                        _InfoPill(
+                          icon: Icons.inventory_2_outlined,
+                          label: 'MOQ ${item.minimumOrderQuantity}',
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     context.l10n.productFromPricePrefix,
                     style: GoogleFonts.inter(
@@ -182,21 +205,21 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.2,
-          ),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text(
+      label,
+      style: GoogleFonts.inter(
+        color: Colors.white,
+        fontSize: 9,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.2,
+      ),
+    ),
+  );
 }
 
 class _HeartButton extends StatelessWidget {
@@ -206,35 +229,70 @@ class _HeartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(7),
-          decoration: BoxDecoration(
-            color: isSaved
-                ? Colors.red.shade50.withOpacity(0.92)
-                : Colors.white.withOpacity(0.88),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.12),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.all(7),
+      decoration: BoxDecoration(
+        color: isSaved
+            ? Colors.red.shade50.withOpacity(0.92)
+            : Colors.white.withOpacity(0.88),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
-            transitionBuilder: (child, anim) =>
-                ScaleTransition(scale: anim, child: child),
-            child: Icon(
-              isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-              key: ValueKey(isSaved),
-              size: 17,
-              color: isSaved ? Colors.red.shade500 : CommonColors.greyText,
+        ],
+      ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        transitionBuilder: (child, anim) =>
+            ScaleTransition(scale: anim, child: child),
+        child: Icon(
+          isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          key: ValueKey(isSaved),
+          size: 17,
+          color: isSaved ? Colors.red.shade500 : CommonColors.greyText,
+        ),
+      ),
+    ),
+  );
+}
+
+class _InfoPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoPill({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+    decoration: BoxDecoration(
+      color: BuyerColors.surface,
+      borderRadius: BorderRadius.circular(5),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 10, color: BuyerColors.textSecondary),
+        const SizedBox(width: 3),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 76),
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.inter(
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+              color: BuyerColors.textSecondary,
             ),
           ),
         ),
-      );
+      ],
+    ),
+  );
 }
