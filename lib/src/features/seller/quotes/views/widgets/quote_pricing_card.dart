@@ -12,6 +12,23 @@ class QuotePricingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The original pricing subtotal reflects the buyer's request. Once a
+    // seller confirms negotiation, the final variants are the source of truth.
+    final agreedSubtotal = quote.finalAgreedVariants.isNotEmpty
+        ? quote.finalAgreedVariants.fold<double>(
+            0,
+            (sum, variant) => sum + (variant.finalPrice * variant.quantity),
+          )
+        : quote.pricing.subtotal;
+    final calculatedTotal =
+        agreedSubtotal +
+        quote.pricing.totalGst +
+        quote.pricing.deliveryCharges -
+        quote.pricing.discountAmount;
+    final total = quote.totalAgreedAmount != null && quote.totalAgreedAmount! > 0
+        ? quote.totalAgreedAmount!
+        : calculatedTotal;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -33,7 +50,7 @@ class QuotePricingCard extends StatelessWidget {
             icon: Icons.payments_outlined,
           ),
           const SizedBox(height: 16),
-          QuotePricingRow(label: 'Subtotal', value: quote.pricing.subtotal),
+          QuotePricingRow(label: 'Subtotal', value: agreedSubtotal),
           QuotePricingRow(label: 'GST', value: quote.pricing.totalGst),
           QuotePricingRow(
             label: 'Delivery Charges',
@@ -61,7 +78,7 @@ class QuotePricingCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '₹${NumberFormat('#,##,###').format(quote.totalAgreedAmount ?? 0)}',
+                '₹${NumberFormat('#,##,###').format(total)}',
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

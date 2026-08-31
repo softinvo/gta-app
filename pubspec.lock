@@ -354,10 +354,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_cashfree_pg_sdk
-      sha256: "2166ceeceac809f1483491aad3724965ac84d0ae7b1a4c506a2637f90a74245a"
+      sha256: "94d618057ffa7721b2bdc97dd0d0ad7f22df2a30ac66b3991a7fd65e6f15e64d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.4+51"
+    version: "2.4.0+52"
   flutter_colorpicker:
     dependency: "direct main"
     description:

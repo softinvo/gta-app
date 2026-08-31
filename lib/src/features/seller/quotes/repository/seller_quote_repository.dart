@@ -90,11 +90,11 @@ class SellerQuotationRepository {
   /// Finalize a quotation.
   FutureEither<void> finalizeQuotation(
     String id,
-    List<Map<String, dynamic>> finalAgreedVariants,
+    List<Map<String, dynamic>> sellerResponse,
   ) async {
     final response = await _api.patchRequest(
       url: Endpoints.finalizeQuotation(id),
-      body: {'finalAgreedVariants': finalAgreedVariants},
+      body: {'sellerResponse': sellerResponse},
     );
 
     return response.fold((l) => Left(l), (r) {
@@ -109,6 +109,26 @@ class SellerQuotationRepository {
         }
       } catch (e) {
         return Left(Failure(message: 'Failed to parse finalize response'));
+      }
+    });
+  }
+
+  /// Moves a quotation from seller review into negotiation.
+  FutureEither<void> startNegotiation(String id) async {
+    final response = await _api.patchRequest(
+      url: Endpoints.startNegotiation(id),
+      body: {},
+    );
+
+    return response.fold((l) => Left(l), (r) {
+      try {
+        final Map<String, dynamic> data = jsonDecode(r.body);
+        if (data['success'] == true) return const Right(null);
+        return Left(
+          Failure(message: data['message'] ?? 'Failed to start negotiation'),
+        );
+      } catch (_) {
+        return Left(Failure(message: 'Failed to parse negotiation response'));
       }
     });
   }

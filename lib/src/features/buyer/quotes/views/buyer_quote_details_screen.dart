@@ -12,6 +12,7 @@ import 'package:gta_app/src/features/buyer/orders/views/buyer_order_details_scre
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
 import 'package:gta_app/src/features/buyer/quotes/controller/buyer_quote_controller.dart';
 import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
+import 'package:gta_app/src/features/seller/quotes/views/widgets/quote_item_card.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
@@ -117,10 +118,19 @@ class _QuoteDetailsBody extends ConsumerWidget {
           )
         : null;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
+    return RefreshIndicator(
+      color: BuyerColors.primaryLight,
+      onRefresh: () async {
+        ref.invalidate(buyerQuotationDetailsProvider(quotation.id));
+        await ref.read(buyerQuotationDetailsProvider(quotation.id).future);
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
           _StatusHeaderCard(quotation: quotation),
           const SizedBox(height: 14),
 
@@ -166,10 +176,7 @@ class _QuoteDetailsBody extends ConsumerWidget {
           _SectionCard(
             title: context.l10n.quoteSectionRequestedVariants,
             icon: Icons.list_alt_outlined,
-            child: _VariantList(
-              variants: quotation.selectedVariants,
-              label: context.l10n.quoteVariantLabelQuoted,
-            ),
+            child: _SellerStyleVariantList(quotation: quotation),
           ),
           const SizedBox(height: 14),
 
@@ -178,7 +185,10 @@ class _QuoteDetailsBody extends ConsumerWidget {
               title: context.l10n.quoteSectionFinalAgreedVariants,
               icon: Icons.check_circle_outline,
               iconColor: const Color(0xFF27AE60),
-              child: _FinalVariantList(variants: quotation.finalAgreedVariants),
+              child: _SellerStyleVariantList(
+                quotation: quotation,
+                finalAgreed: true,
+              ),
             ),
             const SizedBox(height: 14),
           ],
@@ -225,8 +235,9 @@ class _QuoteDetailsBody extends ConsumerWidget {
 
           if (isCancellable) _CancelButton(quotation: quotation),
 
-          const SizedBox(height: 24),
-        ],
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
@@ -461,218 +472,60 @@ class _ProductInfo extends StatelessWidget {
   }
 }
 
-// ── Variant List ──────────────────────────────────────────────────────────────
+// ── Variant Lists ─────────────────────────────────────────────────────────────
 
-class _VariantList extends StatelessWidget {
-  final List<QuotationVariant> variants;
-  final String label;
-  const _VariantList({required this.variants, required this.label});
+class _SellerStyleVariantList extends StatelessWidget {
+  final Quotation quotation;
+  final bool finalAgreed;
+
+  const _SellerStyleVariantList({
+    required this.quotation,
+    this.finalAgreed = false,
+  });
+
+  QuotationVariant? _requestedVariant(QuotationFinalVariant variant) {
+    for (final requested in quotation.selectedVariants) {
+      if (requested.variantColorCode == variant.variantColorCode &&
+          requested.size == variant.size) {
+        return requested;
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (variants.isEmpty) {
-      return Text(
-        context.l10n.quoteNoVariantsLabel,
-        style: GoogleFonts.inter(fontSize: 13, color: CommonColors.greyText),
+    if (!finalAgreed) {
+      if (quotation.selectedVariants.isEmpty) {
+        return Text(
+          context.l10n.quoteNoVariantsLabel,
+          style: GoogleFonts.inter(fontSize: 13, color: CommonColors.greyText),
+        );
+      }
+      return Column(
+        children: quotation.selectedVariants
+            .map((variant) => QuoteItemCard(quote: quotation, variant: variant))
+            .toList(),
       );
     }
+
     return Column(
-      children: variants.map((v) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: BuyerColors.background,
-            borderRadius: BorderRadius.circular(10),
+      children: quotation.finalAgreedVariants.map((variant) {
+        final requested = _requestedVariant(variant);
+        return QuoteItemCard(
+          quote: quotation,
+          variant: QuotationVariant(
+            variantColorCode: variant.variantColorCode,
+            size: variant.size,
+            quotedPrice: variant.finalPrice,
+            currency: variant.currency,
+            unit: requested?.unit,
+            quantity: variant.quantity,
+            totalPrice: variant.totalAmount,
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (v.variantColorCode != null)
-                      Row(
-                        children: [
-                          Container(
-                            width: 14,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: _parseHexColor(v.variantColorCode!),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.black12,
-                                width: 1,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            v.variantColorCode!,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: CommonColors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    if (v.size != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Text(
-                          context.l10n.quoteSizeLabel(v.size!),
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: CommonColors.greyText,
-                          ),
-                        ),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        context.l10n.quoteQtyLabel(
-                          '${v.quantity}${v.unit != null ? ' ${v.unit}' : ''}',
-                        ),
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: CommonColors.greyText,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${v.currency} ${v.quotedPrice.toStringAsFixed(2)}',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: BuyerColors.primaryLight,
-                    ),
-                  ),
-                  Text(
-                    context.l10n.quotePerUnitLabel(label),
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      color: CommonColors.greyText,
-                    ),
-                  ),
-                  if (v.totalPrice != null)
-                    Text(
-                      context.l10n.quoteTotalLabel(_nf.format(v.totalPrice!)),
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: CommonColors.black,
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-Color _parseHexColor(String hex) {
-  try {
-    final cleaned = hex.replaceAll('#', '');
-    final value = int.parse(cleaned.length == 6 ? 'FF$cleaned' : cleaned, radix: 16);
-    return Color(value);
-  } catch (_) {
-    return Colors.grey;
-  }
-}
-
-// ── Final Variant List ────────────────────────────────────────────────────────
-
-class _FinalVariantList extends StatelessWidget {
-  final List<QuotationFinalVariant> variants;
-  const _FinalVariantList({required this.variants});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: variants.map((v) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF27AE60).withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: const Color(0xFF27AE60).withValues(alpha: 0.2),
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (v.variantColorCode != null)
-                      Text(
-                        context.l10n.quoteColorLabel(v.variantColorCode!),
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: CommonColors.black,
-                        ),
-                      ),
-                    if (v.size != null)
-                      Text(
-                        context.l10n.quoteSizeLabel(v.size!),
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: CommonColors.greyText,
-                        ),
-                      ),
-                    Text(
-                      context.l10n.quoteQtyLabel(v.quantity.toString()),
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: CommonColors.greyText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${v.currency} ${v.finalPrice.toStringAsFixed(2)}',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF27AE60),
-                    ),
-                  ),
-                  Text(
-                    context.l10n.quotePerUnitLabel(context.l10n.quoteFinalLabel),
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      color: CommonColors.greyText,
-                    ),
-                  ),
-                  Text(
-                    context.l10n.quoteTotalLabel(_nf.format(v.totalAmount)),
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: CommonColors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          displayPrice: variant.finalPrice,
+          priceLabel: 'final',
+          accentColor: const Color(0xFF27AE60),
         );
       }).toList(),
     );

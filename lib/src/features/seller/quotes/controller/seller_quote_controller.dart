@@ -150,14 +150,30 @@ class SellerQuotationsController extends Notifier<QuotationListState> {
     );
   }
 
-  Future<void> finalize(
+  /// Returns null on success, otherwise the API error message.
+  Future<String?> finalize(
     String quotationId,
     List<Map<String, dynamic>> data,
   ) async {
     final result = await _repo.finalizeQuotation(quotationId, data);
-    result.fold(
-      (failure) {},
-      (_) async => fetchQuotations(refresh: true),
+    return result.fold(
+      (failure) => failure.message,
+      (_) {
+        fetchQuotations(refresh: true);
+        return null;
+      },
+    );
+  }
+
+  /// Returns null when the quote was moved into negotiation.
+  Future<String?> startNegotiation(String quotationId) async {
+    final result = await _repo.startNegotiation(quotationId);
+    return result.fold(
+      (failure) => failure.message,
+      (_) {
+        fetchQuotations(refresh: true);
+        return null;
+      },
     );
   }
 }

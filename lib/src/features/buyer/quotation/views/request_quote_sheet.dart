@@ -693,56 +693,105 @@ class _OrderSummaryCard extends StatelessWidget {
           color: BuyerColors.primaryLight.withValues(alpha: 0.18),
         ),
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 18,
-            color: BuyerColors.primaryLight,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.l10n.quoteOrderSummaryTitle,
+          Row(
+            children: [
+              Icon(
+                Icons.receipt_long_outlined,
+                size: 18,
+                color: BuyerColors.primaryLight,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.l10n.quoteSectionPricing,
                   style: GoogleFonts.inter(
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: BuyerColors.primaryLight,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  context.l10n.quoteOrderSummaryLine(selectedCount, totalQty),
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: CommonColors.greyText,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '₹${nf.format(estimatedTotal)}',
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: BuyerColors.primaryLight,
-                ),
               ),
               Text(
-                context.l10n.quoteQuotedTotalLabel,
+                context.l10n.quoteOrderSummaryLine(selectedCount, totalQty),
                 style: GoogleFonts.inter(
-                  fontSize: 10,
+                  fontSize: 11,
                   color: CommonColors.greyText,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          _QuotePricingRow(
+            label: context.l10n.pricingSubtotal,
+            amount: estimatedTotal,
+            currency: currency,
+            nf: nf,
+          ),
+          const Divider(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.l10n.quoteQuotedTotalLabel,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: CommonColors.black,
+                ),
+              ),
+              Text(
+                '$currency ${nf.format(estimatedTotal)}',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF27AE60),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuotePricingRow extends StatelessWidget {
+  final String label;
+  final double amount;
+  final String currency;
+  final NumberFormat nf;
+
+  const _QuotePricingRow({
+    required this.label,
+    required this.amount,
+    required this.currency,
+    required this.nf,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: CommonColors.greyText,
+            ),
+          ),
+          Text(
+            '$currency ${nf.format(amount)}',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: CommonColors.black,
+            ),
           ),
         ],
       ),

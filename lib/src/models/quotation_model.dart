@@ -242,11 +242,25 @@ class QuotationVariant {
   });
 
   factory QuotationVariant.fromJson(Map<String, dynamic> json) {
-    // Responses use a mix of price shapes: {value, currency}, {amount},
-    // a flat pricePerUnit/price field, or a numeric string.
+    // List, buyer-details, and seller-details endpoints use different keys.
+    // Seller details exposes the buyer offer as buyerPricePerUnit.
     final rawPrice =
-        json['quotedPrice'] ?? json['pricePerUnit'] ?? json['price'];
-    final price = _parseAmount(rawPrice);
+        json['quotedPrice'] ??
+        json['pricePerUnit'] ??
+        json['buyerPricePerUnit'] ??
+        json['sellerPricePerUnit'] ??
+        json['finalPrice'] ??
+        json['price'];
+    final quantity = (json['quantity'] as num?)?.toInt() ?? 0;
+    final totalPrice = json['totalPrice'] != null || json['totalAmount'] != null
+        ? _parseAmount(json['totalPrice'] ?? json['totalAmount'])
+        : null;
+    final parsedPrice = _parseAmount(rawPrice);
+    final price = parsedPrice > 0
+        ? parsedPrice
+        : totalPrice != null && totalPrice > 0 && quantity > 0
+            ? totalPrice / quantity
+            : 0.0;
     final currency = rawPrice is Map
         ? (rawPrice['currency'] ?? json['currency'] ?? 'INR').toString()
         : (json['currency'] ?? 'INR').toString();
@@ -258,10 +272,8 @@ class QuotationVariant {
       quotedPrice: price,
       currency: currency,
       unit: json['unit'],
-      quantity: (json['quantity'] ?? 0) as int,
-      totalPrice: json['totalPrice'] != null || json['totalAmount'] != null
-          ? _parseAmount(json['totalPrice'] ?? json['totalAmount'])
-          : null,
+      quantity: quantity,
+      totalPrice: totalPrice,
     );
   }
 

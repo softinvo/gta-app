@@ -10,8 +10,18 @@ import 'quote_ui_helpers.dart';
 class QuoteItemCard extends StatelessWidget {
   final Quotation quote;
   final QuotationVariant variant;
+  final double? displayPrice;
+  final String priceLabel;
+  final Color? accentColor;
 
-  const QuoteItemCard({super.key, required this.quote, required this.variant});
+  const QuoteItemCard({
+    super.key,
+    required this.quote,
+    required this.variant,
+    this.displayPrice,
+    this.priceLabel = 'quoted',
+    this.accentColor,
+  });
 
   static final _currency = NumberFormat('#,##0');
 
@@ -52,17 +62,23 @@ class QuoteItemCard extends StatelessWidget {
     final thumbnailUrl = _thumbnailUrl;
     final quotedVariant = _quotedVariant;
     final unit = variant.unit?.isNotEmpty == true ? variant.unit! : 'unit';
+    final price = displayPrice ?? quotedVariant.quotedPrice;
+    final color = accentColor ?? SellerColors.primaryLight;
     final total =
-        quotedVariant.totalPrice ??
-        quotedVariant.quotedPrice * variant.quantity;
+        displayPrice != null
+            ? price * variant.quantity
+            : quotedVariant.totalPrice ?? price * variant.quantity;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: accentColor?.withValues(alpha: 0.05) ?? Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F4)),
+        border: Border.all(
+          color: accentColor?.withValues(alpha: 0.22) ??
+              const Color(0xFFF0F0F4),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -122,15 +138,15 @@ class QuoteItemCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '₹${_currency.format(quotedVariant.quotedPrice)}',
+                '₹${_currency.format(price)}',
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: CommonColors.black,
+                  color: accentColor ?? CommonColors.black,
                 ),
               ),
               Text(
-                'quoted / $unit',
+                '$priceLabel / $unit',
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   color: CommonColors.greyText,
@@ -140,7 +156,7 @@ class QuoteItemCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
-                  color: SellerColors.surface,
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -148,7 +164,7 @@ class QuoteItemCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: SellerColors.primaryLight,
+                    color: color,
                   ),
                 ),
               ),

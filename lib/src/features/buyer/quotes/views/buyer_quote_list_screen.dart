@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -520,31 +521,45 @@ class _BuyerQuoteListScreenState extends ConsumerState<BuyerQuoteListScreen> {
 
 // ── Quote Card ────────────────────────────────────────────────────────────────
 
-class _QuoteCard extends StatelessWidget {
+class _QuoteCard extends ConsumerWidget {
   final Quotation quotation;
   const _QuoteCard({required this.quotation});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = _statusColor(quotation.status);
+    final totalQty = quotation.selectedVariants.fold<int>(
+      0,
+      (sum, variant) => sum + variant.quantity,
+    );
+    final thumbUrl = quotation.productSnapshot?.variants?.isNotEmpty == true
+        ? quotation.productSnapshot!.variants!.first.thumbnail?.fileUrl
+        : null;
+    final sellerName = quotation.sellerSnapshot?.name?.isNotEmpty == true
+        ? quotation.sellerSnapshot!.name!
+        : 'Seller';
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BuyerQuoteDetailsScreen(quotationId: quotation.id),
-        ),
-      ),
+      onTap: () {
+        // Detail providers are cached by Riverpod. Clear the previous response
+        // before opening this screen so every card tap loads current quote data.
+        ref.invalidate(buyerQuotationDetailsProvider(quotation.id));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BuyerQuoteDetailsScreen(quotationId: quotation.id),
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: BuyerColors.cardBorder),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -556,90 +571,177 @@ class _QuoteCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Top row
+                        // Top row: quote number + status badge
                         Row(
                           children: [
+                            Expanded(
+                              child: Text(
+                                'Quote #${quotation.quotationNumber}',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: BuyerColors.primaryLight,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.09),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _statusIcon(quotation.status),
+                                    size: 11,
+                                    color: color,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _statusLabel(context, quotation.status)
+                                        .toUpperCase(),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      color: color,
+                                      letterSpacing: 0.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Middle: thumbnail + seller + quantity + arrow
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: thumbUrl != null
+                                  ? CachedNetworkImage(
+                                      imageUrl: thumbUrl,
+                                      width: 52,
+                                      height: 52,
+                                      fit: BoxFit.cover,
+                                      errorWidget: (_, __, ___) =>
+                                          _QuotePlaceholder(color: color),
+                                    )
+                                  : _QuotePlaceholder(color: color),
+                            ),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '#${quotation.quotationNumber}',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: CommonColors.greyText,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
                                     quotation.productSnapshot?.name ??
                                         context.l10n.commonProductFallback,
                                     style: GoogleFonts.inter(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
                                       color: CommonColors.black,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.storefront_outlined,
+                                        size: 12,
+                                        color: CommonColors.greyText,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Expanded(
+                                        child: Text(
+                                          sellerName,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            color: CommonColors.greyText,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.inventory_2_outlined,
+                                        size: 12,
+                                        color: CommonColors.greyText,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        context.l10n.quoteUnitsRequested(
+                                          totalQty.toString(),
+                                        ),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: CommonColors.greyText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
-                            _StatusBadge(
-                              label: _statusLabel(context, quotation.status),
-                              color: color,
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              color: CommonColors.greyText,
+                              size: 20,
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
 
-                        // Category + quantity
-                        if (quotation.productSnapshot?.category != null)
-                          _InfoRow(
-                            icon: Icons.category_outlined,
-                            text: quotation.productSnapshot!.category!,
-                          ),
-                        const SizedBox(height: 4),
-                        _InfoRow(
-                          icon: Icons.inventory_2_outlined,
-                          text: _totalQty(context, quotation),
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Footer
+                        // Bottom: current step + date
                         Row(
                           children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 13,
-                              color: CommonColors.greyText,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              DateFormat('dd MMM yyyy').format(
-                                quotation.createdAt,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
                               ),
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: CommonColors.greyText,
+                              decoration: BoxDecoration(
+                                color: BuyerColors.surface,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                _stepLabel(quotation.step),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: BuyerColors.primaryLight,
+                                ),
                               ),
                             ),
                             const Spacer(),
-                            if (quotation.totalAgreedAmount != null &&
-                                quotation.totalAgreedAmount! > 0)
-                              Text(
-                                '₹${NumberFormat('#,##0').format(quotation.totalAgreedAmount)}',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF27AE60),
-                                ),
+                            Text(
+                              DateFormat('d MMM yyyy').format(
+                                quotation.createdAt,
                               ),
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: CommonColors.greyText,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -652,11 +754,6 @@ class _QuoteCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _totalQty(BuildContext context, Quotation q) {
-    final qty = q.selectedVariants.fold(0, (sum, v) => sum + v.quantity);
-    return context.l10n.quoteUnitsRequested(qty.toString());
   }
 
   String _statusLabel(BuildContext context, String status) {
@@ -700,6 +797,57 @@ class _QuoteCard extends StatelessWidget {
         return CommonColors.greyText;
     }
   }
+
+  IconData _statusIcon(String status) {
+    switch (status) {
+      case 'pending':
+        return Icons.mark_email_unread_outlined;
+      case 'in-progress':
+        return Icons.pending_outlined;
+      case 'agreed':
+        return Icons.handshake_outlined;
+      case 'cancelled':
+        return Icons.cancel_outlined;
+      default:
+        return Icons.help_outline;
+    }
+  }
+
+  String _stepLabel(String step) {
+    switch (step) {
+      case 'submitted':
+        return 'Awaiting Review';
+      case 'seller_reviewing':
+        return 'Under Review';
+      case 'negotiation':
+        return 'In Negotiation';
+      case 'agreement_reached':
+        return 'Agreement Reached';
+      case 'payment_done':
+        return 'Payment Done';
+      case 'completed':
+        return 'Completed';
+      default:
+        return step.replaceAll('_', ' ');
+    }
+  }
+}
+
+class _QuotePlaceholder extends StatelessWidget {
+  final Color color;
+
+  const _QuotePlaceholder({required this.color});
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(Icons.receipt_long_outlined, size: 24, color: color),
+      );
 }
 
 // ── Sort Chip ─────────────────────────────────────────────────────────────────
@@ -809,57 +957,6 @@ class _ActiveChip extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// ── Shared small widgets ──────────────────────────────────────────────────────
-
-class _StatusBadge extends StatelessWidget {
-  final String label;
-  final Color color;
-  const _StatusBadge({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: color,
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  const _InfoRow({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 13, color: CommonColors.greyText),
-        const SizedBox(width: 5),
-        Expanded(
-          child: Text(
-            text,
-            style:
-                GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
     );
   }
 }

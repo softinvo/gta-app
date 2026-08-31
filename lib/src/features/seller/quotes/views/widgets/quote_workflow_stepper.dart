@@ -6,8 +6,15 @@ import 'package:intl/intl.dart';
 
 class QuoteWorkflowStepper extends StatelessWidget {
   final Quotation quote;
+  final VoidCallback? onStartNegotiation;
+  final VoidCallback? onFinalize;
 
-  const QuoteWorkflowStepper({super.key, required this.quote});
+  const QuoteWorkflowStepper({
+    super.key,
+    required this.quote,
+    this.onStartNegotiation,
+    this.onFinalize,
+  });
 
   static const _kGreen = Color(0xFF27AE60);
 
@@ -134,6 +141,24 @@ class QuoteWorkflowStepper extends StatelessWidget {
             final isPending = !isCancelled && i > currentIndex;
             final isNext = isPending && i == currentIndex + 1;
             final isLast = !isCancelled && i == visibleSteps.length - 1;
+            Widget? action;
+            if (key == 'seller_reviewing' &&
+                (quote.step == 'submitted' || quote.step == 'seller_reviewing') &&
+                onStartNegotiation != null) {
+              action = _StepActionButton(
+                label: 'Update Status',
+                icon: Icons.forum_outlined,
+                onTap: onStartNegotiation!,
+              );
+            } else if (key == 'negotiation' &&
+                quote.step == 'negotiation' &&
+                onFinalize != null) {
+              action = _StepActionButton(
+                label: 'Update Status',
+                icon: Icons.check_circle_outline,
+                onTap: onFinalize!,
+              );
+            }
 
             return _QuoteTimelineStep(
               label: label,
@@ -145,6 +170,7 @@ class QuoteWorkflowStepper extends StatelessWidget {
               isPending: isPending,
               isNext: isNext,
               isLast: isLast,
+              action: action,
             );
           }),
 
@@ -180,6 +206,7 @@ class _QuoteTimelineStep extends StatelessWidget {
   final bool isNext;
   final bool isLast;
   final bool isCancelStep;
+  final Widget? action;
 
   const _QuoteTimelineStep({
     required this.label,
@@ -192,6 +219,7 @@ class _QuoteTimelineStep extends StatelessWidget {
     required this.isNext,
     required this.isLast,
     this.isCancelStep = false,
+    this.action,
   });
 
   static const _kGreen = Color(0xFF27AE60);
@@ -296,6 +324,11 @@ class _QuoteTimelineStep extends StatelessWidget {
                           : CommonColors.greyText,
                     ),
                   ),
+                  if (action != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: action!,
+                    ),
                 ],
               ),
             ),
@@ -304,6 +337,38 @@ class _QuoteTimelineStep extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StepActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _StepActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => ElevatedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 16),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: SellerColors.primaryLight,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          textStyle: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
 }
 
 class _DotWidget extends StatelessWidget {
