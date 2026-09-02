@@ -140,9 +140,11 @@ class _QuoteDetailsBody extends ConsumerWidget {
               icon: Icons.store_outlined,
               child: _SellerInfo(
                 sellerSnapshot: quotation.sellerSnapshot!,
-                onChatTap: () {
-                  final buyerId = ref.read(buyerProfileProvider).value?.id;
-                  if (buyerId == null) return;
+                onChatTap: () async {
+                  final buyer = ref.read(buyerProfileProvider).value ??
+                      await ref.read(buyerProfileProvider.notifier).getProfile();
+                  final buyerId = buyer?.id;
+                  if (!context.mounted || buyerId == null) return;
                   final sellerName = quotation.sellerSnapshot?.name ??
                       context.l10n.commonSellerFallback;
                   Navigator.push(
@@ -258,6 +260,7 @@ class _StatusHeaderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: color.withValues(alpha: 0.12),
@@ -335,7 +338,9 @@ class _StatusHeaderCard extends StatelessWidget {
             children: [
               _MetaChip(
                 icon: Icons.calendar_today_outlined,
-                text: DateFormat('dd MMM yyyy').format(quotation.createdAt),
+                text: DateFormat(
+                  'dd MMM yyyy, hh:mm a',
+                ).format(quotation.createdAt.toLocal()),
               ),
               const SizedBox(width: 16),
               _MetaChip(
@@ -1408,6 +1413,7 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),

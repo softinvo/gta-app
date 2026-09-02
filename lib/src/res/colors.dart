@@ -12,6 +12,7 @@ class CommonColors {
   static const Color greyText = Color(0xFF7D7F88);
   static const Color lightGrey = Color(0xFFE0E0E0);
   static const Color darkGrey = Color(0xFF424242);
+  static const Color borderColor = Color(0xFFE5E7EB);
 
   // Status Colors
   static const Color success = Color(0xFF4CAF50);

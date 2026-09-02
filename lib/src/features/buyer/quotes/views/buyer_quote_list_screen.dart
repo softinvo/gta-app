@@ -86,6 +86,16 @@ class _BuyerQuoteListScreenState extends ConsumerState<BuyerQuoteListScreen> {
         );
   }
 
+  Future<void> _refresh() =>
+      ref.read(buyerQuotationsProvider.notifier).fetchQuotations(
+            refresh: true,
+            search: _searchController.text.trim().isEmpty
+                ? null
+                : _searchController.text.trim(),
+            status: _selectedStatus,
+            sort: _sort,
+          );
+
   void _showFilterSheet(BuildContext context) {
     final statuses = [
       {'id': '', 'label': context.l10n.quoteStatusAll},
@@ -444,32 +454,28 @@ class _BuyerQuoteListScreenState extends ConsumerState<BuyerQuoteListScreen> {
                     ),
                   )
                 : quoteState.error != null && quoteState.quotations.isEmpty
-                    ? _ErrorView(
-                        message: quoteState.error!,
-                        onRetry: () => ref
-                            .read(buyerQuotationsProvider.notifier)
-                            .fetchQuotations(refresh: true),
+                    ? _RefreshablePlaceholder(
+                        onRefresh: _refresh,
+                        child: _ErrorView(
+                          message: quoteState.error!,
+                          onRetry: _refresh,
+                        ),
                       )
                     : quoteState.quotations.isEmpty
-                        ? _EmptyView(
-                            icon: Icons.request_quote_outlined,
-                            title: context.l10n.quoteEmptyTitle,
-                            subtitle: context.l10n.quoteEmptySubtitle,
+                        ? _RefreshablePlaceholder(
+                            onRefresh: _refresh,
+                            child: _EmptyView(
+                              icon: Icons.request_quote_outlined,
+                              title: context.l10n.quoteEmptyTitle,
+                              subtitle: context.l10n.quoteEmptySubtitle,
+                            ),
                           )
                         : RefreshIndicator(
                             color: BuyerColors.primaryLight,
-                            onRefresh: () => ref
-                                .read(buyerQuotationsProvider.notifier)
-                                .fetchQuotations(
-                                  refresh: true,
-                                  search: _searchController.text.trim().isEmpty
-                                      ? null
-                                      : _searchController.text.trim(),
-                                  status: _selectedStatus,
-                                  sort: _sort,
-                                ),
+                            onRefresh: _refresh,
                             child: ListView.separated(
                               controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
                               padding:
                                   const EdgeInsets.fromLTRB(16, 4, 16, 24),
                               itemCount: quoteState.quotations.length +
@@ -555,6 +561,7 @@ class _QuoteCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -635,7 +642,7 @@ class _QuoteCard extends ConsumerWidget {
                                       width: 52,
                                       height: 52,
                                       fit: BoxFit.cover,
-                                      errorWidget: (_, __, ___) =>
+                                      errorWidget: (_, _, _) =>
                                           _QuotePlaceholder(color: color),
                                     )
                                   : _QuotePlaceholder(color: color),
@@ -734,8 +741,8 @@ class _QuoteCard extends ConsumerWidget {
                             ),
                             const Spacer(),
                             Text(
-                              DateFormat('d MMM yyyy').format(
-                                quotation.createdAt,
+                              DateFormat('dd MMM yyyy, hh:mm a').format(
+                                quotation.createdAt.toLocal(),
                               ),
                               style: GoogleFonts.inter(
                                 fontSize: 11,
@@ -1004,6 +1011,30 @@ class _EmptyView extends StatelessWidget {
               height: 1.5,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RefreshablePlaceholder extends StatelessWidget {
+  final RefreshCallback onRefresh;
+  final Widget child;
+
+  const _RefreshablePlaceholder({
+    required this.onRefresh,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      color: BuyerColors.primaryLight,
+      onRefresh: onRefresh,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverFillRemaining(hasScrollBody: false, child: child),
         ],
       ),
     );

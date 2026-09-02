@@ -24,14 +24,16 @@ class BuyerAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(70);
+  Size get preferredSize => const Size.fromHeight(65);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: CommonColors.white,
       elevation: 0,
+      scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
+      toolbarHeight: 64,
       automaticallyImplyLeading: automaticallyImplyLeading,
       leading: leading,
       centerTitle: centerTitle,
@@ -41,8 +43,8 @@ class BuyerAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 // Logo
                 Container(
-                  width: 100,
-                  height: 60,
+                  width: 80,
+                  height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -104,6 +106,10 @@ class BuyerAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             const SizedBox(width: 8),
           ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(height: 1, color: const Color(0xFFF0F2F5)),
+      ),
     );
   }
 }

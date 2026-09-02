@@ -8,6 +8,7 @@ import 'package:gta_app/src/features/buyer/profile/views/manage_addresses_screen
 import 'package:gta_app/src/features/buyer/profile/views/add_address_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_verification_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_help_faq_screen.dart';
+import 'package:gta_app/src/features/buyer/profile/views/buyer_rate_app_screen.dart';
 import 'package:gta_app/src/features/seller/dashboard/views/seller_dashboard_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_personal_details_screen.dart';
 import 'package:gta_app/src/features/seller/profile/views/seller_business_address_screen.dart';
@@ -100,6 +101,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: BuyerHelpFaqScreen.routePath,
       builder: (context, state) => const BuyerHelpFaqScreen(),
+    ),
+    GoRoute(
+      path: BuyerRateAppScreen.routePath,
+      builder: (context, state) => const BuyerRateAppScreen(),
     ),
     GoRoute(
       path: BuyerWishlistScreen.routePath,

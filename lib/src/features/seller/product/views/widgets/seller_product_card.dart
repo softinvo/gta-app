@@ -23,15 +23,6 @@ class SellerProductCard extends StatelessWidget {
         ? price!.value * (1 - price.discountPercent! / 100)
         : null;
 
-    final specs = <_SpecEntry>[
-      if (product.gsm != null && product.gsm!.isNotEmpty)
-        _SpecEntry('GSM', product.gsm!),
-      if (product.width != null && product.width!.isNotEmpty)
-        _SpecEntry('Width', product.width!),
-      if (product.compositions != null && product.compositions!.isNotEmpty)
-        _SpecEntry('Comp', product.compositions!),
-    ];
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -90,7 +81,8 @@ class SellerProductCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               _VerificationBadge(
-                                  status: product.verificationStatus),
+                                status: product.verificationStatus,
+                              ),
                             ],
                           ),
                           const SizedBox(height: 4),
@@ -101,19 +93,6 @@ class SellerProductCard extends StatelessWidget {
                             subCategory: product.subCategory,
                             productType: product.productType,
                           ),
-
-                          // Textile spec chips
-                          if (specs.isNotEmpty) ...[
-                            const SizedBox(height: 7),
-                            Wrap(
-                              spacing: 5,
-                              runSpacing: 4,
-                              children: specs
-                                  .map((s) =>
-                                      _SpecChip(label: s.label, value: s.value))
-                                  .toList(),
-                            ),
-                          ],
 
                           const SizedBox(height: 8),
 
@@ -197,18 +176,18 @@ class _ProductImage extends StatelessWidget {
   }
 
   Widget _placeholder() => Container(
-        width: 88,
-        height: 88,
-        decoration: BoxDecoration(
-          color: SellerColors.surface,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(
-          Icons.inventory_2_outlined,
-          color: SellerColors.primaryLight.withValues(alpha: 0.4),
-          size: 28,
-        ),
-      );
+    width: 88,
+    height: 88,
+    decoration: BoxDecoration(
+      color: SellerColors.surface,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Icon(
+      Icons.inventory_2_outlined,
+      color: SellerColors.primaryLight.withValues(alpha: 0.4),
+      size: 28,
+    ),
+  );
 }
 
 // ── Category breadcrumb ────────────────────────────────────────────────────────
@@ -249,68 +228,6 @@ class _CategoryRow extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// ── Textile spec chip ──────────────────────────────────────────────────────────
-
-class _SpecEntry {
-  final String label;
-  final String value;
-  const _SpecEntry(this.label, this.value);
-}
-
-class _SpecChip extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _SpecChip({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(7),
-        border: Border.all(color: SellerColors.fieldBorder),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(7),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Label tab
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              color: SellerColors.surface,
-              child: Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  color: SellerColors.accent,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ),
-            // Hairline divider
-            Container(width: 1, color: SellerColors.fieldBorder),
-            // Value
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-              color: CommonColors.white,
-              child: Text(
-                value,
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: SellerColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -532,8 +449,7 @@ class _CardFooter extends StatelessWidget {
                     ],
                   )
                 else if (product.isMultiColor)
-                  _FooterTag(
-                      icon: Icons.palette_rounded, label: 'Multi-Color')
+                  _FooterTag(icon: Icons.palette_rounded, label: 'Multi-Color')
                 else if (colorCode != null && colorCode.isNotEmpty)
                   _FooterTag(icon: Icons.circle, label: colorCode),
                 if (product.sampleAvailable)
@@ -600,24 +516,24 @@ class _StockBadge extends StatelessWidget {
     final Color dot = !inStock
         ? StatusColors.rejectedDot
         : isLow
-            ? StatusColors.pendingDot
-            : StatusColors.verifiedDot;
+        ? StatusColors.pendingDot
+        : StatusColors.verifiedDot;
     final Color bg = !inStock
         ? StatusColors.rejectedBg
         : isLow
-            ? StatusColors.pendingBg
-            : StatusColors.verifiedBg;
+        ? StatusColors.pendingBg
+        : StatusColors.verifiedBg;
     final Color textColor = !inStock
         ? StatusColors.rejectedText
         : isLow
-            ? StatusColors.pendingText
-            : StatusColors.verifiedText;
+        ? StatusColors.pendingText
+        : StatusColors.verifiedText;
 
     final String label = !inStock
         ? 'Out of stock'
         : isLow
-            ? 'Low: $quantity'
-            : '$quantity $unit';
+        ? 'Low: $quantity'
+        : '$quantity $unit';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

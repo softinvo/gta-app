@@ -231,7 +231,10 @@ class _ImageGallery extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
-                colors: [Colors.black.withOpacity(0.32), Colors.transparent],
+                colors: [
+                  Colors.black.withValues(alpha: 0.32),
+                  Colors.transparent,
+                ],
               ),
             ),
           ),
@@ -255,7 +258,7 @@ class _ImageGallery extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: i == index
                         ? Colors.white
-                        : Colors.white.withOpacity(0.5),
+                        : Colors.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -271,7 +274,7 @@ class _ImageGallery extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -317,7 +320,7 @@ class _ProductHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -354,7 +357,7 @@ class _ProductHeader extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: CommonColors.success.withOpacity(0.1),
+                    color: CommonColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -551,7 +554,7 @@ class _RatingRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: CommonColors.starColor.withOpacity(0.12),
+            color: CommonColors.starColor.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -616,7 +619,7 @@ class _KeyAttributesStrip extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: attrs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) => _AttrChip(item: attrs[i]),
       ),
     );
@@ -699,7 +702,7 @@ class _ColorSelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -758,7 +761,9 @@ class _ColorSelector extends StatelessWidget {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: BuyerColors.primaryLight.withOpacity(0.22),
+                                color: BuyerColors.primaryLight.withValues(
+                                  alpha: 0.22,
+                                ),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -822,7 +827,7 @@ class _SizePriceTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -956,8 +961,8 @@ class _SizeRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: variant.stock.inStock
-                    ? CommonColors.success.withOpacity(0.1)
-                    : CommonColors.error.withOpacity(0.1),
+                    ? CommonColors.success.withValues(alpha: 0.1)
+                    : CommonColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -1013,7 +1018,7 @@ class _SpecsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1116,7 +1121,7 @@ class _DescriptionCardState extends State<_DescriptionCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1195,7 +1200,7 @@ class _SampleBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1282,7 +1287,7 @@ class _SellerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.cardBorder),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1384,7 +1389,7 @@ class _SellerCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: CommonColors.success.withOpacity(0.1),
+                    color: CommonColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -1427,7 +1432,7 @@ class _BottomCtaState extends State<_BottomCta> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -1485,7 +1490,9 @@ class _BottomCtaState extends State<_BottomCta> {
                       ? []
                       : [
                           BoxShadow(
-                            color: BuyerColors.primaryLight.withOpacity(0.38),
+                            color: BuyerColors.primaryLight.withValues(
+                              alpha: 0.38,
+                            ),
                             blurRadius: 16,
                             offset: const Offset(0, 6),
                           ),
@@ -1518,7 +1525,7 @@ class _BottomCtaState extends State<_BottomCta> {
                           context.l10n.productRequestQuoteSubtitle,
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: Colors.white.withOpacity(0.75),
+                            color: Colors.white.withValues(alpha: 0.75),
                             height: 1.2,
                           ),
                         ),

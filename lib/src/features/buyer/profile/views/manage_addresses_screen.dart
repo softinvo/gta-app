@@ -97,22 +97,33 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
   }
 
   Widget _buildAddressCard(Address address) {
+    final displayAddress = address.formattedAddress.trim().isNotEmpty
+        ? address.formattedAddress.trim()
+        : [
+            address.address,
+            address.locality,
+            address.city,
+            address.state,
+            address.pincode,
+            address.country,
+          ].whereType<String>().where((part) => part.trim().isNotEmpty).join(', ');
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.025),
+            blurRadius: 14,
             offset: const Offset(0, 4),
           ),
         ],
         border: address.isPrimary
             ? Border.all(color: BuyerColors.primaryLight, width: 1.5)
-            : Border.all(color: Colors.transparent),
+            : Border.all(color: CommonColors.borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,82 +131,120 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
+              Expanded(
+                child: Row(
+                  children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       color: BuyerColors.surface,
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(11),
                     ),
                     child: Icon(
                       address.name.toLowerCase() == 'home'
-                          ? Icons.home
-                          : Icons.work,
-                      size: 18,
+                          ? Icons.home_outlined
+                          : address.name.toLowerCase() == 'work' ||
+                                address.name.toLowerCase() == 'office'
+                          ? Icons.business_outlined
+                          : Icons.location_on_outlined,
+                      size: 19,
                       color: BuyerColors.primaryLight,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    address.name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: CommonColors.black,
+                  const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        address.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                      fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: CommonColors.black,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              if (address.isPrimary)
+              if (address.isPrimary) ...[
+                const SizedBox(width: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: BuyerColors.primaryLight,
+                    color: BuyerColors.primaryLight.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: BuyerColors.primaryLight.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Text(
                     context.l10n.addressPrimaryBadge,
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: BuyerColors.primaryLight,
                     ),
                   ),
                 ),
+              ],
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            '${address.address}, ${address.locality}, ${address.pincode}',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: CommonColors.greyText,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.phone_outlined,
-                size: 14,
-                color: CommonColors.greyText,
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: Icon(
+                  Icons.location_on_outlined,
+                  size: 17,
+                  color: BuyerColors.primaryLight,
+                ),
               ),
-              const SizedBox(width: 6),
-              Text(
-                address.phoneNumber,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: CommonColors.greyText,
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  displayAddress,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    color: CommonColors.darkGrey,
+                    height: 1.5,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          if (address.phoneNumber.trim().isNotEmpty) ...[
+            const SizedBox(height: 7),
+            Row(
+              children: [
+                const Icon(
+                  Icons.phone_outlined,
+                  size: 16,
+                  color: BuyerColors.primaryLight,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  address.phoneNumber,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    color: CommonColors.darkGrey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: CommonColors.borderColor),
+          const SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -249,7 +298,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                       }
                     },
                   ),
-                  const SizedBox(width: 24),
+                  const SizedBox(width: 10),
                 ],
                 _buildCardOption(Icons.edit_outlined, context.l10n.commonEdit, () {
                   Navigator.push(
@@ -259,7 +308,7 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                     ),
                   );
                 }),
-                const SizedBox(width: 24),
+                const SizedBox(width: 10),
                 _buildCardOption(Icons.delete_outline, context.l10n.commonDelete, () async {
                   final confirmed = await showDialog<bool>(
                     context: context,
@@ -311,22 +360,31 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
     VoidCallback onTap, {
     bool isDestructive = false,
   }) {
-    final color = isDestructive ? Colors.red : BuyerColors.primaryLight;
-    return GestureDetector(
+    final color = isDestructive ? CommonColors.error : BuyerColors.primaryLight;
+    return InkWell(
       onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: color,
+      borderRadius: BorderRadius.circular(11),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(11),
+          border: Border.all(color: color.withValues(alpha: 0.12)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 17, color: color),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

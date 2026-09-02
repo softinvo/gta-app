@@ -86,15 +86,12 @@ class SellerProfileTab extends ConsumerWidget {
                   businessName: seller?.businessName ?? 'Global Textiles Co.',
                   avatarUrl: seller?.avatar?.fileUrl,
                   verificationStatus: seller?.verificationStatus,
-                  onEditTap: () =>
-                      context.push(SellerPersonalDetailsScreen.routePath),
                 ),
                 loading: () => const _ProfileHeaderSkeleton(),
                 error: (_, __) => _ProfileHeader(
                   name: 'Error Loading',
                   phone: '',
                   businessName: '',
-                  onEditTap: () {},
                 ),
               ),
             ),
@@ -233,7 +230,6 @@ class _ProfileHeader extends StatelessWidget {
   final String businessName;
   final String? avatarUrl;
   final VerificationStatus? verificationStatus;
-  final VoidCallback onEditTap;
 
   const _ProfileHeader({
     required this.name,
@@ -241,7 +237,6 @@ class _ProfileHeader extends StatelessWidget {
     required this.businessName,
     this.avatarUrl,
     this.verificationStatus,
-    required this.onEditTap,
   });
 
   @override
@@ -253,6 +248,7 @@ class _ProfileHeader extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.07),
@@ -269,18 +265,8 @@ class _ProfileHeader extends StatelessWidget {
               height: 68,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3F51B5), Color(0xFF1A237E)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: SellerColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: Colors.white,
+                border: Border.all(color: CommonColors.borderColor),
               ),
               child: avatarUrl != null
                   ? ClipRRect(
@@ -289,25 +275,34 @@ class _ProfileHeader extends StatelessWidget {
                         avatarUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
-                            _AvatarInitials(name: name),
+                            const _AvatarPlaceholder(),
                       ),
                     )
-                  : _AvatarInitials(name: name),
+                  : const _AvatarPlaceholder(),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1A237E),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: GoogleFonts.poppins(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1A237E),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _VerificationBadge(status: verificationStatus),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -323,8 +318,6 @@ class _ProfileHeader extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      _VerificationBadge(status: verificationStatus),
-                      const SizedBox(width: 8),
                       Flexible(
                         child: _Badge(
                           icon: Icons.phone_rounded,
@@ -336,22 +329,6 @@ class _ProfileHeader extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
-            ),
-            // Edit button
-            GestureDetector(
-              onTap: onEditTap,
-              child: Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  color: SellerColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.edit_rounded,
-                  color: SellerColors.primaryLight,
-                  size: 18,
-                ),
               ),
             ),
           ],
@@ -379,29 +356,16 @@ class _Circle extends StatelessWidget {
   }
 }
 
-class _AvatarInitials extends StatelessWidget {
-  final String name;
-  const _AvatarInitials({required this.name});
-
-  String _initials() {
-    if (name.isEmpty) return 'TS';
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
-  }
+class _AvatarPlaceholder extends StatelessWidget {
+  const _AvatarPlaceholder();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        _initials(),
-        style: GoogleFonts.poppins(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
+    return const Center(
+      child: Icon(
+        Icons.person_rounded,
+        size: 36,
+        color: SellerColors.primaryLight,
       ),
     );
   }
@@ -517,6 +481,7 @@ class _ProfileHeaderSkeleton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.07),
@@ -545,6 +510,7 @@ class _StatsRow extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -718,6 +684,7 @@ class _MenuSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: CommonColors.borderColor),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.035),

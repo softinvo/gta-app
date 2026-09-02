@@ -29,26 +29,15 @@ class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canPop = automaticallyImplyLeading && Navigator.of(context).canPop();
-
-    Widget? leadingWidget;
-    if (canPop && leading == null) {
-      leadingWidget = _BackButton();
-    } else {
-      leadingWidget = leading;
-    }
-
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: CommonColors.white,
       elevation: 0,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       toolbarHeight: 64,
-      automaticallyImplyLeading: false,
-      leading: leadingWidget,
-      leadingWidth: leadingWidget != null ? 64 : 0,
-      titleSpacing: leadingWidget != null ? 0 : 16,
-      centerTitle: centerTitle,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      leading: leading,
+      centerTitle: showLogo ? centerTitle : true,
       systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
@@ -59,21 +48,22 @@ class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
           : title != null
           ? Text(
               title!,
-              style: GoogleFonts.inter(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
                 color: CommonColors.black,
               ),
             )
           : null,
-      actions: actions ??
+      actions:
+          actions ??
           [
             SellerAppBarIconButton(
               icon: Icons.notifications_outlined,
               onTap: () {},
               badgeCount: 3,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
           ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
@@ -137,31 +127,6 @@ class _LogoTitle extends StatelessWidget {
   }
 }
 
-class _BackButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
-        child: Container(
-          width: 36,
-          height: 36,
-          margin: const EdgeInsets.only(left: 16),
-          decoration: BoxDecoration(
-            color: SellerColors.surface,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 16,
-            color: SellerColors.primaryLight,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// Icon button used in the seller app bar
 class SellerAppBarIconButton extends StatelessWidget {
   final IconData icon;
@@ -180,27 +145,39 @@ class SellerAppBarIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 38,
-        height: 38,
+        width: 42,
+        height: 42,
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(11),
-          border: Border.all(color: const Color(0xFFEEEFF3), width: 1.5),
+          color: SellerColors.surface,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Icon(icon, color: SellerColors.primaryLight, size: 20),
+            Icon(icon, color: SellerColors.primaryLight, size: 22),
             if (badgeCount != null && badgeCount! > 0)
               Positioned(
-                top: 7,
-                right: 7,
+                top: 6,
+                right: 6,
                 child: Container(
-                  width: 7,
-                  height: 7,
+                  padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE53935),
+                    color: CommonColors.error,
                     shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    badgeCount! > 9 ? '9+' : badgeCount.toString(),
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: CommonColors.white,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -310,7 +287,10 @@ class SellerSliverAppBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFEEEFF3), width: 1.5),
+                    border: Border.all(
+                      color: const Color(0xFFEEEFF3),
+                      width: 1.5,
+                    ),
                   ),
                   child: Stack(
                     alignment: Alignment.center,

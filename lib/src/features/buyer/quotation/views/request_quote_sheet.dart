@@ -106,8 +106,11 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
     }).toList();
   }
 
-  void _prefill() {
-    final buyer = ref.read(buyerProfileProvider).asData?.value;
+  Future<void> _prefill() async {
+    final buyer = ref.read(buyerProfileProvider).asData?.value ??
+        await ref.read(buyerProfileProvider.notifier).getProfile();
+    if (!mounted) return;
+
     if (buyer != null) {
       if (buyer.fullName != 'Guest User') _nameCtrl.text = buyer.fullName;
       _phoneCtrl.text = buyer.phone ?? '';
@@ -115,7 +118,10 @@ class _RequestQuoteSheetState extends ConsumerState<RequestQuoteSheet> {
         _emailCtrl.text = buyer.email!;
       }
     }
-    final addresses = ref.read(buyerAddressesProvider).asData?.value ?? [];
+    final addresses = ref.read(buyerAddressesProvider).asData?.value ??
+        await ref.read(buyerAddressesProvider.notifier).getAddresses();
+    if (!mounted) return;
+
     if (addresses.isNotEmpty && _selectedAddress == null) {
       setState(() {
         _selectedAddress = addresses.firstWhere(

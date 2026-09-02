@@ -17,6 +17,8 @@ final buyerAddressesProvider =
     });
 
 class BuyerProfileController extends Notifier<AsyncValue<Buyer?>> {
+  Future<Buyer?>? _profileRequest;
+
   @override
   AsyncValue<Buyer?> build() {
     getProfile();
@@ -26,13 +28,30 @@ class BuyerProfileController extends Notifier<AsyncValue<Buyer?>> {
   BuyerProfileRepository get _repo => ref.read(buyerProfileRepositoryProvider);
 
   /// Fetch profile
-  Future<void> getProfile() async {
+  Future<Buyer?> getProfile() async {
+    if (_profileRequest != null) return _profileRequest!;
+
+    final request = _fetchProfile();
+    _profileRequest = request;
+    try {
+      return await request;
+    } finally {
+      if (identical(_profileRequest, request)) _profileRequest = null;
+    }
+  }
+
+  Future<Buyer?> _fetchProfile() async {
     state = const AsyncValue.loading();
     final result = await _repo.getProfile();
-    result.fold(
-      (failure) =>
-          state = AsyncValue.error(failure.message, StackTrace.current),
-      (buyer) => state = AsyncValue.data(buyer),
+    return result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+        return null;
+      },
+      (buyer) {
+        state = AsyncValue.data(buyer);
+        return buyer;
+      },
     );
   }
 
@@ -66,6 +85,8 @@ class BuyerProfileController extends Notifier<AsyncValue<Buyer?>> {
 }
 
 class BuyerAddressesController extends Notifier<AsyncValue<List<Address>>> {
+  Future<List<Address>>? _addressesRequest;
+
   @override
   AsyncValue<List<Address>> build() {
     getAddresses();
@@ -75,13 +96,30 @@ class BuyerAddressesController extends Notifier<AsyncValue<List<Address>>> {
   BuyerProfileRepository get _repo => ref.read(buyerProfileRepositoryProvider);
 
   /// Fetch addresses
-  Future<void> getAddresses() async {
+  Future<List<Address>> getAddresses() async {
+    if (_addressesRequest != null) return _addressesRequest!;
+
+    final request = _fetchAddresses();
+    _addressesRequest = request;
+    try {
+      return await request;
+    } finally {
+      if (identical(_addressesRequest, request)) _addressesRequest = null;
+    }
+  }
+
+  Future<List<Address>> _fetchAddresses() async {
     state = const AsyncValue.loading();
     final result = await _repo.getAddresses();
-    result.fold(
-      (failure) =>
-          state = AsyncValue.error(failure.message, StackTrace.current),
-      (addresses) => state = AsyncValue.data(addresses),
+    return result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+        return const <Address>[];
+      },
+      (addresses) {
+        state = AsyncValue.data(addresses);
+        return addresses;
+      },
     );
   }
 

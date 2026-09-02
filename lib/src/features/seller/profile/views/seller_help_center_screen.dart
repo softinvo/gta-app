@@ -161,7 +161,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: SellerColors.primaryLight.withOpacity(0.1)),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.02),
@@ -233,6 +233,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: SellerColors.primaryLight.withOpacity(0.3),
@@ -310,6 +311,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
@@ -349,7 +351,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: CommonColors.borderColor),
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -385,7 +387,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: SellerColors.primaryLight.withOpacity(0.2)),
+        border: Border.all(color: CommonColors.borderColor),
       ),
       child: Column(
         children: [

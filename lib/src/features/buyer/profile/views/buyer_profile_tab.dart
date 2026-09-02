@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/commons/controller/locale_controller.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_language_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_policies_screen.dart';
+import 'package:gta_app/src/features/buyer/profile/views/buyer_rate_app_screen.dart';
 import 'package:gta_app/src/features/buyer/wishlist/views/buyer_wishlist_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_verification_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/widgets/logout_button.dart';
@@ -38,21 +39,35 @@ class BuyerProfileTab extends ConsumerWidget {
                     phone: buyer?.phone ?? '',
                     avatarUrl: buyer?.avatar?.fileUrl,
                     userType: 'buyer',
-                    onSettingsTap: () {},
-                    onEditTap: () => context.push(EditProfileScreen.routePath),
                   ),
-                  loading: () => const SizedBox(
-                    height: 200,
-                    child: Center(
-                      child: CircularProgressIndicator(color: Colors.white),
+                  loading: () => Container(
+                    height: 118,
+                    margin: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          BuyerColors.surfaceLight,
+                          Color(0xFFE1F2E6),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: BuyerColors.primary,
+                        width: 1.25,
+                      ),
+                    ),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: BuyerColors.primary,
+                      ),
                     ),
                   ),
                   error: (e, _) => ProfileHeader(
                     name: context.l10n.profileErrorLoading,
                     phone: '',
                     userType: 'buyer',
-                    onSettingsTap: () {},
-                    onEditTap: () {},
                   ),
                 ),
           ),
@@ -146,7 +161,7 @@ class BuyerProfileTab extends ConsumerWidget {
                         iconBgColor: const Color(0xFFFFF7ED),
                         title: context.l10n.profileRateAppTitle,
                         subtitle: context.l10n.profileRateAppSubtitle,
-                        onTap: () {},
+                        onTap: () => context.push(BuyerRateAppScreen.routePath),
                       ),
                     ],
                   ),

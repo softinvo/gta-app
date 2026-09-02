@@ -75,7 +75,6 @@ class _SellerProductListScreenState
   @override
   Widget build(BuildContext context) {
     final productState = ref.watch(productListProvider);
-    final hasProducts = productState.products.isNotEmpty;
 
     return Scaffold(
       backgroundColor: SellerColors.background,
@@ -88,20 +87,24 @@ class _SellerProductListScreenState
           Container(
             color: SellerColors.background,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: SellerSearchField(
-              controller: _searchController,
-              hintText: 'Search products...',
-              onClear: () => _onSearch(''),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SellerSearchField(
+                    controller: _searchController,
+                    hintText: 'Search products...',
+                    onClear: () => _onSearch(''),
+                  ),
+                ),
+                if (!widget.showFAB) ...[
+                  const SizedBox(width: 10),
+                  _AddProductButton(
+                    onTap: () => context.push(AddProductScreen.routePath),
+                  ),
+                ],
+              ],
             ),
           ),
-
-          // ── Count Header (only when products exist) ────────────────
-          if (hasProducts)
-            _ProductCountHeader(
-              count: productState.products.length,
-              hasMore: productState.hasMore,
-              onAddTap: () => context.push(AddProductScreen.routePath),
-            ),
 
           // ── Body ───────────────────────────────────────────────────
           Expanded(
@@ -361,94 +364,38 @@ class _PullToRefreshState extends StatelessWidget {
   }
 }
 
-// ── Product Count Header ──────────────────────────────────────────────────────
+class _AddProductButton extends StatelessWidget {
+  final VoidCallback onTap;
 
-class _ProductCountHeader extends StatelessWidget {
-  final int count;
-  final bool hasMore;
-  final VoidCallback onAddTap;
-
-  const _ProductCountHeader({
-    required this.count,
-    required this.hasMore,
-    required this.onAddTap,
-  });
+  const _AddProductButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: SellerColors.background,
-      padding: const EdgeInsets.fromLTRB(16, 0, 12, 12),
-      child: Row(
-        children: [
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '$count',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: SellerColors.primaryLight,
-                  ),
-                ),
-                TextSpan(
-                  text: hasMore
-                      ? '+ products'
-                      : count == 1
-                      ? ' product'
-                      : ' products',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: CommonColors.greyText,
-                  ),
-                ),
-              ],
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [SellerColors.primaryLight, SellerColors.primary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          const Spacer(),
-          GestureDetector(
-            onTap: onAddTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [SellerColors.primaryLight, SellerColors.primary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: SellerColors.primaryLight.withValues(alpha: 0.35),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.add_rounded,
-                    size: 16,
-                    color: CommonColors.white,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    'Add New',
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: CommonColors.white,
-                    ),
-                  ),
-                ],
-              ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: SellerColors.primaryLight.withValues(alpha: 0.25),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: const Icon(
+          Icons.add_rounded,
+          size: 24,
+          color: CommonColors.white,
+        ),
       ),
     );
   }

@@ -85,6 +85,16 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
         );
   }
 
+  Future<void> _refresh() =>
+      ref.read(buyerOrdersProvider.notifier).fetchOrders(
+            refresh: true,
+            search: _searchController.text.trim().isEmpty
+                ? null
+                : _searchController.text.trim(),
+            status: _selectedStatus,
+            sort: _sort,
+          );
+
   void _showFilterSheet(BuildContext context) {
     final statuses = [
       {'id': '', 'label': context.l10n.quoteStatusAll},
@@ -443,30 +453,24 @@ class _BuyerOrderListScreenState extends ConsumerState<BuyerOrderListScreen> {
                     ),
                   )
                 : orderState.error != null && orderState.orders.isEmpty
-                    ? _ErrorView(
-                        message: orderState.error!,
-                        onRetry: () => ref
-                            .read(buyerOrdersProvider.notifier)
-                            .fetchOrders(refresh: true),
+                    ? _RefreshablePlaceholder(
+                        onRefresh: _refresh,
+                        child: _ErrorView(
+                          message: orderState.error!,
+                          onRetry: _refresh,
+                        ),
                       )
                     : orderState.orders.isEmpty
-                        ? const _EmptyView()
+                        ? _RefreshablePlaceholder(
+                            onRefresh: _refresh,
+                            child: const _EmptyView(),
+                          )
                         : RefreshIndicator(
                             color: BuyerColors.primaryLight,
-                            onRefresh: () => ref
-                                .read(buyerOrdersProvider.notifier)
-                                .fetchOrders(
-                                  refresh: true,
-                                  search: _searchController.text
-                                          .trim()
-                                          .isEmpty
-                                      ? null
-                                      : _searchController.text.trim(),
-                                  status: _selectedStatus,
-                                  sort: _sort,
-                                ),
+                            onRefresh: _refresh,
                             child: ListView.separated(
                               controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
                               padding:
                                   const EdgeInsets.fromLTRB(16, 4, 16, 24),
                               itemCount: orderState.orders.length +
@@ -536,7 +540,7 @@ class _OrderCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: BuyerColors.cardBorder),
+          border: Border.all(color: CommonColors.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -630,7 +634,9 @@ class _OrderCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              DateFormat('dd MMM yyyy').format(order.createdAt),
+                              DateFormat('dd MMM yyyy, hh:mm a').format(
+                                order.createdAt.toLocal(),
+                              ),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: CommonColors.greyText,
@@ -933,6 +939,30 @@ class _EmptyView extends StatelessWidget {
               color: CommonColors.greyText,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RefreshablePlaceholder extends StatelessWidget {
+  final RefreshCallback onRefresh;
+  final Widget child;
+
+  const _RefreshablePlaceholder({
+    required this.onRefresh,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      color: BuyerColors.primaryLight,
+      onRefresh: onRefresh,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverFillRemaining(hasScrollBody: false, child: child),
         ],
       ),
     );

@@ -77,7 +77,7 @@ class QuoteItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: accentColor?.withValues(alpha: 0.22) ??
-              const Color(0xFFF0F0F4),
+              CommonColors.borderColor,
         ),
         boxShadow: [
           BoxShadow(

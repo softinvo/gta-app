@@ -18,6 +18,24 @@ class BuyerHomeScreen extends ConsumerStatefulWidget {
 
 class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
   int _currentIndex = 0;
+  final Set<int> _loadedTabs = {0};
+
+  static const List<Widget> _tabs = [
+    HomeTab(),
+    QuotationsTab(),
+    OrdersTab(),
+    ChatListTab(userType: 'buyer'),
+    BuyerProfileTab(),
+  ];
+
+  void _selectTab(int index) {
+    if (_currentIndex == index) return;
+
+    setState(() {
+      _currentIndex = index;
+      _loadedTabs.add(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +54,16 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          HomeTab(),
-          QuotationsTab(),
-          OrdersTab(),
-          ChatListTab(userType: 'buyer'),
-          BuyerProfileTab(),
-        ],
+        // IndexedStack normally builds every child immediately. Keep a
+        // placeholder for unopened tabs so their API calls start only when
+        // the buyer selects them for the first time. Once opened, the real
+        // child stays in the stack and retains its scroll/filter state.
+        children: List.generate(
+          _tabs.length,
+          (index) => _loadedTabs.contains(index)
+              ? _tabs[index]
+              : const SizedBox.shrink(),
+        ),
       ),
       bottomNavigationBar: _buildBottomNav(),
     );
@@ -54,7 +75,7 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
         color: CommonColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -71,35 +92,35 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
                 activeIcon: Icons.home,
                 label: context.l10n.navHome,
                 isActive: _currentIndex == 0,
-                onTap: () => setState(() => _currentIndex = 0),
+                onTap: () => _selectTab(0),
               ),
               _NavItem(
                 icon: Icons.request_quote_outlined,
                 activeIcon: Icons.request_quote,
                 label: context.l10n.navQuotations,
                 isActive: _currentIndex == 1,
-                onTap: () => setState(() => _currentIndex = 1),
+                onTap: () => _selectTab(1),
               ),
               _NavItem(
                 icon: Icons.receipt_long_outlined,
                 activeIcon: Icons.receipt_long,
                 label: context.l10n.navOrders,
                 isActive: _currentIndex == 2,
-                onTap: () => setState(() => _currentIndex = 2),
+                onTap: () => _selectTab(2),
               ),
               _NavItem(
                 icon: Icons.chat_bubble_outline_rounded,
                 activeIcon: Icons.chat_bubble_rounded,
                 label: context.l10n.navChat,
                 isActive: _currentIndex == 3,
-                onTap: () => setState(() => _currentIndex = 3),
+                onTap: () => _selectTab(3),
               ),
               _NavItem(
                 icon: Icons.person_outline,
                 activeIcon: Icons.person,
                 label: context.l10n.navProfile,
                 isActive: _currentIndex == 4,
-                onTap: () => setState(() => _currentIndex = 4),
+                onTap: () => _selectTab(4),
               ),
             ],
           ),
@@ -134,7 +155,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? BuyerColors.primaryLight.withOpacity(0.1)
+              ? BuyerColors.primaryLight.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),

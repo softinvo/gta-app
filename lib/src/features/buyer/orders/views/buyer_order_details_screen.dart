@@ -91,9 +91,11 @@ class _OrderDetailsBody extends ConsumerWidget {
               order.sellerSnapshot!.displayName.isNotEmpty)
             _SellerCard(
               snap: order.sellerSnapshot!,
-              onChatTap: () {
-                final buyerId = ref.read(buyerProfileProvider).value?.id;
-                if (buyerId == null) return;
+              onChatTap: () async {
+                final buyer = ref.read(buyerProfileProvider).value ??
+                    await ref.read(buyerProfileProvider.notifier).getProfile();
+                final buyerId = buyer?.id;
+                if (!context.mounted || buyerId == null) return;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -167,6 +169,7 @@ class _HeaderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: BuyerColors.primaryLight.withValues(alpha: 0.08),
@@ -508,7 +511,7 @@ class _ItemsCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: BuyerColors.background,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE8F0EA)),
+              border: Border.all(color: CommonColors.borderColor),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1469,6 +1472,7 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1833,4 +1837,3 @@ class _VerticalDashedPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
