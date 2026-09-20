@@ -16,7 +16,7 @@ Future<void> _backgroundMessageHandler(RemoteMessage message) async {
 }
 
 const _channelId = 'gta_high_importance_channel';
-const _channelName = 'GTA Notifications';
+const _channelName = 'Texax Notifications';
 
 final _localNotifications = FlutterLocalNotificationsPlugin();
 
@@ -36,11 +36,7 @@ class FcmService {
     FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
 
     // Request permissions (no-op on Android < 13, shows dialog on iOS)
-    await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     // iOS: show banner/sound/badge even when app is in foreground
     await messaging.setForegroundNotificationPresentationOptions(
@@ -59,16 +55,19 @@ class FcmService {
     try {
       final token = await messaging.getToken();
       if (token != null) {
-        log('FCM Token obtained: $token', name: 'FCM');
+        log('FCM token obtained', name: 'FCM');
         await SharedPrefsRepo().setFcmToken(token);
       }
     } catch (e) {
-      log('Failed to get FCM token (likely running on iOS Simulator): $e', name: 'FCM');
+      log(
+        'Failed to get FCM token (likely running on iOS Simulator): $e',
+        name: 'FCM',
+      );
     }
 
     // Re-upload token on rotation
     messaging.onTokenRefresh.listen((newToken) async {
-      log('FCM Token refreshed: $newToken', name: 'FCM');
+      log('FCM token refreshed', name: 'FCM');
       await SharedPrefsRepo().setFcmToken(newToken);
       await _uploadIfAuthenticated(newToken);
     });
@@ -78,18 +77,17 @@ class FcmService {
     // Create the high-importance Android channel
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_androidChannel);
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings();
 
     await _localNotifications.initialize(
-      const InitializationSettings(
-        android: androidSettings,
-        iOS: iosSettings,
-      ),
+      const InitializationSettings(android: androidSettings, iOS: iosSettings),
     );
   }
 

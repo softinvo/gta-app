@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/common_features/auth/controller/auth_controller.dart';
 import 'package:gta_app/src/features/common_features/auth/views/login_screen.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/logout_confirmation_dialog.dart';
+import 'package:gta_app/src/features/common_features/auth/views/widgets/delete_account_button.dart';
 import 'package:gta_app/src/models/seller_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
@@ -196,6 +197,9 @@ class SellerProfileTab extends ConsumerWidget {
 
                     // Logout
                     _LogoutButton(),
+
+                    const SizedBox(height: 8),
+                    const Center(child: DeleteAccountButton()),
 
                     const SizedBox(height: 16),
 

@@ -30,17 +30,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: SellerAppBar(
-        showLogo: true,
-        actions: [
-          SellerAppBarIconButton(
-            icon: Icons.notifications_outlined,
-            onTap: () {},
-            badgeCount: 3,
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
+      appBar: const SellerAppBar(showLogo: true),
       body: IndexedStack(
         index: _currentIndex,
         children: const [
@@ -931,7 +921,7 @@ class _HeroBanner extends ConsumerWidget {
               right: 16,
               bottom: 12,
               child: Text(
-                'Global Textile Axis',
+                'Texax',
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,

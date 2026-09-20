@@ -1,6 +1,6 @@
 {
-    "name": "gta_app",
-    "short_name": "gta_app",
+    "name": "Texax",
+    "short_name": "Texax",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -55,16 +55,7 @@ class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : null,
-      actions:
-          actions ??
-          [
-            SellerAppBarIconButton(
-              icon: Icons.notifications_outlined,
-              onTap: () {},
-              badgeCount: 3,
-            ),
-            const SizedBox(width: 8),
-          ],
+      actions: actions,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: const Color(0xFFF0F2F5)),
@@ -95,7 +86,7 @@ class _LogoTitle extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'GTA',
+                  'Texax',
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -193,16 +184,12 @@ class SellerSliverAppBar extends StatelessWidget {
   final String greeting;
   final String subtitle;
   final String? emoji;
-  final VoidCallback? onNotificationTap;
-  final int notificationCount;
 
   const SellerSliverAppBar({
     super.key,
     this.greeting = 'Hello, Seller!',
     this.subtitle = 'Manage your business',
     this.emoji = '🏪',
-    this.onNotificationTap,
-    this.notificationCount = 0,
   });
 
   @override
@@ -242,7 +229,7 @@ class SellerSliverAppBar extends StatelessWidget {
                       color: SellerColors.surface,
                       child: Center(
                         child: Text(
-                          'GTA',
+                          'Texax',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -277,44 +264,6 @@ class SellerSliverAppBar extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-              GestureDetector(
-                onTap: onNotificationTap,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFFEEEFF3),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_outlined,
-                        color: SellerColors.primaryLight,
-                        size: 24,
-                      ),
-                      if (notificationCount > 0)
-                        Positioned(
-                          top: 9,
-                          right: 9,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFE53935),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
                 ),
               ),
             ],

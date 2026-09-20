@@ -8,6 +8,45 @@ import 'package:gta_app/src/utils/config.dart';
 import 'package:http/http.dart';
 import 'core.dart';
 
+const _sensitiveLogKeys = {
+  'accesstoken',
+  'authorization',
+  'cookie',
+  'fcmtoken',
+  'idtoken',
+  'otp',
+  'password',
+  'refreshtoken',
+  'token',
+};
+
+dynamic _redactForLog(dynamic value) {
+  if (value is Map) {
+    return value.map((key, item) {
+      final normalizedKey = key
+          .toString()
+          .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+          .toLowerCase();
+      return MapEntry(
+        key,
+        _sensitiveLogKeys.contains(normalizedKey)
+            ? '<redacted>'
+            : _redactForLog(item),
+      );
+    });
+  }
+  if (value is Iterable) return value.map(_redactForLog).toList();
+  return value;
+}
+
+String _responseForLog(Response response) {
+  try {
+    return _redactForLog(jsonDecode(response.body)).toString();
+  } on FormatException {
+    return '<non-JSON response: ${response.bodyBytes.length} bytes>';
+  }
+}
+
 /// Watch apiProvider to make sure to have the latest authToken passed.
 
 final apiProvider = Provider((ref) {
@@ -50,7 +89,9 @@ class API {
         Uri.parse(url).replace(queryParameters: queryParams),
         headers: requestHeaders,
       );
-      log('RESPONSE : ${response.body}', name: LogLabel.httpGet);
+      if (AppConfig.logHttp) {
+        log('RESPONSE : ${_responseForLog(response)}', name: LogLabel.httpGet);
+      }
       return Right(response);
     } catch (e, stktrc) {
       return Left(
@@ -76,7 +117,7 @@ class API {
     if (AppConfig.logHttp) {
       log('REQUEST TO : $url', name: LogLabel.httpPost);
       log('requireAuth : $requireAuth', name: LogLabel.httpPost);
-      log('BODY : $body', name: LogLabel.httpPost);
+      log('BODY : ${_redactForLog(body)}', name: LogLabel.httpPost);
     }
     try {
       final response = await post(
@@ -84,7 +125,9 @@ class API {
         body: jsonEncode(body),
         headers: requestHeaders,
       );
-      log('RESPONSE : ${response.body}', name: LogLabel.httpPost);
+      if (AppConfig.logHttp) {
+        log('RESPONSE : ${_responseForLog(response)}', name: LogLabel.httpPost);
+      }
       return Right(response);
     } catch (e, stktrc) {
       return Left(
@@ -110,8 +153,7 @@ class API {
     if (AppConfig.logHttp) {
       log('REQUEST TO : $url', name: LogLabel.httpPut);
       log('requireAuth : $requireAuth', name: LogLabel.httpPut);
-      log('BODY : $body', name: LogLabel.httpPut);
-      log('Token : $_authToken', name: "TOKEN");
+      log('BODY : ${_redactForLog(body)}', name: LogLabel.httpPut);
     }
     try {
       final response = await put(
@@ -119,7 +161,9 @@ class API {
         body: jsonEncode(body),
         headers: requestHeaders,
       );
-      log('RESPONSE : ${response.body}', name: LogLabel.httpPut);
+      if (AppConfig.logHttp) {
+        log('RESPONSE : ${_responseForLog(response)}', name: LogLabel.httpPut);
+      }
       return Right(response);
     } catch (e, stktrc) {
       return Left(
@@ -172,8 +216,7 @@ class API {
     if (AppConfig.logHttp) {
       log('REQUEST TO : $url', name: LogLabel.httpPatch);
       log('requireAuth : $requireAuth', name: LogLabel.httpPatch);
-      log('BODY : $body', name: LogLabel.httpPatch);
-      log('Token : $_authToken', name: "TOKEN");
+      log('BODY : ${_redactForLog(body)}', name: LogLabel.httpPatch);
     }
     try {
       final response = await patch(
@@ -181,7 +224,12 @@ class API {
         body: jsonEncode(body),
         headers: requestHeaders,
       );
-      log('RESPONSE : ${response.body}', name: LogLabel.httpPatch);
+      if (AppConfig.logHttp) {
+        log(
+          'RESPONSE : ${_responseForLog(response)}',
+          name: LogLabel.httpPatch,
+        );
+      }
       return Right(response);
     } catch (e, stktrc) {
       return Left(
@@ -207,7 +255,7 @@ class API {
     if (AppConfig.logHttp) {
       log('REQUEST TO : $url', name: LogLabel.httpDelete);
       log('requireAuth : $requireAuth', name: LogLabel.httpDelete);
-      log('BODY : $body', name: LogLabel.httpDelete);
+      log('BODY : ${_redactForLog(body)}', name: LogLabel.httpDelete);
     }
     try {
       final response = await delete(
@@ -215,7 +263,12 @@ class API {
         body: jsonEncode(body),
         headers: requestHeaders,
       );
-      log('RESPONSE : ${response.body}', name: LogLabel.httpDelete);
+      if (AppConfig.logHttp) {
+        log(
+          'RESPONSE : ${_responseForLog(response)}',
+          name: LogLabel.httpDelete,
+        );
+      }
       return Right(response);
     } catch (e, stktrc) {
       return Left(

@@ -41,17 +41,7 @@ class _BuyerHomeScreenState extends ConsumerState<BuyerHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BuyerColors.background,
-      appBar: BuyerAppBar(
-        showLogo: true,
-        actions: [
-          BuyerAppBarIconButton(
-            icon: Icons.notifications_outlined,
-            onTap: () {},
-            badgeCount: 0,
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
+      appBar: const BuyerAppBar(showLogo: true),
       body: IndexedStack(
         index: _currentIndex,
         // IndexedStack normally builds every child immediately. Keep a

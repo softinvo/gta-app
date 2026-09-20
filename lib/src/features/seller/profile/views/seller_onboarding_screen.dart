@@ -88,16 +88,12 @@ class _SellerOnboardingScreenState
           title: _stepLabels[_currentPage],
           showLogo: false,
           centerTitle: true,
-          leading: _OnboardingBackButton(onTap: _goPrev),
+          leading: BackButton(onPressed: _goPrev),
           automaticallyImplyLeading: false,
-          actions: const [],
         ),
         body: Column(
           children: [
-            _StepIndicator(
-              currentStep: _currentPage,
-              stepLabels: _stepLabels,
-            ),
+            _StepIndicator(currentStep: _currentPage, stepLabels: _stepLabels),
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -118,38 +114,6 @@ class _SellerOnboardingScreenState
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Back button
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _OnboardingBackButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _OnboardingBackButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 36,
-          height: 36,
-          margin: const EdgeInsets.only(left: 16),
-          decoration: BoxDecoration(
-            color: SellerColors.surface,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 16,
-            color: SellerColors.primaryLight,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Step indicator
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -157,87 +121,118 @@ class _StepIndicator extends StatelessWidget {
   final int currentStep;
   final List<String> stepLabels;
 
-  const _StepIndicator({
-    required this.currentStep,
-    required this.stepLabels,
-  });
+  const _StepIndicator({required this.currentStep, required this.stepLabels});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
-      child: Row(
-        children: List.generate(stepLabels.length * 2 - 1, (i) {
-          if (i.isOdd) {
-            final filled = (i ~/ 2) < currentStep;
-            return Expanded(
-              child: Container(
-                height: 2,
-                decoration: BoxDecoration(
-                  color: filled
-                      ? SellerColors.primaryLight
-                      : SellerColors.fieldDisabledBorder,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            );
-          }
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: CommonColors.borderColor)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: List.generate(stepLabels.length, (step) {
+              final isActive = step == currentStep;
+              final isDone = step < currentStep;
 
-          final step = i ~/ 2;
-          final isActive = step == currentStep;
-          final isDone = step < currentStep;
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (isActive || isDone)
-                      ? SellerColors.primaryLight
-                      : Colors.white,
-                  border: Border.all(
-                    color: (isActive || isDone)
-                        ? SellerColors.primaryLight
-                        : SellerColors.fieldDisabledBorder,
-                    width: 2,
+              return Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 5,
                   ),
-                ),
-                child: Center(
-                  child: isDone
-                      ? const Icon(Icons.check_rounded,
-                          size: 16, color: Colors.white)
-                      : Text(
-                          '${step + 1}',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: isActive
-                                ? Colors.white
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? SellerColors.primaryLight.withValues(alpha: 0.10)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: (isActive || isDone)
+                              ? SellerColors.primaryLight
+                              : Colors.white,
+                          border: Border.all(
+                            color: (isActive || isDone)
+                                ? SellerColors.primaryLight
                                 : SellerColors.fieldDisabledBorder,
+                            width: 1.5,
                           ),
                         ),
+                        child: Center(
+                          child: isDone
+                              ? const Icon(
+                                  Icons.check_rounded,
+                                  size: 13,
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  '${step + 1}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: isActive
+                                        ? Colors.white
+                                        : CommonColors.greyText,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          stepLabels[step],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: isActive
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: isActive
+                                ? SellerColors.primaryLight
+                                : CommonColors.greyText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 5),
+          Row(
+            children: List.generate(
+              stepLabels.length,
+              (step) => Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  height: 3,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    color: step <= currentStep
+                        ? SellerColors.primaryLight
+                        : SellerColors.fieldDisabledBorder,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                stepLabels[step],
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight:
-                      isActive ? FontWeight.w700 : FontWeight.w500,
-                  color: isActive
-                      ? SellerColors.primaryLight
-                      : CommonColors.greyText,
-                ),
-              ),
-            ],
-          );
-        }),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -271,8 +266,15 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
   bool _isPopulated = false;
 
   static const _allSpecializations = [
-    'Bridal', 'Party Wear', 'Custom Tailoring', 'Fashion Consultation',
-    'Ethnic Wear', 'Western Wear', 'Kids Wear', 'Accessories', 'Other',
+    'Bridal',
+    'Party Wear',
+    'Custom Tailoring',
+    'Fashion Consultation',
+    'Ethnic Wear',
+    'Western Wear',
+    'Kids Wear',
+    'Accessories',
+    'Other',
   ];
 
   @override
@@ -549,8 +551,10 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
               onTap: () => setState(() => _businessType = t.$1),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? SellerColors.primaryLight
@@ -564,8 +568,9 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: SellerColors.primaryLight
-                                .withValues(alpha: 0.25),
+                            color: SellerColors.primaryLight.withValues(
+                              alpha: 0.25,
+                            ),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -575,11 +580,11 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(t.$3,
-                        size: 15,
-                        color: isSelected
-                            ? Colors.white
-                            : SellerColors.textLabel),
+                    Icon(
+                      t.$3,
+                      size: 15,
+                      color: isSelected ? Colors.white : SellerColors.textLabel,
+                    ),
                     const SizedBox(width: 5),
                     Text(
                       t.$2,
@@ -606,8 +611,8 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
   Widget _buildDatePicker() {
     final label = _registrationDate != null
         ? '${_registrationDate!.day.toString().padLeft(2, '0')}/'
-            '${_registrationDate!.month.toString().padLeft(2, '0')}/'
-            '${_registrationDate!.year}'
+              '${_registrationDate!.month.toString().padLeft(2, '0')}/'
+              '${_registrationDate!.year}'
         : 'Select date';
 
     return Column(
@@ -626,8 +631,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
         GestureDetector(
           onTap: _pickDate,
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             decoration: BoxDecoration(
               color: SellerColors.fieldFill,
               borderRadius: BorderRadius.circular(12),
@@ -635,8 +639,11 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today_outlined,
-                    size: 18, color: SellerColors.primaryLight),
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: SellerColors.primaryLight,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   label,
@@ -649,8 +656,11 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.chevron_right_rounded,
-                    size: 18, color: SellerColors.accentLight),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 18,
+                  color: SellerColors.accentLight,
+                ),
               ],
             ),
           ),
@@ -688,9 +698,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   margin: EdgeInsets.only(
-                    right: opt.$1 != AvailabilityStatus.notTakingOrders
-                        ? 8
-                        : 0,
+                    right: opt.$1 != AvailabilityStatus.notTakingOrders ? 8 : 0,
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
@@ -756,8 +764,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
               color: isSelected
                   ? SellerColors.primaryLight
@@ -773,16 +780,18 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isSelected) ...[
-                  const Icon(Icons.check_rounded,
-                      size: 12, color: Colors.white),
+                  const Icon(
+                    Icons.check_rounded,
+                    size: 12,
+                    color: Colors.white,
+                  ),
                   const SizedBox(width: 4),
                 ],
                 Text(
                   spec,
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected ? Colors.white : SellerColors.textLabel,
                   ),
                 ),
@@ -848,12 +857,13 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    final error =
-        await ref.read(sellerProfileProvider.notifier).addBankDetails(
-              accountHolderName: _holderNameController.text.trim(),
-              bankAccountNumber: _accountNumberController.text.trim(),
-              ifscCode: _ifscController.text.trim().toUpperCase(),
-            );
+    final error = await ref
+        .read(sellerProfileProvider.notifier)
+        .addBankDetails(
+          accountHolderName: _holderNameController.text.trim(),
+          bankAccountNumber: _accountNumberController.text.trim(),
+          ifscCode: _ifscController.text.trim().toUpperCase(),
+        );
     setState(() => _isLoading = false);
     if (!mounted) return;
     if (error == null) {
@@ -871,8 +881,7 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
       if (!_isPopulated) _populateExistingDetails();
     });
 
-    final hasBankDetails =
-        sellerAsync.asData?.value?.bankAccountNumber != null;
+    final hasBankDetails = sellerAsync.asData?.value?.bankAccountNumber != null;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -892,8 +901,11 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded,
-                      color: SellerColors.primaryLight, size: 20),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: SellerColors.primaryLight,
+                    size: 20,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -1000,9 +1012,7 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
             const SizedBox(height: 36),
 
             SellerGradientButton(
-              label: hasBankDetails
-                  ? 'Update & Continue'
-                  : 'Save & Continue',
+              label: hasBankDetails ? 'Update & Continue' : 'Save & Continue',
               isLoading: _isLoading,
               onTap: _submit,
               leadingIcon: const Icon(
@@ -1045,7 +1055,7 @@ class _DocFormState {
   bool isUploading = false;
 
   _DocFormState({String initialNumber = ''})
-      : numberCtrl = TextEditingController(text: initialNumber);
+    : numberCtrl = TextEditingController(text: initialNumber);
 
   Attachment? get effectiveAttachment => newAttachment ?? existingImage;
 
@@ -1159,7 +1169,9 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
 
     if (error == null) {
       SnackBarService.showSuccess(
-          context, 'Documents submitted for verification');
+        context,
+        'Documents submitted for verification',
+      );
       widget.onDone();
     } else {
       SnackBarService.showError(context, error);
@@ -1214,7 +1226,9 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
           Text(
             'Upload a clear image of each document',
             style: GoogleFonts.inter(
-                fontSize: 13, color: CommonColors.greyText),
+              fontSize: 13,
+              color: CommonColors.greyText,
+            ),
           ),
           const SizedBox(height: 16),
           ..._requiredDocs.map(
@@ -1284,8 +1298,7 @@ class _SectionCard extends StatelessWidget {
                     color: SellerColors.sectionIconBg,
                     borderRadius: BorderRadius.circular(9),
                   ),
-                  child: Icon(icon,
-                      size: 16, color: SellerColors.primaryLight),
+                  child: Icon(icon, size: 16, color: SellerColors.primaryLight),
                 ),
                 const SizedBox(width: 10),
                 Text(
@@ -1357,8 +1370,7 @@ class _OnboardingField extends StatelessWidget {
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
-          keyboardType:
-              maxLines > 1 ? TextInputType.multiline : keyboardType,
+          keyboardType: maxLines > 1 ? TextInputType.multiline : keyboardType,
           maxLines: maxLines,
           maxLength: maxLength,
           inputFormatters: inputFormatters,
@@ -1380,8 +1392,11 @@ class _OnboardingField extends StatelessWidget {
                       color: SellerColors.fieldIconBg,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(icon,
-                        size: 16, color: SellerColors.primaryLight),
+                    child: Icon(
+                      icon,
+                      size: 16,
+                      color: SellerColors.primaryLight,
+                    ),
                   )
                 : null,
             contentPadding: EdgeInsets.symmetric(
@@ -1402,7 +1417,9 @@ class _OnboardingField extends StatelessWidget {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                  color: SellerColors.primaryLight, width: 2),
+                color: SellerColors.primaryLight,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -1411,7 +1428,9 @@ class _OnboardingField extends StatelessWidget {
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                  color: CommonColors.error, width: 1.5),
+                color: CommonColors.error,
+                width: 1.5,
+              ),
             ),
           ),
           validator: required
@@ -1470,16 +1489,19 @@ class _BankTextField extends StatelessWidget {
       textCapitalization: textCapitalization,
       inputFormatters: formatters,
       validator: validator,
-      style: GoogleFonts.inter(
-          fontSize: 14, color: SellerColors.textPrimary),
+      style: GoogleFonts.inter(fontSize: 14, color: SellerColors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.inter(
-            fontSize: 14, color: SellerColors.accentLight),
+          fontSize: 14,
+          color: SellerColors.accentLight,
+        ),
         filled: true,
         fillColor: SellerColors.fieldFill,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: SellerColors.fieldBorder),
@@ -1491,7 +1513,9 @@ class _BankTextField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-              color: SellerColors.primaryLight, width: 1.5),
+            color: SellerColors.primaryLight,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -1499,8 +1523,7 @@ class _BankTextField extends StatelessWidget {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide:
-              const BorderSide(color: CommonColors.error, width: 1.5),
+          borderSide: const BorderSide(color: CommonColors.error, width: 1.5),
         ),
       ),
     );
@@ -1615,8 +1638,11 @@ class _DocUploadCard extends StatelessWidget {
                   color: SellerColors.sectionIconBg,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(meta.icon,
-                    size: 20, color: SellerColors.primaryLight),
+                child: Icon(
+                  meta.icon,
+                  size: 20,
+                  color: SellerColors.primaryLight,
+                ),
               ),
               const SizedBox(width: 10),
               Text(
@@ -1633,15 +1659,21 @@ class _DocUploadCard extends StatelessWidget {
           TextFormField(
             controller: docState.numberCtrl,
             style: GoogleFonts.inter(
-                fontSize: 13, color: SellerColors.textPrimary),
+              fontSize: 13,
+              color: SellerColors.textPrimary,
+            ),
             decoration: InputDecoration(
               hintText: 'Document number',
               hintStyle: GoogleFonts.inter(
-                  fontSize: 13, color: SellerColors.accentLight),
+                fontSize: 13,
+                color: SellerColors.accentLight,
+              ),
               filled: true,
               fillColor: SellerColors.fieldFill,
               contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 11),
+                horizontal: 14,
+                vertical: 11,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(color: SellerColors.fieldBorder),
@@ -1653,7 +1685,9 @@ class _DocUploadCard extends StatelessWidget {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(
-                    color: SellerColors.primaryLight, width: 1.5),
+                  color: SellerColors.primaryLight,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
@@ -1691,13 +1725,21 @@ class _DocThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget child;
     if (localFile != null) {
-      child = Image.file(localFile!,
-          width: 64, height: 64, fit: BoxFit.cover,
-          errorBuilder: (context, error, stack) => _fallback());
+      child = Image.file(
+        localFile!,
+        width: 64,
+        height: 64,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stack) => _fallback(),
+      );
     } else if (remoteUrl != null) {
-      child = Image.network(remoteUrl!,
-          width: 64, height: 64, fit: BoxFit.cover,
-          errorBuilder: (context, error, stack) => _fallback());
+      child = Image.network(
+        remoteUrl!,
+        width: 64,
+        height: 64,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stack) => _fallback(),
+      );
     } else {
       child = _fallback();
     }
@@ -1705,12 +1747,15 @@ class _DocThumbnail extends StatelessWidget {
   }
 
   Widget _fallback() => Container(
-        width: 64,
-        height: 64,
-        color: SellerColors.sectionIconBg,
-        child: Icon(Icons.insert_drive_file_rounded,
-            color: SellerColors.primaryLight, size: 28),
-      );
+    width: 64,
+    height: 64,
+    color: SellerColors.sectionIconBg,
+    child: Icon(
+      Icons.insert_drive_file_rounded,
+      color: SellerColors.primaryLight,
+      size: 28,
+    ),
+  );
 }
 
 class _DocUploadButton extends StatelessWidget {
@@ -1726,8 +1771,9 @@ class _DocUploadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent =
-        hasExisting ? CommonColors.greyText : SellerColors.primaryLight;
+    final accent = hasExisting
+        ? CommonColors.greyText
+        : SellerColors.primaryLight;
     final bg = hasExisting
         ? SellerColors.fieldDisabledFill
         : SellerColors.primaryLight.withValues(alpha: 0.08);
@@ -1743,9 +1789,7 @@ class _DocUploadButton extends StatelessWidget {
           color: isUploading ? SellerColors.fieldDisabledFill : bg,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isUploading
-                ? SellerColors.fieldDisabledBorder
-                : borderColor,
+            color: isUploading ? SellerColors.fieldDisabledBorder : borderColor,
           ),
         ),
         child: isUploading
@@ -1760,9 +1804,7 @@ class _DocUploadButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    hasExisting
-                        ? Icons.refresh_rounded
-                        : Icons.upload_rounded,
+                    hasExisting ? Icons.refresh_rounded : Icons.upload_rounded,
                     size: 18,
                     color: accent,
                   ),
@@ -1816,9 +1858,13 @@ class _PickerSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text('Choose image source',
-              style: GoogleFonts.inter(
-                  fontSize: 13, color: CommonColors.greyText)),
+          Text(
+            'Choose image source',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: CommonColors.greyText,
+            ),
+          ),
           const SizedBox(height: 28),
           Row(
             children: [
@@ -1850,8 +1896,11 @@ class _PickerOption extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _PickerOption(
-      {required this.icon, required this.label, required this.onTap});
+  const _PickerOption({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1923,8 +1972,11 @@ class _ApprovedBanner extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.verified_rounded,
-                      color: Colors.white, size: 44),
+                  child: const Icon(
+                    Icons.verified_rounded,
+                    color: Colors.white,
+                    size: 44,
+                  ),
                 ),
                 const SizedBox(height: 18),
                 Text(
@@ -1937,7 +1989,7 @@ class _ApprovedBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your business is verified on GTA Marketplace.\nYou can now sell and receive payouts.',
+                  'Your business is verified on Texax Marketplace.\nYou can now sell and receive payouts.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
@@ -1973,8 +2025,11 @@ class _PendingBanner extends StatelessWidget {
                 color: Color(0xFFFFF8E1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.hourglass_top_rounded,
-                  color: Color(0xFFF57F17), size: 48),
+              child: const Icon(
+                Icons.hourglass_top_rounded,
+                color: Color(0xFFF57F17),
+                size: 48,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -2013,14 +2068,16 @@ class _RejectionBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: CommonColors.error.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(14),
-        border:
-            Border.all(color: CommonColors.error.withValues(alpha: 0.25)),
+        border: Border.all(color: CommonColors.error.withValues(alpha: 0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_rounded,
-              color: CommonColors.error, size: 20),
+          Icon(
+            Icons.warning_amber_rounded,
+            color: CommonColors.error,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(

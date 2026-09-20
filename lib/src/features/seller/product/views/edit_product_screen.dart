@@ -882,9 +882,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                gradient: const LinearGradient(
-                  colors: [SellerColors.primary, SellerColors.primaryLight],
-                ),
+                gradient: SellerColors.buttonGradient,
               ),
               child: ElevatedButton(
                 onPressed: isLoading ? null : _nextStep,

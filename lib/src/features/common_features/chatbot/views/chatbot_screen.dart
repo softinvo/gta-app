@@ -134,7 +134,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'GTA Assistant',
+                  'Texax Assistant',
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -311,7 +311,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                   color: CommonColors.black,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Ask GTA Assistant...',
+                  hintText: 'Ask Texax Assistant...',
                   hintStyle: GoogleFonts.inter(
                     color: CommonColors.greyText.withValues(alpha: 0.7),
                     fontSize: 14,

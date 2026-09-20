@@ -279,7 +279,7 @@ class _ApprovedBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your business is verified on GTA Marketplace.\nYou can now sell and receive payouts.',
+                  'Your business is verified on Texax Marketplace.\nYou can now sell and receive payouts.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,

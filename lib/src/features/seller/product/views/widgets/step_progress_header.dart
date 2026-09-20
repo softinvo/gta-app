@@ -7,135 +7,118 @@ class StepProgressHeader extends StatelessWidget {
 
   const StepProgressHeader({super.key, required this.currentStep});
 
-  static const List<Map<String, dynamic>> _steps = [
-    {'icon': Icons.inventory_2_outlined, 'label': 'Details'},
-    {'icon': Icons.description_outlined, 'label': 'Description'},
-    {'icon': Icons.sell_outlined, 'label': 'Pricing'},
-  ];
+  static const _stepLabels = ['Details', 'Description', 'Pricing'];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: const BoxDecoration(
         color: CommonColors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade100),
-        ),
+        border: Border(bottom: BorderSide(color: CommonColors.borderColor)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (int i = 0; i < _steps.length; i++) ...[
-            _StepItem(
-              index: i,
-              currentStep: currentStep,
-              icon: _steps[i]['icon'] as IconData,
-              label: _steps[i]['label'] as String,
-            ),
-            if (i < _steps.length - 1)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: _StepConnector(isActive: currentStep > i),
-                ),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _StepItem extends StatelessWidget {
-  final int index;
-  final int currentStep;
-  final IconData icon;
-  final String label;
-
-  const _StepItem({
-    required this.index,
-    required this.currentStep,
-    required this.icon,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isCurrent = index == currentStep;
-    final isCompleted = index < currentStep;
-    final isActive = isCurrent || isCompleted;
-
-    return SizedBox(
-      width: 64,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: isCurrent
-                  ? SellerColors.primaryLight
-                  : isCompleted
-                      ? SellerColors.primaryLight.withValues(alpha: 0.12)
-                      : Colors.grey.shade100,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isActive
-                    ? SellerColors.primaryLight
-                    : Colors.grey.shade300,
-                width: isCurrent ? 2 : 1.5,
-              ),
-              boxShadow: isCurrent
-                  ? [
-                      BoxShadow(
-                        color: SellerColors.primaryLight.withValues(alpha: 0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: isCompleted
-                ? const Icon(Icons.check_rounded, size: 18, color: SellerColors.primaryLight)
-                : Icon(
-                    icon,
-                    size: 18,
-                    color: isCurrent ? Colors.white : Colors.grey.shade400,
+          Row(
+            children: List.generate(_stepLabels.length, (step) {
+              final isActive = step == currentStep;
+              final isDone = step < currentStep;
+
+              return Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 5,
                   ),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? SellerColors.primaryLight.withValues(alpha: 0.10)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: (isActive || isDone)
+                              ? SellerColors.primaryLight
+                              : Colors.white,
+                          border: Border.all(
+                            color: (isActive || isDone)
+                                ? SellerColors.primaryLight
+                                : SellerColors.fieldDisabledBorder,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Center(
+                          child: isDone
+                              ? const Icon(
+                                  Icons.check_rounded,
+                                  size: 13,
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  '${step + 1}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: isActive
+                                        ? Colors.white
+                                        : CommonColors.greyText,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          _stepLabels[step],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: isActive
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: isActive
+                                ? SellerColors.primaryLight
+                                : CommonColors.greyText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
           ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-              color: isActive ? SellerColors.primaryLight : Colors.grey.shade400,
+          const SizedBox(height: 5),
+          Row(
+            children: List.generate(
+              _stepLabels.length,
+              (step) => Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  height: 3,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    color: step <= currentStep
+                        ? SellerColors.primaryLight
+                        : SellerColors.fieldDisabledBorder,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _StepConnector extends StatelessWidget {
-  final bool isActive;
-  const _StepConnector({required this.isActive});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      height: 2,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(1),
-        color: isActive
-            ? SellerColors.primaryLight
-            : Colors.grey.shade200,
       ),
     );
   }

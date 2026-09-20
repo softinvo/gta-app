@@ -60,7 +60,7 @@ class BuyerAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                         child: Center(
                           child: Text(
-                            'GTA',
+                            'Texax',
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -95,17 +95,7 @@ class BuyerAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : null,
-      actions:
-          actions ??
-          [
-            // Notification bell
-            BuyerAppBarIconButton(
-              icon: Icons.notifications_outlined,
-              onTap: () {},
-              badgeCount: 0,
-            ),
-            const SizedBox(width: 8),
-          ],
+      actions: actions,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: const Color(0xFFF0F2F5)),
@@ -179,16 +169,8 @@ class BuyerAppBarIconButton extends StatelessWidget {
 class BuyerSliverAppBar extends StatelessWidget {
   final String? greeting;
   final String? subtitle;
-  final VoidCallback? onNotificationTap;
-  final int notificationCount;
 
-  const BuyerSliverAppBar({
-    super.key,
-    this.greeting,
-    this.subtitle,
-    this.onNotificationTap,
-    this.notificationCount = 0,
-  });
+  const BuyerSliverAppBar({super.key, this.greeting, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +212,7 @@ class BuyerSliverAppBar extends StatelessWidget {
                       color: BuyerColors.surface,
                       child: Center(
                         child: Text(
-                          'GTA',
+                          'Texax',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -266,55 +248,6 @@ class BuyerSliverAppBar extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-              // Notification Button
-              GestureDetector(
-                onTap: onNotificationTap,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: BuyerColors.surface,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_outlined,
-                        color: BuyerColors.primaryLight,
-                        size: 24,
-                      ),
-                      if (notificationCount > 0)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: CommonColors.error,
-                              shape: BoxShape.circle,
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 18,
-                              minHeight: 18,
-                            ),
-                            child: Text(
-                              notificationCount > 9
-                                  ? '9+'
-                                  : notificationCount.toString(),
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: CommonColors.white,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
                 ),
               ),
             ],

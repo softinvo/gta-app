@@ -1,4 +1,4 @@
-# gta_app
+# Texax
 
 A new Flutter project.
 

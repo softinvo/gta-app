@@ -190,7 +190,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Chat with GTA Assistant',
+                    'Chat with Texax Assistant',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

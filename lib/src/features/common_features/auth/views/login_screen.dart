@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/commons/widgets/phone_input_textfield.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/continue_button.dart';
+import 'package:gta_app/src/features/common_features/auth/views/widgets/apple_sign_in_button.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/google_sign_in_button.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/user_type_toggle.dart';
 import 'package:gta_app/src/res/assets.dart';
@@ -99,10 +101,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
   }
 
+  void _appleSignIn() async {
+    final success = await ref
+        .read(verifyOtpStateProvider.notifier)
+        .signInWithApple(userType: _userType);
+
+    if (success && mounted) {
+      context.go(
+        _userType == 'buyer'
+            ? BuyerHomeScreen.routePath
+            : SellerDashboardScreen.routePath,
+      );
+    } else if (mounted && ref.read(verifyOtpStateProvider).hasError) {
+      final error = ref.read(verifyOtpStateProvider).error;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error?.toString() ?? 'Sign in with Apple failed'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final isBuyer = _userType == 'buyer';
+    final useAppleSignIn =
+        !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: CommonColors.lightPrimaryColor,
@@ -133,7 +159,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           child: Image.asset(
                             ImageAssets.logo,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) {
+                            errorBuilder: (_, _, _) {
                               return Container(
                                 decoration: BoxDecoration(
                                   color: CommonColors.white.withValues(
@@ -143,7 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'GTA',
+                                    'Texax',
                                     style: GoogleFonts.poppins(
                                       fontSize: 42,
                                       fontWeight: FontWeight.bold,
@@ -300,17 +326,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           ),
                           const SizedBox(height: 20),
 
-                          const SizedBox(height: 20),
-
                           Consumer(
                             builder: (context, ref, child) {
                               final verifyState = ref.watch(
                                 verifyOtpStateProvider,
                               );
-                              return GoogleSignInButton(
-                                isLoading: verifyState.isLoading,
-                                onTap: _googleSignIn,
-                              );
+                              return useAppleSignIn
+                                  ? AppleSignInButton(
+                                      isLoading: verifyState.isLoading,
+                                      onTap: _appleSignIn,
+                                    )
+                                  : GoogleSignInButton(
+                                      isLoading: verifyState.isLoading,
+                                      onTap: _googleSignIn,
+                                    );
                             },
                           ),
                           const SizedBox(height: 24),

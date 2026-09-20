@@ -247,7 +247,7 @@ class AppLogo extends StatelessWidget {
               errorBuilder: (context, error, stackTrace) {
                 return Center(
                   child: Text(
-                    'GTA',
+                    'Texax',
                     style: GoogleFonts.inter(
                       fontSize: size * 0.35,
                       fontWeight: FontWeight.bold,
@@ -262,7 +262,7 @@ class AppLogo extends StatelessWidget {
         if (showText) ...[
           const SizedBox(height: 16),
           Text(
-            'Global Textile Axis',
+            'Texax',
             style: GoogleFonts.inter(
               fontSize: 24,
               fontWeight: FontWeight.bold,

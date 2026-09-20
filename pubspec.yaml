@@ -82,6 +82,12 @@ flutter_launcher_icons:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # Several iOS plugins in this app still require CocoaPods. Keeping dependency
+  # management on CocoaPods also avoids Flutter's generated Swift package
+  # reverting its deployment target below Firebase's iOS 15 minimum.
+  config:
+    enable-swift-package-manager: false
+
   generate: true
 
   # The following line ensures that the Material Icons font is

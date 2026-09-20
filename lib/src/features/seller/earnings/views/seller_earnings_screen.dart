@@ -52,11 +52,10 @@ class _SellerEarningsScreenState extends ConsumerState<SellerEarningsScreen> {
       ),
       body: RefreshIndicator(
         color: SellerColors.primaryLight,
-        onRefresh: () async =>
-            ref.invalidate(sellerOrderStatsProvider(_range)),
+        onRefresh: () async => ref.invalidate(sellerOrderStatsProvider(_range)),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -73,7 +72,11 @@ class _SellerEarningsScreenState extends ConsumerState<SellerEarningsScreen> {
               statsAsync.when(
                 loading: () => const _LoadingSkeleton(),
                 error: (e, _) => _ErrorCard(message: e.toString()),
-                data: (stats) => _EarningsContent(stats: stats, fmt: _fmt, fmtFull: _fmtFull),
+                data: (stats) => _EarningsContent(
+                  stats: stats,
+                  fmt: _fmt,
+                  fmtFull: _fmtFull,
+                ),
               ),
             ],
           ),
@@ -98,12 +101,18 @@ class _RangeFilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 36,
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: CommonColors.borderColor),
+      ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 4),
         itemBuilder: (_, i) {
           final (label, value) = filters[i];
           final isSelected = selected == value;
@@ -116,17 +125,14 @@ class _RangeFilterRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected
                     ? SellerColors.primaryLight
-                    : Colors.white,
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isSelected
-                      ? SellerColors.primaryLight
-                      : Colors.grey.shade200,
-                ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: SellerColors.primaryLight.withValues(alpha: 0.25),
+                          color: SellerColors.primaryLight.withValues(
+                            alpha: 0.25,
+                          ),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -137,8 +143,7 @@ class _RangeFilterRow extends StatelessWidget {
                 label,
                 style: GoogleFonts.inter(
                   fontSize: 12,
-                  fontWeight:
-                      isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected ? Colors.white : CommonColors.greyText,
                 ),
               ),
@@ -194,49 +199,75 @@ class _EarningsContent extends StatelessWidget {
           fmt: fmt,
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
-        // ── Payment summary row ───────────────────────────────────
-        Row(
-          children: [
-            Expanded(
-              child: _SummaryCard(
+        // ── Payment summary ───────────────────────────────────────
+        const _SectionTitle(title: 'Payment Summary'),
+        const SizedBox(height: 12),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 600;
+            final cards = [
+              _SummaryCard(
                 label: 'Paid',
                 amount: totalPaid,
                 count: paidCount,
                 color: const Color(0xFF27AE60),
                 icon: Icons.check_circle_outline_rounded,
                 fmt: fmt,
+                horizontal: !isWide,
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _SummaryCard(
+              _SummaryCard(
                 label: 'Pending',
                 amount: totalPending,
                 count: pendingCount,
                 color: const Color(0xFFF57F17),
                 icon: Icons.hourglass_top_rounded,
                 fmt: fmt,
+                horizontal: !isWide,
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _SummaryCard(
+              _SummaryCard(
                 label: 'Refunded',
                 amount: totalRefunded,
                 count: refundedCount,
                 color: CommonColors.error,
                 icon: Icons.replay_rounded,
                 fmt: fmt,
+                horizontal: !isWide,
               ),
-            ),
-          ],
+            ];
+
+            if (!isWide) {
+              return Column(
+                children:
+                    cards
+                        .expand((card) => [card, const SizedBox(height: 10)])
+                        .toList()
+                      ..removeLast(),
+              );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:
+                  cards
+                      .expand(
+                        (card) => [
+                          Expanded(child: card),
+                          const SizedBox(width: 10),
+                        ],
+                      )
+                      .toList()
+                    ..removeLast(),
+            );
+          },
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
 
-        // ── Avg order value strip ─────────────────────────────────
+        // ── Revenue metrics ───────────────────────────────────────
+        const _SectionTitle(title: 'Revenue Insights'),
+        const SizedBox(height: 12),
         _MetricStrip(
           items: [
             _MetricItem(
@@ -260,7 +291,7 @@ class _EarningsContent extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
 
         // ── Payment status breakdown ──────────────────────────────
         _SectionTitle(title: 'Payment Breakdown'),
@@ -294,7 +325,7 @@ class _EarningsContent extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
 
         // ── Order status breakdown ────────────────────────────────
         _SectionTitle(title: 'Order Status'),
@@ -361,98 +392,150 @@ class _HeroEarningsCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF3F51B5), Color(0xFF1A237E)],
+          colors: [Color(0xFF18225C), Color(0xFF3F51B5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: const Color(0xFF7986CB).withValues(alpha: 0.65),
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3F51B5).withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF1A237E).withValues(alpha: 0.24),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Stack(
         children: [
           Positioned(
-            right: -24,
-            top: -24,
-            child: Container(
-              width: 130,
-              height: 130,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.06),
-              ),
+            right: -18,
+            top: 12,
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              size: 138,
+              color: Colors.white.withValues(alpha: 0.055),
             ),
           ),
           Positioned(
-            right: 50,
-            bottom: -30,
+            left: -40,
+            bottom: -60,
             child: Container(
-              width: 90,
-              height: 90,
+              width: 150,
+              height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.white.withValues(alpha: 0.035),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(22),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.18),
+                        ),
                       ),
                       child: const Icon(
                         Icons.account_balance_wallet_rounded,
                         color: Colors.white,
-                        size: 18,
+                        size: 21,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Total Earned',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.8),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'TOTAL EARNED',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.7,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Paid earnings in the selected period',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withValues(alpha: 0.65),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                Text(
-                  fmtFull(totalEarned),
-                  style: GoogleFonts.poppins(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.1,
+                const SizedBox(height: 20),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    fmtFull(totalEarned),
+                    style: GoogleFonts.poppins(
+                      fontSize: 38,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1,
+                      letterSpacing: -0.8,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    _HeroChip(
-                      icon: Icons.shopping_bag_outlined,
-                      label: '$totalOrders orders',
+                const SizedBox(height: 22),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.14),
                     ),
-                    const SizedBox(width: 10),
-                    _HeroChip(
-                      icon: Icons.trending_up_rounded,
-                      label: '${fmt(avgOrderValue)} avg',
-                    ),
-                  ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _HeroMetric(
+                          icon: Icons.shopping_bag_outlined,
+                          label: 'Paid orders',
+                          value: '$totalOrders',
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 36,
+                        margin: const EdgeInsets.symmetric(horizontal: 14),
+                        color: Colors.white.withValues(alpha: 0.16),
+                      ),
+                      Expanded(
+                        child: _HeroMetric(
+                          icon: Icons.receipt_long_outlined,
+                          label: 'Average value',
+                          value: fmt(avgOrderValue),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -463,36 +546,53 @@ class _HeroEarningsCard extends StatelessWidget {
   }
 }
 
-class _HeroChip extends StatelessWidget {
+class _HeroMetric extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String value;
 
-  const _HeroChip({required this.icon, required this.label});
+  const _HeroMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: Colors.white),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.white.withValues(alpha: 0.75)),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  height: 1.1,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withValues(alpha: 0.62),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -506,6 +606,7 @@ class _SummaryCard extends StatelessWidget {
   final Color color;
   final IconData icon;
   final String Function(double) fmt;
+  final bool horizontal;
 
   const _SummaryCard({
     required this.label,
@@ -514,15 +615,39 @@ class _SummaryCard extends StatelessWidget {
     required this.color,
     required this.icon,
     required this.fmt,
+    this.horizontal = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final iconWidget = Container(
+      width: horizontal ? 42 : 32,
+      height: horizontal ? 42 : 32,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(horizontal ? 12 : 9),
+      ),
+      child: Icon(icon, size: horizontal ? 20 : 16, color: color),
+    );
+
+    final amountWidget = Text(
+      fmt(amount),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.poppins(
+        fontSize: horizontal ? 17 : 15,
+        fontWeight: FontWeight.w800,
+        color: color,
+        height: 1.1,
+      ),
+    );
+
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(horizontal ? 14 : 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -531,47 +656,74 @@ class _SummaryCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(9),
+      child: horizontal
+          ? Row(
+              children: [
+                iconWidget,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: CommonColors.greyText,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      amountWidget,
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '$count orders',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                iconWidget,
+                const SizedBox(height: 10),
+                amountWidget,
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: CommonColors.greyText,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$count orders',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: CommonColors.greyText,
+                  ),
+                ),
+              ],
             ),
-            child: Icon(icon, size: 16, color: color),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            fmt(amount),
-            style: GoogleFonts.poppins(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              color: color,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              color: CommonColors.greyText,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '$count orders',
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: CommonColors.greyText,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -598,10 +750,11 @@ class _MetricStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -610,53 +763,64 @@ class _MetricStrip extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: items.asMap().entries.map((entry) {
           final i = entry.key;
           final item = entry.value;
-          return Expanded(
-            child: Row(
-              children: [
-                if (i > 0)
-                  Container(
-                    width: 1,
-                    height: 40,
-                    color: Colors.grey.shade100,
-                    margin: const EdgeInsets.only(right: 8),
-                  ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: item.color.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(item.icon, size: 16, color: item.color),
+          return Column(
+            children: [
+              if (i > 0)
+                const Divider(
+                  height: 1,
+                  indent: 64,
+                  endIndent: 16,
+                  color: CommonColors.borderColor,
+                ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: item.color.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(11),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        item.value,
-                        style: GoogleFonts.poppins(
+                      child: Icon(item.icon, size: 19, color: item.color),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        style: GoogleFonts.inter(
                           fontSize: 13,
+                          color: CommonColors.greyText,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        item.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: item.color,
                         ),
+                        textAlign: TextAlign.end,
                       ),
-                      Text(
-                        item.label,
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          color: CommonColors.greyText,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         }).toList(),
       ),
@@ -723,6 +887,7 @@ class _BreakdownCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -740,7 +905,12 @@ class _BreakdownCard extends StatelessWidget {
           return Column(
             children: [
               if (i > 0)
-                Divider(height: 1, indent: 56, endIndent: 16, color: Colors.grey.shade100),
+                Divider(
+                  height: 1,
+                  indent: 56,
+                  endIndent: 16,
+                  color: Colors.grey.shade100,
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                 child: Row(
@@ -787,8 +957,9 @@ class _BreakdownCard extends StatelessWidget {
                               value: pct,
                               minHeight: 4,
                               backgroundColor: Colors.grey.shade100,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(row.color),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                row.color,
+                              ),
                             ),
                           ),
                         ],
@@ -823,16 +994,19 @@ class _LoadingSkeleton extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Row(
-          children: List.generate(3, (i) => Expanded(
-            child: Container(
-              height: 110,
-              margin: EdgeInsets.only(right: i < 2 ? 10 : 0),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(14),
+          children: List.generate(
+            3,
+            (i) => Expanded(
+              child: Container(
+                height: 110,
+                margin: EdgeInsets.only(right: i < 2 ? 10 : 0),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
             ),
-          )),
+          ),
         ),
         const SizedBox(height: 16),
         Container(
@@ -858,10 +1032,15 @@ class _ErrorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
       ),
       child: Column(
         children: [
-          Icon(Icons.error_outline_rounded, color: CommonColors.error, size: 40),
+          Icon(
+            Icons.error_outline_rounded,
+            color: CommonColors.error,
+            size: 40,
+          ),
           const SizedBox(height: 12),
           Text(
             'Failed to load earnings',
@@ -874,7 +1053,10 @@ class _ErrorCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             message,
-            style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: CommonColors.greyText,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

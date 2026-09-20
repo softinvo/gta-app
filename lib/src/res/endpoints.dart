@@ -7,6 +7,9 @@ class Endpoints {
   static const String sendOTP = '${baseUrl}user/sendotp';
   static const String verifyOTP = '${baseUrl}user/loginphone';
   static const String googleLogin = '${baseUrl}user/google-login';
+  static const String appleLogin = '${baseUrl}user/apple-login';
+  static const String buyerDeleteAccount = '${baseUrl}buyer/delete-account';
+  static const String sellerDeleteAccount = '${baseUrl}seller/delete-account';
 
   //Profile
   static const String storage = "${baseUrl}storage/upload";
@@ -146,8 +149,7 @@ class Endpoints {
   static const String createOrder = "${baseUrl}order/create";
   static const String verifyOrderPayment = "${baseUrl}order/verify-payment";
   static const String buyerOrderList = "${baseUrl}order/buyer/list";
-  static String buyerOrderDetails(String orderId) =>
-      "${baseUrl}order/$orderId";
+  static String buyerOrderDetails(String orderId) => "${baseUrl}order/$orderId";
   static String cancelBuyerOrder(String orderId) =>
       "${baseUrl}order/$orderId/cancel";
 

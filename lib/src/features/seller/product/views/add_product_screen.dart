@@ -116,21 +116,26 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           ? sv!.productVariants.first
           : null;
       if (pv != null) {
-        _singlePriceController.text =
-            pv.price.value > 0 ? pv.price.value.toString() : '';
+        _singlePriceController.text = pv.price.value > 0
+            ? pv.price.value.toString()
+            : '';
         _singleStockController.text = pv.stock.quantity.toString();
         _singleSizeController.text = pv.size ?? '';
         _selectedCurrency = pv.price.currency;
         _selectedUnit = pv.stock.unit ?? 'pcs';
       }
-      final colorCode = sv?.variantColorCode ??
-          (dup.variants.isNotEmpty ? dup.variants.first.variantColorCode : null);
+      final colorCode =
+          sv?.variantColorCode ??
+          (dup.variants.isNotEmpty
+              ? dup.variants.first.variantColorCode
+              : null);
       if (colorCode != null) {
         _singleColorLabelController.text = colorCode;
         if (colorCode.startsWith('#') && colorCode.length >= 7) {
           try {
-            _singleSelectedColor =
-                Color(int.parse(colorCode.replaceFirst('#', '0xFF')));
+            _singleSelectedColor = Color(
+              int.parse(colorCode.replaceFirst('#', '0xFF')),
+            );
           } catch (_) {}
         }
       }
@@ -233,8 +238,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 color: SellerColors.surface,
                 borderRadius: BorderRadius.circular(9),
               ),
-              child: const Icon(Icons.colorize_rounded,
-                  size: 16, color: SellerColors.primaryLight),
+              child: const Icon(
+                Icons.colorize_rounded,
+                size: 16,
+                color: SellerColors.primaryLight,
+              ),
             ),
             const SizedBox(width: 10),
             Text(
@@ -264,8 +272,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             style: TextButton.styleFrom(foregroundColor: CommonColors.greyText),
-            child: Text('Cancel',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
@@ -274,12 +284,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             ),
-            child: Text('Apply',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+            child: Text(
+              'Apply',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
@@ -304,25 +316,34 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       final uploader = ref.read(uploadUtilsProvider);
 
       if (_singleThumbnailFile != null) {
-        final result = await uploader.uploadFile(_singleThumbnailFile!, 'Product');
+        final result = await uploader.uploadFile(
+          _singleThumbnailFile!,
+          'Product',
+        );
         if (!mounted) return;
         bool failed = false;
-        result.fold(
-          (f) { failed = true; _showError('Thumbnail upload failed: ${f.message}'); },
-          (a) => thumbnail = a,
-        );
-        if (failed) { setState(() => _isUploadingImages = false); return; }
+        result.fold((f) {
+          failed = true;
+          _showError('Thumbnail upload failed: ${f.message}');
+        }, (a) => thumbnail = a);
+        if (failed) {
+          setState(() => _isUploadingImages = false);
+          return;
+        }
       }
 
       for (final file in _singlePreviewFiles) {
         final result = await uploader.uploadFile(file, 'Product');
         if (!mounted) return;
         bool failed = false;
-        result.fold(
-          (f) { failed = true; _showError('Preview image upload failed: ${f.message}'); },
-          (a) => previewImages.add(a),
-        );
-        if (failed) { setState(() => _isUploadingImages = false); return; }
+        result.fold((f) {
+          failed = true;
+          _showError('Preview image upload failed: ${f.message}');
+        }, (a) => previewImages.add(a));
+        if (failed) {
+          setState(() => _isUploadingImages = false);
+          return;
+        }
       }
 
       if (mounted) setState(() => _isUploadingImages = false);
@@ -379,36 +400,53 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       category: _selectedCategoryName ?? '',
       subCategory: _selectedSubCategoryName,
       productType: _selectedProductTypeName,
-      gsm: _gsmController.text.trim().isEmpty ? null : _gsmController.text.trim(),
-      width: _widthController.text.trim().isEmpty ? null : _widthController.text.trim(),
-      compositions: _compositionsController.text.trim().isEmpty ? null : _compositionsController.text.trim(),
+      gsm: _gsmController.text.trim().isEmpty
+          ? null
+          : _gsmController.text.trim(),
+      width: _widthController.text.trim().isEmpty
+          ? null
+          : _widthController.text.trim(),
+      compositions: _compositionsController.text.trim().isEmpty
+          ? null
+          : _compositionsController.text.trim(),
       isMultiColor: _isMultiColor,
       description: ProductDescription(
-        short: _shortDescController.text.trim().isEmpty ? null : _shortDescController.text.trim(),
-        long: _longDescController.text.trim().isEmpty ? null : _longDescController.text.trim(),
+        short: _shortDescController.text.trim().isEmpty
+            ? null
+            : _shortDescController.text.trim(),
+        long: _longDescController.text.trim().isEmpty
+            ? null
+            : _longDescController.text.trim(),
       ),
-      countryOfOrigin: _originController.text.trim().isEmpty ? null : _originController.text.trim(),
+      countryOfOrigin: _originController.text.trim().isEmpty
+          ? null
+          : _originController.text.trim(),
       sampleAvailable: _sampleAvailable,
-      sampleCost: _sampleAvailable ? double.tryParse(_sampleCostController.text) : null,
+      sampleCost: _sampleAvailable
+          ? double.tryParse(_sampleCostController.text)
+          : null,
       minimumOrderQuantity: int.tryParse(_moqController.text) ?? 1,
       hasVariants: _isMultiColor ? false : _hasVariants,
       variants: variants,
     );
 
-    ref.read(productControllerProvider.notifier).addProduct(
-      product: product,
-      onError: (msg) => _showError(msg),
-      onSuccess: () {
-        ref.read(productListProvider.notifier).fetchProducts(refresh: true);
-        SnackBarService.showSuccess(context, 'Product added successfully!');
-        Navigator.pop(context);
-      },
-    );
+    ref
+        .read(productControllerProvider.notifier)
+        .addProduct(
+          product: product,
+          onError: (msg) => _showError(msg),
+          onSuccess: () {
+            ref.read(productListProvider.notifier).fetchProducts(refresh: true);
+            SnackBarService.showSuccess(context, 'Product added successfully!');
+            Navigator.pop(context);
+          },
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(productControllerProvider) || _isUploadingImages;
+    final isLoading =
+        ref.watch(productControllerProvider) || _isUploadingImages;
 
     return Scaffold(
       backgroundColor: SellerColors.background,
@@ -564,7 +602,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           children: [
             Text(
               'Sample Available',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
             ),
             CustomSwitchToggle(
               value: _sampleAvailable,
@@ -735,12 +776,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             children: [
               Text(
                 label,
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14, color: CommonColors.black),
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: CommonColors.black,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: CommonColors.greyText,
+                ),
               ),
             ],
           ),
@@ -761,7 +809,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         icon: Icons.style_outlined,
         title: 'Variants (${_variants.length})',
         children: [
-          ..._variants.asMap().entries.map((e) => _buildVariantTile(e.value, e.key)),
+          ..._variants.asMap().entries.map(
+            (e) => _buildVariantTile(e.value, e.key),
+          ),
           if (_variants.isNotEmpty) _gap(),
           GestureDetector(
             onTap: _showAddVariantDialog,
@@ -778,7 +828,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_rounded, color: SellerColors.primaryLight, size: 20),
+                  Icon(
+                    Icons.add_rounded,
+                    color: SellerColors.primaryLight,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Add Variant',
@@ -850,8 +904,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             hint: 'e.g. Navy Blue',
             readOnly: true,
             trailingLabel: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(6),
@@ -859,8 +912,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.auto_awesome_rounded,
-                      size: 10, color: SellerColors.primaryLight),
+                  Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 10,
+                    color: SellerColors.primaryLight,
+                  ),
                   const SizedBox(width: 3),
                   Text(
                     'Auto',
@@ -904,7 +960,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 onPressed: isLoading ? null : _previousStep,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 9),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   side: BorderSide(color: SellerColors.primaryLight),
                 ),
                 child: Text(
@@ -924,9 +982,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                gradient: const LinearGradient(
-                  colors: [SellerColors.primary, SellerColors.primaryLight],
-                ),
+                gradient: SellerColors.buttonGradient,
               ),
               child: ElevatedButton(
                 onPressed: isLoading ? null : _nextStep,
@@ -934,13 +990,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   padding: const EdgeInsets.symmetric(vertical: 9),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: isLoading
                     ? const SizedBox(
                         height: 18,
                         width: 18,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
                       )
                     : Text(
                         _currentStep == 2 ? 'Add Product' : 'Next',
@@ -966,11 +1027,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       data: (categories) => CustomFormDropdown<String>(
         label: 'Category *',
         value: _selectedCategoryId,
-        items: categories.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+        items: categories
+            .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
+            .toList(),
         onChanged: (val) {
           setState(() {
             _selectedCategoryId = val;
-            _selectedCategoryName = categories.firstWhere((c) => c.id == val).name;
+            _selectedCategoryName = categories
+                .firstWhere((c) => c.id == val)
+                .name;
             _selectedSubCategoryId = null;
             _selectedSubCategoryName = null;
             _selectedProductTypeId = null;
@@ -979,47 +1044,68 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         },
       ),
       loading: () => const LinearProgressIndicator(),
-      error: (err, _) => Text('Error loading categories', style: GoogleFonts.inter(color: Colors.red)),
+      error: (err, _) => Text(
+        'Error loading categories',
+        style: GoogleFonts.inter(color: Colors.red),
+      ),
     );
   }
 
   Widget _buildSubCategoryDropdown() {
-    final subCategoriesAsync = ref.watch(subCategoriesProvider(_selectedCategoryId!));
+    final subCategoriesAsync = ref.watch(
+      subCategoriesProvider(_selectedCategoryId!),
+    );
     return subCategoriesAsync.when(
       data: (subCats) => CustomFormDropdown<String>(
         label: 'Sub Category *',
         value: _selectedSubCategoryId,
-        items: subCats.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+        items: subCats
+            .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
+            .toList(),
         onChanged: (val) {
           setState(() {
             _selectedSubCategoryId = val;
-            _selectedSubCategoryName = subCats.firstWhere((c) => c.id == val).name;
+            _selectedSubCategoryName = subCats
+                .firstWhere((c) => c.id == val)
+                .name;
             _selectedProductTypeId = null;
             _selectedProductTypeName = null;
           });
         },
       ),
       loading: () => const LinearProgressIndicator(),
-      error: (err, _) => Text('Error loading sub categories', style: GoogleFonts.inter(color: Colors.red)),
+      error: (err, _) => Text(
+        'Error loading sub categories',
+        style: GoogleFonts.inter(color: Colors.red),
+      ),
     );
   }
 
   Widget _buildProductTypeDropdown() {
-    final productTypesAsync = ref.watch(productTypesProvider(_selectedSubCategoryId!));
+    final productTypesAsync = ref.watch(
+      productTypesProvider(_selectedSubCategoryId!),
+    );
     return productTypesAsync.when(
       data: (types) => CustomFormDropdown<String>(
         label: 'Product Type *',
         value: _selectedProductTypeId,
-        items: types.map((c) => DropdownMenuItem(value: c.id, child: Text(c.name))).toList(),
+        items: types
+            .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
+            .toList(),
         onChanged: (val) {
           setState(() {
             _selectedProductTypeId = val;
-            _selectedProductTypeName = types.firstWhere((c) => c.id == val).name;
+            _selectedProductTypeName = types
+                .firstWhere((c) => c.id == val)
+                .name;
           });
         },
       ),
       loading: () => const LinearProgressIndicator(),
-      error: (err, _) => Text('Error loading product types', style: GoogleFonts.inter(color: Colors.red)),
+      error: (err, _) => Text(
+        'Error loading product types',
+        style: GoogleFonts.inter(color: Colors.red),
+      ),
     );
   }
 
@@ -1039,7 +1125,12 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           if (v.thumbnail != null)
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.file(File(v.thumbnail!.fileUrl), width: 44, height: 44, fit: BoxFit.cover),
+              child: Image.file(
+                File(v.thumbnail!.fileUrl),
+                width: 44,
+                height: 44,
+                fit: BoxFit.cover,
+              ),
             )
           else
             Container(
@@ -1050,7 +1141,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: const Icon(Icons.image_outlined, color: CommonColors.greyText, size: 20),
+              child: const Icon(
+                Icons.image_outlined,
+                color: CommonColors.greyText,
+                size: 20,
+              ),
             ),
           const SizedBox(width: 12),
           Expanded(
@@ -1059,12 +1154,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               children: [
                 Text(
                   '${v.variantColorCode ?? "No Color"}${v.size != null ? " · ${v.size}" : ""}',
-                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: CommonColors.black),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: CommonColors.black,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${v.price.currency} ${v.price.value}  ·  ${v.stock.quantity} ${v.stock.unit ?? ""}',
-                  style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: CommonColors.greyText,
+                  ),
                 ),
               ],
             ),
@@ -1088,7 +1190,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       children: [
         Text(
           'Select Color',
-          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: CommonColors.black),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: CommonColors.black,
+          ),
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -1109,7 +1215,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.grey.shade300),
                     ),
-                    child: Icon(Icons.colorize, size: 20, color: SellerColors.primaryLight),
+                    child: Icon(
+                      Icons.colorize,
+                      size: 20,
+                      color: SellerColors.primaryLight,
+                    ),
                   ),
                 );
               }
@@ -1129,17 +1239,28 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     color: item['color'],
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? SellerColors.primaryLight : Colors.black12,
+                      color: isSelected
+                          ? SellerColors.primaryLight
+                          : Colors.black12,
                       width: isSelected ? 3 : 1,
                     ),
                     boxShadow: isSelected
-                        ? [BoxShadow(color: SellerColors.primaryLight.withValues(alpha: 0.3), blurRadius: 8)]
+                        ? [
+                            BoxShadow(
+                              color: SellerColors.primaryLight.withValues(
+                                alpha: 0.3,
+                              ),
+                              blurRadius: 8,
+                            ),
+                          ]
                         : null,
                   ),
                   child: isSelected
                       ? Icon(
                           Icons.check,
-                          color: item['color'] == Colors.white ? Colors.black : Colors.white,
+                          color: item['color'] == Colors.white
+                              ? Colors.black
+                              : Colors.white,
                           size: 20,
                         )
                       : null,
@@ -1256,7 +1377,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: SellerColors.primaryLight.withValues(alpha: 0.12),
+                        color: SellerColors.primaryLight.withValues(
+                          alpha: 0.12,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1296,7 +1419,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             const SizedBox(height: 4),
             Text(
               'JPG or PNG • Best at 800 × 800',
-              style: GoogleFonts.inter(fontSize: 11, color: CommonColors.greyText),
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: CommonColors.greyText,
+              ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -1304,7 +1430,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               children: [
                 _sourceChip(icon: Icons.camera_alt_outlined, label: 'Camera'),
                 const SizedBox(width: 8),
-                _sourceChip(icon: Icons.photo_library_outlined, label: 'Gallery'),
+                _sourceChip(
+                  icon: Icons.photo_library_outlined,
+                  label: 'Gallery',
+                ),
               ],
             ),
           ],
@@ -1345,7 +1474,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: SellerColors.primaryLight,
                       borderRadius: BorderRadius.circular(6),
@@ -1353,7 +1485,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Colors.white,
+                          size: 10,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           'Main',
@@ -1370,7 +1506,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   GestureDetector(
                     onTap: () => _showImageSourcePicker(),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
@@ -1381,7 +1520,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.edit_outlined, color: Colors.white, size: 12),
+                          const Icon(
+                            Icons.edit_outlined,
+                            color: Colors.white,
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Change',
@@ -1412,7 +1555,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   color: Colors.black.withValues(alpha: 0.55),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.white, size: 15),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 15,
+                ),
               ),
             ),
           ),
@@ -1477,7 +1624,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: count > 0 ? SellerColors.primaryLight : CommonColors.greyText,
+                  color: count > 0
+                      ? SellerColors.primaryLight
+                      : CommonColors.greyText,
                 ),
               ),
             ),
@@ -1498,7 +1647,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         ..._singlePreviewFiles.asMap().entries.map((entry) {
           return _previewTile(
             child: Image.file(entry.value, fit: BoxFit.cover),
-            onRemove: () => setState(() => _singlePreviewFiles.removeAt(entry.key)),
+            onRemove: () =>
+                setState(() => _singlePreviewFiles.removeAt(entry.key)),
           );
         }),
         if (_singlePreviewFiles.length < maxPreviews) _addPreviewTile(),
@@ -1528,7 +1678,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   color: Color(0xFFE53935),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.white, size: 13),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 13,
+                ),
               ),
             ),
           ),
@@ -1559,7 +1713,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: SellerColors.fieldBorder),
               ),
-              child: const Icon(Icons.add_rounded, color: SellerColors.primaryLight, size: 20),
+              child: const Icon(
+                Icons.add_rounded,
+                color: SellerColors.primaryLight,
+                size: 20,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
@@ -1688,7 +1846,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   }
 
   Future<void> _pickThumbnailFrom(ImageSource source) async {
-    final picked = await ImagePicker().pickImage(source: source, imageQuality: 80);
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 80,
+    );
     if (picked != null && mounted) {
       setState(() => _singleThumbnailFile = File(picked.path));
     }
@@ -1698,9 +1859,14 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     const maxPreviews = 5;
     final remaining = maxPreviews - _singlePreviewFiles.length;
     if (remaining <= 0) return;
-    final picked = await ImagePicker().pickMultiImage(imageQuality: 75, limit: remaining);
+    final picked = await ImagePicker().pickMultiImage(
+      imageQuality: 75,
+      limit: remaining,
+    );
     if (picked.isNotEmpty && mounted) {
-      setState(() => _singlePreviewFiles.addAll(picked.map((x) => File(x.path))));
+      setState(
+        () => _singlePreviewFiles.addAll(picked.map((x) => File(x.path))),
+      );
     }
   }
 }

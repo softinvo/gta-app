@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppString {
-  static const appName = "Global Textile Axis";
-  static const splashTitleName = "Global Textile Axis";
+  static const appName = "Texax";
+  static const splashTitleName = "Texax";
 }
 
 class FailureMessage {

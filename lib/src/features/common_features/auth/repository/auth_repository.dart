@@ -93,4 +93,55 @@ class AuthRepository {
       return Left(Failure(message: data['message'] ?? 'Google login failed'));
     });
   }
+
+  /// Sign in or create an account using a Firebase ID token issued for Apple.
+  FutureEither<Map<String, dynamic>> appleLogin({
+    required String idToken,
+    required String userType,
+  }) async {
+    final result = await _api.postRequest(
+      url: Endpoints.appleLogin,
+      body: {'idToken': idToken, 'userType': userType},
+      requireAuth: false,
+    );
+
+    return result.fold((failure) => Left(failure), (response) {
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return Right({
+          'token': data['token'],
+          'userType': data['userType'],
+          'user': data['data'],
+        });
+      }
+      return Left(
+        Failure(
+          message: data['message'] ?? data['msg'] ?? 'Apple login failed',
+        ),
+      );
+    });
+  }
+
+  /// Permanently delete the authenticated user's account and associated data.
+  FutureEither<bool> deleteAccount({required String userType}) async {
+    final endpoint = userType == 'seller'
+        ? Endpoints.sellerDeleteAccount
+        : Endpoints.buyerDeleteAccount;
+    final result = await _api.deleteRequest(url: endpoint);
+
+    return result.fold((failure) => Left(failure), (response) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right(true);
+      }
+
+      try {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return Left(
+          Failure(message: data['message'] ?? 'Failed to delete account'),
+        );
+      } catch (_) {
+        return Left(Failure(message: 'Failed to delete account'));
+      }
+    });
+  }
 }

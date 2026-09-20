@@ -221,6 +221,73 @@ class VerifyOtpNotifier extends Notifier<AsyncValue<AuthState>> {
     }
   }
 
+  Future<bool> signInWithApple({required String userType}) async {
+    state = const AsyncValue.loading();
+
+    try {
+      final appleProvider = AppleAuthProvider()
+        ..addScope('email')
+        ..addScope('name');
+      final userCredential = await FirebaseAuth.instance.signInWithProvider(
+        appleProvider,
+      );
+      final firebaseIdToken = await userCredential.user?.getIdToken();
+
+      if (firebaseIdToken == null) {
+        state = AsyncValue.error('Failed to get ID token', StackTrace.current);
+        return false;
+      }
+
+      final result = await ref
+          .read(authRepositoryProvider)
+          .appleLogin(idToken: firebaseIdToken, userType: userType);
+
+      return result.fold(
+        (failure) {
+          state = AsyncValue.error(failure.message, StackTrace.current);
+          return false;
+        },
+        (data) async {
+          await _completeLogin(data);
+          return true;
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      // Closing Apple's sheet is not an authentication failure worth showing.
+      if (e.code == 'web-context-canceled' || e.code == 'canceled') {
+        state = const AsyncValue.data(AuthState());
+        return false;
+      }
+      state = AsyncValue.error(
+        e.message ?? 'Sign in with Apple failed',
+        StackTrace.current,
+      );
+      return false;
+    } catch (e) {
+      state = AsyncValue.error(e.toString(), StackTrace.current);
+      return false;
+    }
+  }
+
+  Future<void> _completeLogin(Map<String, dynamic> data) async {
+    final token = data['token'] as String;
+    final userType = data['userType'] as String;
+    await ref.read(sharedPrefsControllerPovider).setCookie(cookie: token);
+    await ref
+        .read(sharedPrefsControllerPovider)
+        .setData(key: 'USER_TYPE', cookie: userType);
+    ref.read(authTokenProvider.notifier).state = token;
+    _resetUserScopedProviders();
+    FcmService.uploadAfterLogin(authToken: token, userType: userType);
+    state = AsyncValue.data(
+      AuthState(
+        status: AuthStatus.authenticated,
+        userType: data['userType'],
+        user: data['user'],
+      ),
+    );
+  }
+
   Future<void> logout() async {
     await ref.read(sharedPrefsControllerPovider).clear();
     ref.read(authTokenProvider.notifier).state = null;
@@ -275,6 +342,93 @@ class VerifyOtpNotifier extends Notifier<AsyncValue<AuthState>> {
 
   void reset() {
     state = const AsyncValue.data(AuthState());
+  }
+}
+
+final accountDeletionProvider =
+    NotifierProvider<AccountDeletionNotifier, AsyncValue<void>>(
+      AccountDeletionNotifier.new,
+    );
+
+class AccountDeletionNotifier extends Notifier<AsyncValue<void>> {
+  @override
+  AsyncValue<void> build() => const AsyncValue.data(null);
+
+  Future<bool> deleteAccount() async {
+    state = const AsyncValue.loading();
+
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final usesApple =
+        firebaseUser?.providerData.any(
+          (provider) => provider.providerId == 'apple.com',
+        ) ??
+        false;
+
+    // Apple requires apps that offer Sign in with Apple to revoke the user's
+    // Apple token when the account is deleted. Reauthentication supplies the
+    // one-time authorization code Firebase needs for revocation.
+    if (firebaseUser != null && usesApple) {
+      try {
+        final credential = await firebaseUser.reauthenticateWithProvider(
+          AppleAuthProvider()
+            ..addScope('email')
+            ..addScope('name'),
+        );
+        final authorizationCode =
+            credential.additionalUserInfo?.authorizationCode;
+        if (authorizationCode == null) {
+          state = AsyncValue.error(
+            'Could not authorize Apple account deletion. Please try again.',
+            StackTrace.current,
+          );
+          return false;
+        }
+        await FirebaseAuth.instance.revokeTokenWithAuthorizationCode(
+          authorizationCode,
+        );
+      } on FirebaseAuthException catch (error) {
+        state = AsyncValue.error(
+          error.message ?? 'Apple authorization was not completed.',
+          StackTrace.current,
+        );
+        return false;
+      }
+    }
+
+    final userType = await ref
+        .read(sharedPrefsControllerPovider)
+        .getData('USER_TYPE');
+    if (userType != 'buyer' && userType != 'seller') {
+      state = AsyncValue.error(
+        'Could not determine the account type.',
+        StackTrace.current,
+      );
+      return false;
+    }
+
+    final result = await ref
+        .read(authRepositoryProvider)
+        .deleteAccount(userType: userType!);
+
+    return result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+        return false;
+      },
+      (_) async {
+        // The API owns the primary account record. Remove the Firebase identity
+        // too when one exists; phone-only sessions may not have one.
+        try {
+          await firebaseUser?.delete();
+        } on FirebaseAuthException {
+          await FirebaseAuth.instance.signOut();
+        }
+        await ref.read(sharedPrefsControllerPovider).clear();
+        ref.read(authTokenProvider.notifier).state = null;
+        state = const AsyncValue.data(null);
+        return true;
+      },
+    );
   }
 }
 

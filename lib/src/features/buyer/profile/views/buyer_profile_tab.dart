@@ -16,6 +16,7 @@ import 'widgets/profile_header.dart';
 import 'widgets/profile_stats.dart';
 import 'widgets/profile_menu.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
+import 'package:gta_app/src/features/common_features/auth/views/widgets/delete_account_button.dart';
 import 'edit_profile_screen.dart';
 import 'manage_addresses_screen.dart';
 import 'buyer_help_faq_screen.dart';
@@ -45,10 +46,7 @@ class BuyerProfileTab extends ConsumerWidget {
                     margin: const EdgeInsets.fromLTRB(20, 16, 20, 16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [
-                          BuyerColors.surfaceLight,
-                          Color(0xFFE1F2E6),
-                        ],
+                        colors: [BuyerColors.surfaceLight, Color(0xFFE1F2E6)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -81,7 +79,7 @@ class BuyerProfileTab extends ConsumerWidget {
                 quoteCount: '0',
                 wishlistCount:
                     ref.watch(savedProductsProvider).value?.length.toString() ??
-                        '0',
+                    '0',
                 onWishlistTap: () =>
                     context.push(BuyerWishlistScreen.routePath),
               ),
@@ -120,7 +118,8 @@ class BuyerProfileTab extends ConsumerWidget {
                         iconColor: const Color(0xFFD97706),
                         iconBgColor: const Color(0xFFFFFBEB),
                         title: context.l10n.profileVerificationStatusTitle,
-                        subtitle: context.l10n.profileVerificationStatusSubtitle,
+                        subtitle:
+                            context.l10n.profileVerificationStatusSubtitle,
                         onTap: () =>
                             context.push(BuyerVerificationScreen.routePath),
                       ),
@@ -218,6 +217,9 @@ class BuyerProfileTab extends ConsumerWidget {
 
                   // Logout button
                   LogoutButton(),
+
+                  const SizedBox(height: 8),
+                  const Center(child: DeleteAccountButton()),
 
                   const SizedBox(height: 16),
 
