@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
 import 'package:gta_app/src/features/seller/product/controllers/product_controller.dart';
+import 'package:gta_app/src/models/category_model.dart';
 import 'package:gta_app/src/models/product_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/commons/widgets/custom_switch_toggle.dart';
@@ -16,6 +17,7 @@ import 'package:gta_app/src/models/attachment_model.dart';
 import 'widgets/step_progress_header.dart';
 import 'widgets/add_product_form_widgets.dart';
 import 'widgets/add_variant_sheet.dart';
+import 'widgets/product_attribute_fields.dart';
 
 class AddProductScreen extends ConsumerStatefulWidget {
   final Product? duplicateFrom;
@@ -68,6 +70,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   String? _selectedSubCategoryName;
   String? _selectedProductTypeId;
   String? _selectedProductTypeName;
+  ProductType? _selectedProductType;
+  final Map<String, dynamic> _attributeValues = {};
+  Set<String> _invalidAttributeNames = {};
 
   String _selectedCurrency = 'INR';
   String _selectedUnit = 'pcs';
@@ -186,8 +191,37 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       }
     } else {
       if (!_formKey.currentState!.validate()) return false;
+      if (_currentStep == 1 && !_validateProductAttributes()) return false;
     }
     return true;
+  }
+
+  bool _validateProductAttributes() {
+    final type = _selectedProductType;
+    if (type == null) return true;
+    final invalid = type.fields
+        .where((field) => field.required && _isAttributeValueEmpty(_attributeValues[field.fieldName]))
+        .map((field) => field.fieldName)
+        .toSet();
+    setState(() => _invalidAttributeNames = invalid);
+    if (invalid.isNotEmpty) {
+      _showError('Please complete all required product attributes');
+      return false;
+    }
+    return true;
+  }
+
+  bool _isAttributeValueEmpty(dynamic value) =>
+      value == null || (value is String && value.trim().isEmpty) || (value is List && value.isEmpty);
+
+  void _selectProductType(ProductType type) {
+    setState(() {
+      _selectedProductTypeId = type.id;
+      _selectedProductTypeName = type.name;
+      _selectedProductType = type;
+      _attributeValues.clear();
+      _invalidAttributeNames = {};
+    });
   }
 
   void _showError(String msg) {
@@ -426,6 +460,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           ? double.tryParse(_sampleCostController.text)
           : null,
       minimumOrderQuantity: int.tryParse(_moqController.text) ?? 1,
+      attributes: Map<String, dynamic>.from(_attributeValues),
       hasVariants: _isMultiColor ? false : _hasVariants,
       variants: variants,
     );
@@ -486,6 +521,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                         _buildDescriptionCard(),
                         const SizedBox(height: 16),
                         _buildOrderCard(),
+                        if (_selectedProductType?.fields.isNotEmpty == true) ...[
+                          const SizedBox(height: 16),
+                          _buildProductAttributesCard(),
+                        ],
                         const SizedBox(height: 24),
                       ],
                     ),
@@ -719,6 +758,28 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
           controller: _moqController,
           hint: 'e.g. 100',
           keyboardType: TextInputType.number,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductAttributesCard() {
+    final type = _selectedProductType!;
+    return _buildSectionCard(
+      icon: Icons.tune_rounded,
+      title: 'Product Attributes',
+      children: [
+        ProductAttributeFields(
+          productTypeId: type.id,
+          fields: type.fields,
+          values: _attributeValues,
+          invalidFieldNames: _invalidAttributeNames,
+          onChanged: (fieldName, value) {
+            setState(() {
+              _attributeValues[fieldName] = value;
+              _invalidAttributeNames = {..._invalidAttributeNames}..remove(fieldName);
+            });
+          },
         ),
       ],
     );
@@ -1093,12 +1154,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
             .toList(),
         onChanged: (val) {
-          setState(() {
-            _selectedProductTypeId = val;
-            _selectedProductTypeName = types
-                .firstWhere((c) => c.id == val)
-                .name;
-          });
+          _selectProductType(types.firstWhere((type) => type.id == val));
         },
       ),
       loading: () => const LinearProgressIndicator(),
