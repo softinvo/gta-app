@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
@@ -15,9 +14,11 @@ import 'package:gta_app/src/utils/snackbar_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gta_app/src/utils/upload_utils.dart';
 import 'package:gta_app/src/models/attachment_model.dart';
+import 'package:gta_colors/gta_colors.dart';
 import 'widgets/step_progress_header.dart';
 import 'widgets/add_product_form_widgets.dart';
 import 'widgets/add_variant_sheet.dart';
+import 'widgets/color_picker_field.dart';
 import 'widgets/product_attribute_fields.dart';
 
 class EditProductScreen extends ConsumerStatefulWidget {
@@ -45,21 +46,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   late final TextEditingController _singlePriceController;
   late final TextEditingController _singleStockController;
   late final TextEditingController _singleSizeController;
-  late final TextEditingController _singleColorLabelController;
-  Color _singleSelectedColor = Colors.black;
-
-  final List<Map<String, dynamic>> _commonColors = [
-    {'name': 'Black', 'color': Colors.black},
-    {'name': 'White', 'color': Colors.white},
-    {'name': 'Red', 'color': Colors.red},
-    {'name': 'Blue', 'color': Colors.blue},
-    {'name': 'Green', 'color': Colors.green},
-    {'name': 'Navy', 'color': const Color(0xFF000080)},
-    {'name': 'Grey', 'color': Colors.grey},
-    {'name': 'Maroon', 'color': const Color(0xFF800000)},
-    {'name': 'Yellow', 'color': Colors.yellow},
-    {'name': 'Orange', 'color': Colors.orange},
-  ];
+  String _singleColorHex = '#000000';
 
   // Classification selection
   String? _selectedCategoryId;
@@ -132,16 +119,15 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
       _singleSizeController = TextEditingController(
         text: firstVariant.size ?? '',
       );
-      _singleColorLabelController = TextEditingController(
-        text: firstVariant.variantColorCode ?? 'Black',
-      );
+      if (firstVariant.variantColorCode != null) {
+        _singleColorHex = firstVariant.variantColorCode!;
+      }
       _selectedCurrency = firstVariant.price.currency;
       _selectedUnit = firstVariant.stock.unit ?? 'pcs';
     } else {
       _singlePriceController = TextEditingController();
       _singleStockController = TextEditingController();
       _singleSizeController = TextEditingController();
-      _singleColorLabelController = TextEditingController(text: 'Black');
     }
 
     if (_hasVariants && !_isMultiColor) {
@@ -174,7 +160,6 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
     _singlePriceController.dispose();
     _singleStockController.dispose();
     _singleSizeController.dispose();
-    _singleColorLabelController.dispose();
     _gsmController.dispose();
     _widthController.dispose();
     _compositionsController.dispose();
@@ -316,7 +301,6 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         ? [..._existingPreviews, ...newPreviews]
         : <Attachment>[];
 
-    final colorLabel = _singleColorLabelController.text.trim();
     final singleSize = _singleSizeController.text.trim().isEmpty
         ? null
         : _singleSizeController.text.trim();
@@ -341,11 +325,22 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         ),
       ];
     } else if (_hasVariants) {
-      variants = _variants;
+      setState(() => _isUploadingImages = true);
+      final result = await ref
+          .read(uploadUtilsProvider)
+          .uploadVariantImages(_variants, 'Product');
+      if (!mounted) return;
+      setState(() => _isUploadingImages = false);
+      final uploaded = result.fold((f) {
+        _showError('Variant image upload failed: ${f.message}');
+        return null;
+      }, (v) => v);
+      if (uploaded == null) return;
+      variants = uploaded;
     } else {
       variants = [
         Variant(
-          variantColorCode: colorLabel.isNotEmpty ? colorLabel : null,
+          variantColorCode: _singleColorHex,
           size: singleSize,
           type: 'primary',
           thumbnail: thumbnail,
@@ -722,8 +717,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               if (_isMultiColor) {
                 _hasVariants = false;
               } else {
-                _singleColorLabelController.text = _commonColors[0]['name'];
-                _singleSelectedColor = _commonColors[0]['color'];
+                _singleColorHex = '#000000';
               }
             });
           },
@@ -868,35 +862,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         ),
         if (!_isMultiColor) ...[
           _gap(20),
-          _buildColorSelectionSection(),
-          _gap(),
-          CustomFormTextField(
-            label: 'Color Label',
-            controller: _singleColorLabelController,
-            hint: 'e.g. Navy Blue',
-            readOnly: true,
-            trailingLabel: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.auto_awesome_rounded, size: 10, color: SellerColors.primaryLight),
-                  const SizedBox(width: 3),
-                  Text(
-                    'Auto',
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: SellerColors.primaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          ColorSelectField(
+            valueHex: _singleColorHex,
+            onChanged: (hex) => setState(() => _singleColorHex = hex),
           ),
         ],
       ],
@@ -1139,7 +1107,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${v.variantColorCode ?? "No Color"}${v.size != null ? " · ${v.size}" : ""}',
+                  '${v.variantColorCode == null ? "No Color" : GtaColors.nameFromHex(v.variantColorCode) ?? v.variantColorCode}${v.size != null ? " · ${v.size}" : ""}',
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -1175,154 +1143,6 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: const Icon(Icons.image_outlined, color: CommonColors.greyText, size: 20),
-    );
-  }
-
-  // ─── Color Selection ───────────────────────────────────────────────────────
-
-  Widget _buildColorSelectionSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Select Color',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: CommonColors.black,
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 48,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: _commonColors.length + 1,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
-            itemBuilder: (context, index) {
-              if (index == _commonColors.length) {
-                return GestureDetector(
-                  onTap: _showSingleColorPicker,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Icon(Icons.colorize, size: 20, color: SellerColors.primaryLight),
-                  ),
-                );
-              }
-              final item = _commonColors[index];
-              final isSelected = _singleSelectedColor == item['color'];
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _singleSelectedColor = item['color'];
-                    _singleColorLabelController.text = item['name'];
-                  });
-                },
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: item['color'],
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? SellerColors.primaryLight : Colors.black12,
-                      width: isSelected ? 3 : 1,
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: SellerColors.primaryLight.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: isSelected
-                      ? Icon(
-                          Icons.check,
-                          color: item['color'] == Colors.white ? Colors.black : Colors.white,
-                          size: 20,
-                        )
-                      : null,
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showSingleColorPicker() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        contentPadding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: SellerColors.surface,
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: const Icon(Icons.colorize_rounded,
-                  size: 16, color: SellerColors.primaryLight),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Custom Color',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: CommonColors.black,
-              ),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: _singleSelectedColor,
-            onColorChanged: (color) {
-              setState(() {
-                _singleSelectedColor = color;
-                _singleColorLabelController.text =
-                    '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
-              });
-            },
-            pickerAreaHeightPercent: 0.8,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(foregroundColor: CommonColors.greyText),
-            child: Text('Cancel', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SellerColors.primaryLight,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            ),
-            child: Text('Apply', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ),
     );
   }
 

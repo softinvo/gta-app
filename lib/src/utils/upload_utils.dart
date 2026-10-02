@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:gta_app/src/core/core.dart';
 import 'package:gta_app/src/models/attachment_model.dart';
+import 'package:gta_app/src/models/product_model.dart';
 import 'package:gta_app/src/commons/repository/storage_repository.dart';
 
 final uploadUtilsProvider = Provider((ref) {
@@ -66,5 +67,47 @@ class FileUploadUtils {
         ),
       );
     }
+  }
+
+  /// Uploads every variant image that still points at a local file (picked
+  /// in the variant sheet) and returns the variants with remote URLs.
+  /// Already-uploaded (http) attachments are kept as-is, and a file shared by
+  /// several variants is uploaded only once.
+  FutureEither<List<Variant>> uploadVariantImages(
+    List<Variant> variants,
+    String type,
+  ) async {
+    final uploaded = <String, Attachment>{};
+
+    Future<Either<Failure, Attachment>> resolve(Attachment a) async {
+      if (a.fileUrl.startsWith('http')) return Right(a);
+      final cached = uploaded[a.fileUrl];
+      if (cached != null) return Right(cached);
+      final result = await uploadFile(File(a.fileUrl), type);
+      return result.map((remote) => uploaded[a.fileUrl] = remote);
+    }
+
+    final out = <Variant>[];
+    for (final v in variants) {
+      Attachment? thumbnail;
+      if (v.thumbnail != null) {
+        final result = await resolve(v.thumbnail!);
+        if (result.isLeft()) return Left(result.getLeft().toNullable()!);
+        thumbnail = result.getRight().toNullable();
+      }
+
+      List<Attachment>? previews;
+      if (v.previewImages != null) {
+        previews = [];
+        for (final p in v.previewImages!) {
+          final result = await resolve(p);
+          if (result.isLeft()) return Left(result.getLeft().toNullable()!);
+          previews.add(result.getRight().toNullable()!);
+        }
+      }
+
+      out.add(v.copyWith(thumbnail: thumbnail, previewImages: previews));
+    }
+    return Right(out);
   }
 }

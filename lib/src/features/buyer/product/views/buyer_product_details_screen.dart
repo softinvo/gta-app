@@ -5,9 +5,11 @@ import 'package:gta_app/src/features/buyer/product/controller/buyer_product_cont
 import 'package:gta_app/src/features/buyer/quotation/views/request_quote_sheet.dart';
 import 'package:gta_app/src/models/buyer_product_details_model.dart';
 import 'package:gta_app/src/models/product_model.dart';
+import 'package:gta_app/src/commons/widgets/product_attribute_rows.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
+import 'package:gta_colors/gta_colors.dart';
 
 class BuyerProductDetailsScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -795,6 +797,8 @@ class _ColorSelector extends StatelessWidget {
   }
 
   String _displayColorName(BuildContext context, String code) {
+    final name = GtaColors.nameFromHex(code);
+    if (name != null) return name;
     if (code.startsWith('#')) return context.l10n.productColorCustom;
     return code
         .replaceAll('_', ' ')
@@ -1042,6 +1046,10 @@ class _SpecsCard extends StatelessWidget {
           const SizedBox(height: 14),
           ...specs.asMap().entries.map(
             (e) => _SpecRow(spec: e.value, isLast: e.key == specs.length - 1),
+          ),
+          ProductAttributeRows(
+            attributes: product.attributes,
+            dividerBefore: true,
           ),
         ],
       ),

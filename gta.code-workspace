@@ -17,6 +17,9 @@
         },
         {
             "path": "../global-textile-axis-frontend"
+        },
+        {
+            "path": "../gta-shared-colors"
         }
     ],
     "settings": {}

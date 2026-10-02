@@ -165,7 +165,13 @@ class QuoteProductCard extends StatelessWidget {
                             ),
                           ),
                         Text(
-                          'Size: ${variant.size ?? 'Standard'}',
+                          [
+                            if (variant.variantColorCode != null)
+                              QuoteUIHelpers.colorName(
+                                variant.variantColorCode!,
+                              ),
+                            'Size: ${variant.size ?? 'Standard'}',
+                          ].join(' · '),
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,

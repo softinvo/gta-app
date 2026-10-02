@@ -8,6 +8,7 @@ import 'package:gta_app/src/features/seller/quotes/controller/seller_quote_contr
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/res/seller_theme.dart';
+import 'package:gta_colors/gta_colors.dart';
 import 'widgets/quote_header_card.dart';
 import 'widgets/quote_buyer_card.dart';
 import 'widgets/quote_delivery_card.dart';
@@ -678,6 +679,16 @@ class _NegotiationPriceField extends StatelessWidget {
     required this.enabled,
   });
 
+  String get _variantLabel {
+    final parts = [
+      if (variant.variantColorCode?.isNotEmpty == true)
+        GtaColors.nameFromHex(variant.variantColorCode) ??
+            variant.variantColorCode!,
+      if (variant.size?.isNotEmpty == true) 'Size ${variant.size}',
+    ];
+    return parts.isEmpty ? 'Variant' : parts.join(' · ');
+  }
+
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(12),
@@ -693,18 +704,7 @@ class _NegotiationPriceField extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    [
-                      if (variant.variantColorCode?.isNotEmpty == true)
-                        variant.variantColorCode!,
-                      if (variant.size?.isNotEmpty == true) 'Size ${variant.size}',
-                    ].join(' · ').isNotEmpty
-                        ? [
-                            if (variant.variantColorCode?.isNotEmpty == true)
-                              variant.variantColorCode!,
-                            if (variant.size?.isNotEmpty == true)
-                              'Size ${variant.size}',
-                          ].join(' · ')
-                        : 'Variant',
+                    _variantLabel,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,

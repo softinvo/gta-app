@@ -64,6 +64,10 @@ dependencies:
   socket_io_client: ^2.0.3+1
   file_picker: ^8.1.7
   emoji_picker_flutter: ^4.4.0
+  gta_colors:
+    git:
+      url: https://github.com/softinvo-tech/gta-shared-colors.git
+      path: dart
 
 dev_dependencies:
   flutter_test:

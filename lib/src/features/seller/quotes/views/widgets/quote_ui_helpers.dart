@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_colors/gta_colors.dart';
 
 class QuoteUIHelpers {
   static Color getStatusColor(String status) {
@@ -42,4 +43,8 @@ class QuoteUIHelpers {
       return Colors.transparent;
     }
   }
+
+  /// Display name for a stored color hex. Falls back to the raw value.
+  static String colorName(String colorCode) =>
+      GtaColors.nameFromHex(colorCode) ?? colorCode;
 }

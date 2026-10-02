@@ -214,7 +214,7 @@ class _ColorTag extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          Text(colorCode, style: _tagTextStyle),
+          Text(QuoteUIHelpers.colorName(colorCode), style: _tagTextStyle),
         ],
       ),
     );

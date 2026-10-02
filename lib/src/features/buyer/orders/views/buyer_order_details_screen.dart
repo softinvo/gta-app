@@ -8,6 +8,7 @@ import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
+import 'package:gta_colors/gta_colors.dart';
 import 'package:intl/intl.dart';
 
 class BuyerOrderDetailsScreen extends ConsumerWidget {
@@ -1738,7 +1739,7 @@ class _ColorTag extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            colorCode,
+            GtaColors.nameFromHex(colorCode) ?? colorCode,
             style: GoogleFonts.inter(
               fontSize: 11,
               color: BuyerColors.textSecondary,

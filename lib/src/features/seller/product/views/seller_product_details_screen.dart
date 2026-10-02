@@ -4,9 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/product_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:gta_app/src/commons/widgets/product_attribute_rows.dart';
 import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gta_colors/gta_colors.dart';
 import '../controllers/product_controller.dart';
 import '../repository/product_repository.dart';
 import 'edit_product_screen.dart';
@@ -256,7 +258,7 @@ class _SellerProductDetailsScreenState
           _buildSpecsCard(product),
 
           // Attributes (dynamic key-value from API)
-          if (product.attributes.isNotEmpty)
+          if (ProductAttributeRows.hasVisible(product.attributes))
             _buildAttributesCard(product.attributes),
 
           const SizedBox(height: 40),
@@ -543,19 +545,11 @@ class _SellerProductDetailsScreenState
               children: product.variants.map((v) {
                 final code = v.variantColorCode ?? '';
                 final isSelected = code == selectedCode;
+                // Render the exact picked color, not the nearest named one.
                 final hexColor = _tryParseHex(code);
                 final thumbUrl = v.thumbnail?.fileUrl;
 
-                final colorName = code
-                    .replaceAll('_', ' ')
-                    .replaceAll('-', ' ')
-                    .split(' ')
-                    .map(
-                      (w) => w.isEmpty
-                          ? ''
-                          : '${w[0].toUpperCase()}${w.substring(1)}',
-                    )
-                    .join(' ');
+                final colorName = GtaColors.nameFromHex(code) ?? code;
 
                 return GestureDetector(
                   onTap: () {
@@ -1366,38 +1360,16 @@ class _SellerProductDetailsScreenState
   // ─── Attributes Card ───────────────────────────────────────────────────────
 
   Widget _buildAttributesCard(Map<String, dynamic> attributes) {
-    final entries = attributes.entries
-        .where((e) => e.value != null && e.value.toString().isNotEmpty)
-        .toList();
-
-    if (entries.isEmpty) return const SizedBox.shrink();
-
     return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionHeader(icon: Icons.tune_rounded, title: 'Additional Attributes'),
-          const SizedBox(height: 14),
-          ...entries.asMap().entries.map(
-            (e) => _AttributeRow(
-              label: _humanize(e.value.key),
-              value: e.value.value.toString(),
-              isLast: e.key == entries.length - 1,
-            ),
-          ),
+          const SizedBox(height: 6),
+          ProductAttributeRows(attributes: attributes, alignValueEnd: true),
         ],
       ),
     );
-  }
-
-  String _humanize(String key) {
-    return key
-        .replaceAllMapped(RegExp(r'([A-Z])'), (m) => ' ${m.group(0)}')
-        .replaceAll('_', ' ')
-        .trim()
-        .split(' ')
-        .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1)}')
-        .join(' ');
   }
 
   // ─── Rejection Banner ──────────────────────────────────────────────────────
@@ -1471,14 +1443,7 @@ class _SellerProductDetailsScreenState
         .toList();
     final inStockList = variantDetails.map((v) => v.stock.inStock).toList();
 
-    // Humanize color code for display  ("navy_blue" → "Navy Blue", "#1A2B3C" stays as-is)
-    final colorName = group.variantColorCode
-        .replaceAll('_', ' ')
-        .replaceAll('-', ' ')
-        .split(' ')
-        .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
-        .join(' ')
-        .trim();
+    final colorName = GtaColors.nameFromHex(group.variantColorCode) ?? '';
     final colorSwatch = _tryParseHex(group.variantColorCode);
 
     showModalBottomSheet(
@@ -2596,60 +2561,6 @@ class _InfoTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// ── Attributes: label | value row ────────────────────────────────────────────
-
-class _AttributeRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool isLast;
-
-  const _AttributeRow({
-    required this.label,
-    required this.value,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  label,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: CommonColors.greyText,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Text(
-                  value,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1C1C1E),
-                  ),
-                  textAlign: TextAlign.end,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (!isLast) Divider(height: 1, color: Colors.grey.shade100),
-      ],
     );
   }
 }

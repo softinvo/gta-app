@@ -57,6 +57,20 @@ class Variant {
         'previewImages': previewImages!.map((i) => i.toJson()).toList(),
     };
   }
+
+  Variant copyWith({Attachment? thumbnail, List<Attachment>? previewImages}) {
+    return Variant(
+      variantColorCode: variantColorCode,
+      size: size,
+      price: price,
+      stock: stock,
+      barcode: barcode,
+      type: type,
+      thumbnail: thumbnail ?? this.thumbnail,
+      previewImages: previewImages ?? this.previewImages,
+      verificationStatus: verificationStatus,
+    );
+  }
 }
 
 // Variant Summary for color picker

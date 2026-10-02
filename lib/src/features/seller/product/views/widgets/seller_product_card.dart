@@ -5,6 +5,7 @@ import 'package:gta_app/src/models/product_card_model.dart';
 import 'package:gta_app/src/models/product_model.dart';
 import 'package:gta_app/src/models/attachment_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:gta_colors/gta_colors.dart';
 
 class SellerProductCard extends StatelessWidget {
   final ProductCard product;
@@ -439,7 +440,7 @@ class _CardFooter extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        colorCode,
+                        GtaColors.nameFromHex(colorCode) ?? colorCode,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: SellerColors.textSecondary,

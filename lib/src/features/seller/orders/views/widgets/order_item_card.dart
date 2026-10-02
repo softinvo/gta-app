@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_colors/gta_colors.dart';
 
 class OrderItemCard extends StatelessWidget {
   final Order order;
@@ -201,7 +202,7 @@ class _ColorTag extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            colorCode,
+            GtaColors.nameFromHex(colorCode) ?? colorCode,
             style: GoogleFonts.inter(
               fontSize: 11,
               color: SellerColors.textSecondary,

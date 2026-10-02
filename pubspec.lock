@@ -661,6 +661,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  gta_colors:
+    dependency: "direct main"
+    description:
+      path: dart
+      ref: HEAD
+      resolved-ref: "497ee2a166ceacd9796375ea84b71d67934472af"
+      url: "https://github.com/softinvo-tech/gta-shared-colors.git"
+    source: git
+    version: "1.0.0"
   html:
     dependency: transitive
     description:
