@@ -21,20 +21,20 @@ class ProductCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () => context.push('/buyer/product/${item.id}'),
       child: Container(
-        width: 175,
+        width: 184,
         margin: const EdgeInsets.only(right: 14, bottom: 4, top: 2),
         decoration: BoxDecoration(
           color: CommonColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 16,
               spreadRadius: 0,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: BuyerColors.primaryLight.withOpacity(0.06),
+              color: BuyerColors.primaryLight.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -48,7 +48,7 @@ class ProductCard extends ConsumerWidget {
               children: [
                 AppNetworkImage(
                   url: item.thumbnailUrl,
-                  height: 150,
+                  height: 142,
                   width: double.infinity,
                   memCacheWidth: 350,
                   memCacheHeight: 300,
@@ -71,7 +71,7 @@ class ProductCard extends ConsumerWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.30),
+                          Colors.black.withValues(alpha: 0.30),
                           Colors.transparent,
                         ],
                       ),
@@ -90,6 +90,15 @@ class ProductCard extends ConsumerWidget {
                       color: Colors.red.shade600,
                     ),
                   ),
+                if (!item.inStock)
+                  Positioned(
+                    left: 10,
+                    bottom: 10,
+                    child: _Badge(
+                      label: 'Out of stock',
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
                 // Heart – top right
                 Positioned(
                   top: 6,
@@ -104,89 +113,108 @@ class ProductCard extends ConsumerWidget {
             ),
 
             // ── Info ───────────────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.name,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: CommonColors.black,
-                      height: 1.25,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (item.shortDescription?.isNotEmpty == true) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      item.shortDescription!,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: CommonColors.greyText,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (item.category?.isNotEmpty == true)
+                      Text(
+                        item.category!.toUpperCase(),
+                        style: GoogleFonts.inter(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: BuyerColors.primaryLight,
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
+                    if (item.category?.isNotEmpty == true)
+                      const SizedBox(height: 3),
+                    Text(
+                      item.name,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: CommonColors.black,
+                        height: 1.25,
+                      ),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                  const SizedBox(height: 7),
-                  Wrap(
-                    spacing: 5,
-                    runSpacing: 4,
-                    children: [
-                      if (item.category?.isNotEmpty == true)
-                        _InfoPill(
-                          icon: Icons.category_outlined,
-                          label: item.category!,
-                        ),
-                      if (item.minimumOrderQuantity != null &&
-                          item.minimumOrderQuantity! > 1)
-                        _InfoPill(
-                          icon: Icons.inventory_2_outlined,
-                          label: 'MOQ ${item.minimumOrderQuantity}',
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.l10n.productFromPricePrefix,
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      color: CommonColors.greyText,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
+                    if (item.shortDescription?.isNotEmpty == true) ...[
+                      const SizedBox(height: 3),
                       Text(
-                        '₹${item.discountedPrice.toStringAsFixed(0)}',
+                        item.shortDescription!,
                         style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: BuyerColors.primaryLight,
+                          fontSize: 11,
+                          color: CommonColors.greyText,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (hasDiscount) ...[
-                        const SizedBox(width: 6),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 1),
+                    ],
+                    if (item.cardMeta.isNotEmpty) ...[
+                      const SizedBox(height: 5),
+                      Text(
+                        item.cardMeta,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: CommonColors.greyText,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    const Spacer(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${context.l10n.productFromPricePrefix} ',
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            color: CommonColors.greyText,
+                          ),
+                        ),
+                        Text(
+                          '₹${item.discountedPrice.toStringAsFixed(0)}',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: BuyerColors.primaryLight,
+                          ),
+                        ),
+                        Expanded(
                           child: Text(
-                            '₹${item.price.toStringAsFixed(0)}',
+                            '/ ${item.unit ?? 'pcs'}',
+                            overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.inter(
-                              fontSize: 11,
+                              fontSize: 10,
                               color: CommonColors.greyText,
-                              decoration: TextDecoration.lineThrough,
                             ),
                           ),
                         ),
+                        if (hasDiscount)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 6, bottom: 1),
+                            child: Text(
+                              '₹${item.price.toStringAsFixed(0)}',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: CommonColors.greyText,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                          ),
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -236,12 +264,12 @@ class _HeartButton extends StatelessWidget {
       padding: const EdgeInsets.all(7),
       decoration: BoxDecoration(
         color: isSaved
-            ? Colors.red.shade50.withOpacity(0.92)
-            : Colors.white.withOpacity(0.88),
+            ? Colors.red.shade50.withValues(alpha: 0.92)
+            : Colors.white.withValues(alpha: 0.88),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -258,41 +286,6 @@ class _HeartButton extends StatelessWidget {
           color: isSaved ? Colors.red.shade500 : CommonColors.greyText,
         ),
       ),
-    ),
-  );
-}
-
-class _InfoPill extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _InfoPill({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-    decoration: BoxDecoration(
-      color: BuyerColors.surface,
-      borderRadius: BorderRadius.circular(5),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 10, color: BuyerColors.textSecondary),
-        const SizedBox(width: 3),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 76),
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
-              color: BuyerColors.textSecondary,
-            ),
-          ),
-        ),
-      ],
     ),
   );
 }

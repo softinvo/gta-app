@@ -12,6 +12,12 @@ class ProductCollectionItem {
   final int? ratingCount;
   final int? minimumOrderQuantity;
   final bool sampleAvailable;
+  final String? unit;
+  final bool inStock;
+  final int? stockQuantity;
+  final String? composition;
+  final String? gsm;
+  final List<String> colorCodes;
 
   ProductCollectionItem({
     required this.id,
@@ -25,6 +31,12 @@ class ProductCollectionItem {
     this.ratingCount,
     this.minimumOrderQuantity,
     this.sampleAvailable = false,
+    this.unit,
+    this.inStock = true,
+    this.stockQuantity,
+    this.composition,
+    this.gsm,
+    this.colorCodes = const [],
   });
 
   String? get thumbnailUrl => thumbnail?.fileUrl;
@@ -34,11 +46,27 @@ class ProductCollectionItem {
     return price * (1 - discountPercent / 100);
   }
 
+  int get colorCount => colorCodes.toSet().length;
+
+  String get cardMeta {
+    final parts = <String>[];
+    if (composition?.isNotEmpty == true) parts.add(composition!);
+    if (gsm?.isNotEmpty == true) {
+      parts.add(gsm!.toUpperCase().contains('GSM') ? gsm! : '${gsm!} GSM');
+    }
+    if (minimumOrderQuantity != null && minimumOrderQuantity! > 1) {
+      parts.add('MOQ $minimumOrderQuantity');
+    }
+    if (colorCount > 1) parts.add('$colorCount colors');
+    return parts.join(' · ');
+  }
+
   factory ProductCollectionItem.fromJson(Map<String, dynamic> json) {
     final priceMap = (json['price'] as Map<String, dynamic>?) ?? {};
     final descRaw =
         json['description']; // may be Map or String depending on endpoint
     final ratingMap = json['rating'] as Map<String, dynamic>?;
+    final stockMap = (json['stock'] as Map<String, dynamic>?) ?? {};
     final rawCount = (ratingMap?['count'] as num? ?? 0).toInt();
     final rawAvg = (ratingMap?['avg'] as num? ?? 0).toDouble();
     return ProductCollectionItem(
@@ -57,6 +85,15 @@ class ProductCollectionItem {
       ratingCount: rawCount > 0 ? rawCount : null,
       minimumOrderQuantity: (json['minimumOrderQuantity'] as num?)?.toInt(),
       sampleAvailable: json['sampleAvailable'] == true,
+      unit: stockMap['unit']?.toString(),
+      inStock: stockMap['inStock'] != false,
+      stockQuantity: (stockMap['quantity'] as num?)?.toInt(),
+      composition: json['compositions']?.toString(),
+      gsm: json['gsm']?.toString(),
+      colorCodes: (json['colorCodes'] as List<dynamic>? ?? [])
+          .whereType<String>()
+          .where((color) => color.isNotEmpty)
+          .toList(),
     );
   }
 }

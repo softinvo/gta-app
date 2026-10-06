@@ -78,7 +78,7 @@ class ProductGridCard extends ConsumerWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            const Color(0xFF14120E).withOpacity(0.28),
+                            const Color(0xFF14120E).withValues(alpha: 0.28),
                             Colors.transparent,
                           ],
                         ),
@@ -97,7 +97,7 @@ class ProductGridCard extends ConsumerWidget {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            const Color(0xFF14120E).withOpacity(0.16),
+                            const Color(0xFF14120E).withValues(alpha: 0.16),
                             Colors.transparent,
                           ],
                         ),
@@ -131,6 +131,15 @@ class ProductGridCard extends ConsumerWidget {
                         color: BuyerColors.gridBadgeTop,
                       ),
                     ),
+                  if (!item.inStock)
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: _BadgePill(
+                        label: 'Out of stock',
+                        color: CommonColors.greyText,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -162,7 +171,11 @@ class ProductGridCard extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        if (item.shortDescription?.isNotEmpty == true) ...[
+                        // In the compact grid card, show either the short
+                        // description or the richer fabric/MOQ/color metadata
+                        // so the fixed-height layout never overflows.
+                        if (item.shortDescription?.isNotEmpty == true &&
+                            item.cardMeta.isEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             item.shortDescription!,
@@ -188,6 +201,19 @@ class ProductGridCard extends ConsumerWidget {
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
+                              color: BuyerColors.gridCardTextHint,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                        if (item.cardMeta.isNotEmpty) ...[
+                          const SizedBox(height: 3),
+                          Text(
+                            item.cardMeta,
+                            style: GoogleFonts.inter(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w500,
                               color: BuyerColors.gridCardTextHint,
                             ),
                             maxLines: 1,
@@ -230,6 +256,18 @@ class ProductGridCard extends ConsumerWidget {
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                '/ ${item.unit ?? 'pcs'}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: GoogleFonts.inter(
+                                  fontSize: 9,
+                                  color: BuyerColors.gridCardTextHint,
+                                ),
                               ),
                             ),
                             if (hasDiscount) ...[
@@ -312,8 +350,8 @@ class _HeartButton extends StatelessWidget {
       height: 30,
       decoration: BoxDecoration(
         color: isSaved
-            ? BuyerColors.gridHeartSaved.withOpacity(0.92)
-            : Colors.white.withOpacity(0.82),
+            ? BuyerColors.gridHeartSaved.withValues(alpha: 0.92)
+            : Colors.white.withValues(alpha: 0.82),
         shape: BoxShape.circle,
       ),
       child: Center(

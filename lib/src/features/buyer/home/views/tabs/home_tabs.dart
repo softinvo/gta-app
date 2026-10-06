@@ -42,7 +42,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -78,7 +78,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         SliverToBoxAdapter(
           child: collectionsAsync.when(
             loading: () => const _CollectionsSkeleton(),
-            error: (_, __) => _CollectionsError(
+            error: (_, _) => _CollectionsError(
               onRetry: () => ref.invalidate(productCollectionsProvider),
             ),
             data: (collections) => _CollectionsBody(collections: collections),
@@ -159,7 +159,7 @@ class _HorizontalSection extends StatelessWidget {
           SectionHeader(title: title, onSeeAll: () {}),
           const SizedBox(height: 16),
           SizedBox(
-            height: 288,
+            height: 304,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: items.length,
@@ -238,12 +238,12 @@ class _CollectionsSkeleton extends StatelessWidget {
             const SizedBox(height: 14),
             // Horizontal card row
             SizedBox(
-              height: 288,
+              height: 304,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: 3,
-                itemBuilder: (_, __) => Container(
+                itemBuilder: (_, _) => Container(
                   width: 175,
                   margin: const EdgeInsets.only(right: 14),
                   decoration: BoxDecoration(
@@ -267,7 +267,7 @@ class _CollectionsSkeleton extends StatelessWidget {
                 mainAxisSpacing: 16,
               ),
               itemCount: 4,
-              itemBuilder: (_, __) => Container(
+              itemBuilder: (_, _) => Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
