@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
@@ -35,7 +36,9 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
     super.initState();
     // Initialize controllers with existing address data
     _nameController = TextEditingController(text: widget.address.name);
-    _phoneController = TextEditingController(text: widget.address.phoneNumber);
+    _phoneController = TextEditingController(
+      text: _localPhoneNumber(widget.address.phoneNumber),
+    );
     _addressController = TextEditingController(text: widget.address.address);
     _localityController = TextEditingController(text: widget.address.locality);
     _landmarkController = TextEditingController(
@@ -65,12 +68,10 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
 
     setState(() => _isLoading = true);
 
-    // For now, we'll need to delete the old address and create a new one
-    // since there's no update endpoint yet
     final newAddress = Address(
       id: widget.address.id,
       name: _nameController.text,
-      phoneNumber: _phoneController.text,
+      phoneNumber: '+91${_phoneController.text.trim()}',
       address: _addressController.text,
       locality: _localityController.text,
       landmark: _landmarkController.text,
@@ -85,29 +86,13 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
           widget.address.geolocation ?? GeoLocation(coordinates: [0, 0]),
     );
 
-    // Delete old address and add new one
-    final deleteSuccess = await ref
+    final updateSuccess = await ref
         .read(buyerAddressesProvider.notifier)
-        .removeAddress(widget.address.id!);
-
-    if (!deleteSuccess && mounted) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.addressUpdateFailed),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    final addSuccess = await ref
-        .read(buyerAddressesProvider.notifier)
-        .addAddress(newAddress);
+        .updateAddress(newAddress);
 
     setState(() => _isLoading = false);
 
-    if (addSuccess && mounted) {
+    if (updateSuccess && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.addressUpdatedSuccess)),
       );
@@ -152,26 +137,43 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
             children: [
               _buildLabel(context.l10n.addressFullNameLabel),
               const SizedBox(height: 8),
-              _buildTextField(_nameController, context.l10n.addressReceiverNameHint),
+              _buildTextField(
+                _nameController,
+                context.l10n.addressReceiverNameHint,
+              ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressPhoneLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _phoneController,
-                '+91 XXXXX XXXXX',
+                'Enter 10-digit mobile number',
                 keyboardType: TextInputType.phone,
+                prefixIcon: _buildPhonePrefix(),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 116,
+                  minHeight: 48,
+                ),
+                maxLength: 10,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: _phoneValidator,
               ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressFlatLabel),
               const SizedBox(height: 8),
-              _buildTextField(_addressController, context.l10n.addressDetailsHint),
+              _buildTextField(
+                _addressController,
+                context.l10n.addressDetailsHint,
+              ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressLocalityLabel),
               const SizedBox(height: 8),
-              _buildTextField(_localityController, context.l10n.addressLocalityHint),
+              _buildTextField(
+                _localityController,
+                context.l10n.addressLocalityHint,
+              ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressLandmarkLabel),
@@ -206,7 +208,10 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
                       children: [
                         _buildLabel(context.l10n.addressCityLabel),
                         const SizedBox(height: 8),
-                        _buildTextField(_cityController, context.l10n.addressCityHint),
+                        _buildTextField(
+                          _cityController,
+                          context.l10n.addressCityHint,
+                        ),
                       ],
                     ),
                   ),
@@ -230,7 +235,7 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
                   ),
                 ),
                 value: _isPrimary,
-                activeColor: BuyerColors.primaryLight,
+                activeThumbColor: BuyerColors.primaryLight,
                 onChanged: (val) {
                   setState(() => _isPrimary = val);
                 },
@@ -292,13 +297,25 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
     String hint, {
     bool required = true,
     TextInputType keyboardType = TextInputType.text,
+    Widget? prefixIcon,
+    BoxConstraints? prefixIconConstraints,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      maxLength: maxLength,
+      inputFormatters: inputFormatters,
       style: GoogleFonts.inter(fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
+        counterText: '',
+        prefixIcon: prefixIcon,
+        prefixIconConstraints:
+            prefixIconConstraints ??
+            const BoxConstraints(minWidth: 52, minHeight: 48),
         hintStyle: GoogleFonts.inter(
           fontSize: 15,
           color: CommonColors.greyText,
@@ -322,12 +339,54 @@ class _EditAddressScreenState extends ConsumerState<EditAddressScreen> {
           borderSide: BorderSide(color: BuyerColors.primaryLight),
         ),
       ),
-      validator: (value) {
-        if (required && (value == null || value.isEmpty)) {
-          return context.l10n.commonFieldRequired;
-        }
-        return null;
-      },
+      validator:
+          validator ??
+          (value) {
+            if (required && (value == null || value.isEmpty)) {
+              return context.l10n.commonFieldRequired;
+            }
+            return null;
+          },
+    );
+  }
+
+  String _localPhoneNumber(String phoneNumber) {
+    final digits = phoneNumber.replaceAll(RegExp(r'\D'), '');
+    if (digits.length == 12 && digits.startsWith('91')) {
+      return digits.substring(2);
+    }
+    return digits;
+  }
+
+  String? _phoneValidator(String? value) {
+    final phone = value?.trim() ?? '';
+    if (phone.isEmpty) return context.l10n.commonFieldRequired;
+    if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
+      return 'Enter a valid 10-digit mobile number';
+    }
+    return null;
+  }
+
+  Widget _buildPhonePrefix() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 14, right: 10),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('🇮🇳', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 6),
+          Text(
+            '+91',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: CommonColors.black,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Container(width: 1, height: 24, color: CommonColors.borderColor),
+        ],
+      ),
     );
   }
 }

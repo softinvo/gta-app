@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/buyer/profile/controller/profile_controller.dart';
@@ -47,18 +48,18 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     setState(() => _isLoading = true);
 
     final address = Address(
-      name: _nameController.text,
-      phoneNumber: _phoneController.text,
-      address: _addressController.text,
-      locality: _localityController.text,
-      landmark: _landmarkController.text,
-      pincode: _pincodeController.text,
-      city: _cityController.text,
-      state: _stateController.text,
+      name: _nameController.text.trim(),
+      phoneNumber: '+91${_phoneController.text.trim()}',
+      address: _addressController.text.trim(),
+      locality: _localityController.text.trim(),
+      landmark: _landmarkController.text.trim(),
+      pincode: _pincodeController.text.trim(),
+      city: _cityController.text.trim(),
+      state: _stateController.text.trim(),
       country: 'India',
       isPrimary: _isPrimary,
       formattedAddress:
-          '${_addressController.text}, ${_localityController.text}, ${_cityController.text}, ${_stateController.text} - ${_pincodeController.text}',
+          '${_addressController.text.trim()}, ${_localityController.text.trim()}, ${_cityController.text.trim()}, ${_stateController.text.trim()} - ${_pincodeController.text.trim()}',
       geolocation: GeoLocation(coordinates: [0, 0]),
     );
 
@@ -113,26 +114,50 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
             children: [
               _buildLabel(context.l10n.addressFullNameLabel),
               const SizedBox(height: 8),
-              _buildTextField(_nameController, context.l10n.addressReceiverNameHint),
+              _buildTextField(
+                _nameController,
+                context.l10n.addressReceiverNameHint,
+                icon: Icons.person_outline_rounded,
+                textCapitalization: TextCapitalization.words,
+              ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressPhoneLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 _phoneController,
-                '+91 XXXXX XXXXX',
+                'Enter 10-digit mobile number',
                 keyboardType: TextInputType.phone,
+                prefixIcon: _buildPhonePrefix(),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 116,
+                  minHeight: 48,
+                ),
+                maxLength: 10,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: _phoneValidator,
               ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressFlatLabel),
               const SizedBox(height: 8),
-              _buildTextField(_addressController, context.l10n.addressDetailsHint),
+              _buildTextField(
+                _addressController,
+                context.l10n.addressDetailsHint,
+                icon: Icons.home_outlined,
+                maxLines: 2,
+                textCapitalization: TextCapitalization.sentences,
+              ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressLocalityLabel),
               const SizedBox(height: 8),
-              _buildTextField(_localityController, context.l10n.addressLocalityHint),
+              _buildTextField(
+                _localityController,
+                context.l10n.addressLocalityHint,
+                icon: Icons.location_city_outlined,
+                textCapitalization: TextCapitalization.words,
+              ),
 
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressLandmarkLabel),
@@ -141,6 +166,8 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                 _landmarkController,
                 context.l10n.addressLandmarkHint,
                 required: false,
+                icon: Icons.place_outlined,
+                textCapitalization: TextCapitalization.words,
               ),
 
               const SizedBox(height: 20),
@@ -155,7 +182,13 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         _buildTextField(
                           _pincodeController,
                           'XXXXXX',
+                          icon: Icons.pin_drop_outlined,
                           keyboardType: TextInputType.number,
+                          maxLength: 6,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: _pincodeValidator,
                         ),
                       ],
                     ),
@@ -167,7 +200,12 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                       children: [
                         _buildLabel(context.l10n.addressCityLabel),
                         const SizedBox(height: 8),
-                        _buildTextField(_cityController, context.l10n.addressCityHint),
+                        _buildTextField(
+                          _cityController,
+                          context.l10n.addressCityHint,
+                          icon: Icons.location_city_outlined,
+                          textCapitalization: TextCapitalization.words,
+                        ),
                       ],
                     ),
                   ),
@@ -177,7 +215,12 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
               const SizedBox(height: 20),
               _buildLabel(context.l10n.addressStateLabel),
               const SizedBox(height: 8),
-              _buildTextField(_stateController, context.l10n.addressStateHint),
+              _buildTextField(
+                _stateController,
+                context.l10n.addressStateHint,
+                icon: Icons.map_outlined,
+                textCapitalization: TextCapitalization.words,
+              ),
 
               const SizedBox(height: 20),
               SwitchListTile(
@@ -191,7 +234,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                   ),
                 ),
                 value: _isPrimary,
-                activeColor: BuyerColors.primaryLight,
+                activeThumbColor: BuyerColors.primaryLight,
                 onChanged: (val) {
                   setState(() => _isPrimary = val);
                 },
@@ -253,13 +296,41 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     String hint, {
     bool required = true,
     TextInputType keyboardType = TextInputType.text,
+    IconData? icon,
+    int maxLines = 1,
+    int? maxLength,
+    String? prefixText,
+    Widget? prefixIcon,
+    BoxConstraints? prefixIconConstraints,
+    List<TextInputFormatter>? inputFormatters,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      inputFormatters: inputFormatters,
+      textCapitalization: textCapitalization,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       style: GoogleFonts.inter(fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
+        prefixText: prefixText,
+        prefixStyle: GoogleFonts.inter(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: CommonColors.black,
+        ),
+        prefixIcon:
+            prefixIcon ??
+            (icon == null
+                ? null
+                : Icon(icon, size: 20, color: BuyerColors.primaryLight)),
+        prefixIconConstraints:
+            prefixIconConstraints ??
+            const BoxConstraints(minWidth: 52, minHeight: 48),
         hintStyle: GoogleFonts.inter(
           fontSize: 15,
           color: CommonColors.greyText,
@@ -270,6 +341,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
         ),
         filled: true,
         fillColor: Colors.white,
+        counterText: '',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade200),
@@ -283,12 +355,53 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           borderSide: BorderSide(color: BuyerColors.primaryLight),
         ),
       ),
-      validator: (value) {
-        if (required && (value == null || value.isEmpty)) {
+      validator: validator ?? (value) {
+        if (required && (value == null || value.trim().isEmpty)) {
           return context.l10n.commonFieldRequired;
         }
         return null;
       },
     );
+  }
+
+  String? _phoneValidator(String? value) {
+    final phone = value?.trim() ?? '';
+    if (phone.isEmpty) return context.l10n.commonFieldRequired;
+    if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
+      return 'Enter a valid 10-digit mobile number';
+    }
+    return null;
+  }
+
+  Widget _buildPhonePrefix() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 14, right: 10),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('🇮🇳', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 6),
+          Text(
+            '+91',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: CommonColors.black,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Container(width: 1, height: 24, color: CommonColors.borderColor),
+        ],
+      ),
+    );
+  }
+
+  String? _pincodeValidator(String? value) {
+    final pincode = value?.trim() ?? '';
+    if (pincode.isEmpty) return context.l10n.commonFieldRequired;
+    if (!RegExp(r'^\d{6}$').hasMatch(pincode)) {
+      return 'Enter a valid 6-digit PIN code';
+    }
+    return null;
   }
 }

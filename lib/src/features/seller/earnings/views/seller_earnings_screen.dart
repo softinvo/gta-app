@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
 import 'package:gta_app/src/features/seller/orders/controller/seller_order_controller.dart';
+import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 
 class SellerEarningsScreen extends ConsumerStatefulWidget {
@@ -52,7 +53,7 @@ class _SellerEarningsScreenState extends ConsumerState<SellerEarningsScreen> {
       ),
       body: RefreshIndicator(
         color: SellerColors.primaryLight,
-        onRefresh: () async => ref.invalidate(sellerOrderStatsProvider(_range)),
+        onRefresh: () => ref.refresh(sellerOrderStatsProvider(_range).future),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -185,7 +186,6 @@ class _EarningsContent extends StatelessWidget {
         (earnings['avgPaidOrderValue'] as num?)?.toDouble() ?? 0;
     final totalRevenue = (revenue['total'] as num?)?.toDouble() ?? 0;
     final avgOrderValue = (revenue['avgOrderValue'] as num?)?.toDouble() ?? 0;
-    final totalOrders = stats['totalOrders'] as int? ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +193,7 @@ class _EarningsContent extends StatelessWidget {
         // ── Hero earned card ─────────────────────────────────────
         _HeroEarningsCard(
           totalEarned: totalPaid,
-          totalOrders: totalOrders,
+          paidOrders: paidCount,
           avgOrderValue: avgOrderValue,
           fmtFull: fmtFull,
           fmt: fmt,
@@ -364,7 +364,345 @@ class _EarningsContent extends StatelessWidget {
             ),
           ],
         ),
+
       ],
+    );
+  }
+}
+
+// ─── Transactions ────────────────────────────────────────────────────────────
+
+class SellerTransactionsScreen extends ConsumerStatefulWidget {
+  const SellerTransactionsScreen({super.key});
+
+  static const routePath = '/seller/transactions';
+
+  @override
+  ConsumerState<SellerTransactionsScreen> createState() =>
+      _SellerTransactionsScreenState();
+}
+
+class _SellerTransactionsScreenState
+    extends ConsumerState<SellerTransactionsScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_loadMoreWhenNeeded);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchTransactions());
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_loadMoreWhenNeeded)
+      ..dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchTransactions({bool refresh = false}) {
+    return ref
+        .read(sellerOrdersProvider.notifier)
+        .fetchOrders(refresh: refresh);
+  }
+
+  void _loadMoreWhenNeeded() {
+    if (!_scrollController.hasClients ||
+        _scrollController.position.pixels <
+            _scrollController.position.maxScrollExtent * 0.9) {
+      return;
+    }
+    ref.read(sellerOrdersProvider.notifier).loadMore();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final transactionState = ref.watch(sellerOrdersProvider);
+
+    return Scaffold(
+      backgroundColor: SellerColors.background,
+      appBar: const SellerAppBar(
+        title: 'Transactions',
+        showLogo: false,
+        centerTitle: true,
+      ),
+      body: RefreshIndicator(
+        color: SellerColors.primaryLight,
+        onRefresh: () => _fetchTransactions(refresh: true),
+        child: ListView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          children: [
+            if (transactionState.isLoading && transactionState.orders.isEmpty)
+              const _TransactionsLoadingCard()
+            else if (transactionState.error != null &&
+                transactionState.orders.isEmpty)
+              const _TransactionsErrorCard()
+            else if (transactionState.orders.isEmpty)
+              const _TransactionsEmptyCard()
+            else
+              _TransactionList(
+                transactions: transactionState.orders,
+                isLoadingMore: transactionState.isLoadingMore,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TransactionList extends StatelessWidget {
+  final List<Order> transactions;
+  final bool isLoadingMore;
+
+  const _TransactionList({
+    required this.transactions,
+    required this.isLoadingMore,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: CommonColors.borderColor),
+          ),
+          child: Column(
+            children: [
+              for (var i = 0; i < transactions.length; i++) ...[
+                _TransactionTile(order: transactions[i]),
+                if (i < transactions.length - 1)
+                  Divider(
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                    color: Colors.grey.shade100,
+                  ),
+              ],
+            ],
+          ),
+        ),
+        if (isLoadingMore)
+          const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: CircularProgressIndicator(color: SellerColors.primaryLight),
+          ),
+      ],
+    );
+  }
+}
+
+class _TransactionTile extends StatelessWidget {
+  final Order order;
+
+  const _TransactionTile({required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    final status = order.payment.status.toLowerCase();
+    final color = _paymentColor(status);
+    final amount = order.payment.amountPaid != null && order.payment.amountPaid! > 0
+        ? order.payment.amountPaid!
+        : order.totalPayableAmount;
+    final date = order.payment.paidAt ?? order.createdAt;
+    final productName = order.productSnapshot?.name;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(_paymentIcon(status), color: color, size: 21),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  order.orderNumber.isNotEmpty
+                      ? 'Order #${order.orderNumber}'
+                      : 'Order transaction',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: CommonColors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  [
+                    if (productName?.isNotEmpty == true) productName!,
+                    DateFormat('dd MMM yyyy, hh:mm a').format(date.toLocal()),
+                  ].join(' • '),
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: CommonColors.greyText,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '₹${NumberFormat('#,##0').format(amount)}',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: CommonColors.black,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _paymentLabel(status),
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Color _paymentColor(String status) {
+    switch (status) {
+      case 'paid':
+        return const Color(0xFF27AE60);
+      case 'pending':
+        return const Color(0xFFF57F17);
+      case 'refunded':
+        return const Color(0xFF8E24AA);
+      case 'failed':
+        return CommonColors.error;
+      default:
+        return CommonColors.greyText;
+    }
+  }
+
+  static IconData _paymentIcon(String status) {
+    switch (status) {
+      case 'paid':
+        return Icons.arrow_downward_rounded;
+      case 'refunded':
+        return Icons.replay_rounded;
+      case 'failed':
+        return Icons.cancel_outlined;
+      default:
+        return Icons.schedule_rounded;
+    }
+  }
+
+  static String _paymentLabel(String status) {
+    if (status.isEmpty) return 'Unknown';
+    return '${status[0].toUpperCase()}${status.substring(1)}';
+  }
+}
+
+class _TransactionsLoadingCard extends StatelessWidget {
+  const _TransactionsLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 94,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class _TransactionsEmptyCard extends StatelessWidget {
+  const _TransactionsEmptyCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _TransactionMessageCard(
+      icon: Icons.receipt_long_outlined,
+      title: 'No transactions yet',
+      subtitle: 'Transactions from new orders will appear here.',
+    );
+  }
+}
+
+class _TransactionsErrorCard extends StatelessWidget {
+  const _TransactionsErrorCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _TransactionMessageCard(
+      icon: Icons.receipt_long_outlined,
+      title: 'Could not load transactions',
+      subtitle: 'Use View All to check your order history.',
+    );
+  }
+}
+
+class _TransactionMessageCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _TransactionMessageCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CommonColors.borderColor),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: CommonColors.greyText, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: CommonColors.black,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(fontSize: 11, color: CommonColors.greyText),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -373,14 +711,14 @@ class _EarningsContent extends StatelessWidget {
 
 class _HeroEarningsCard extends StatelessWidget {
   final double totalEarned;
-  final int totalOrders;
+  final int paidOrders;
   final double avgOrderValue;
   final String Function(double) fmtFull;
   final String Function(double) fmt;
 
   const _HeroEarningsCard({
     required this.totalEarned,
-    required this.totalOrders,
+    required this.paidOrders,
     required this.avgOrderValue,
     required this.fmtFull,
     required this.fmt,
@@ -518,7 +856,7 @@ class _HeroEarningsCard extends StatelessWidget {
                         child: _HeroMetric(
                           icon: Icons.shopping_bag_outlined,
                           label: 'Paid orders',
-                          value: '$totalOrders',
+                          value: '$paidOrders',
                         ),
                       ),
                       Container(

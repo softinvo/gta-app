@@ -4,6 +4,7 @@ import 'package:gta_app/src/features/common_features/chatbot/views/chatbot_scree
 import 'package:gta_app/src/features/buyer/complaint/views/complaints_list_screen.dart';
 import 'package:gta_app/src/features/buyer/complaint/views/create_complaint_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/customer_support.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class BuyerHelpFaqScreen extends StatelessWidget {
@@ -126,31 +127,6 @@ class BuyerHelpFaqScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 32),
-
-          _buildSectionTitle(context.l10n.helpFaqSectionTitle),
-          const SizedBox(height: 16),
-          _buildFaqItem(
-            context.l10n.helpFaq1Q,
-            context.l10n.helpFaq1A,
-          ),
-          _buildFaqItem(
-            context.l10n.helpFaq2Q,
-            context.l10n.helpFaq2A,
-          ),
-          _buildFaqItem(
-            context.l10n.helpFaq3Q,
-            context.l10n.helpFaq3A,
-          ),
-          _buildFaqItem(
-            context.l10n.helpFaq4Q,
-            context.l10n.helpFaq4A,
-          ),
-          _buildFaqItem(
-            context.l10n.helpFaq5Q,
-            context.l10n.helpFaq5A,
-          ),
-          const SizedBox(height: 24),
-
           _buildContactCard(context),
         ],
       ),
@@ -170,10 +146,12 @@ class BuyerHelpFaqScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: BuyerColors.primaryLight.withOpacity(0.1)),
+          border: Border.all(
+            color: BuyerColors.primaryLight.withValues(alpha: 0.1),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -184,7 +162,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: BuyerColors.primaryLight.withOpacity(0.1),
+                color: BuyerColors.primaryLight.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -218,7 +196,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: CommonColors.greyText.withOpacity(0.5),
+              color: CommonColors.greyText.withValues(alpha: 0.5),
               size: 16,
             ),
           ],
@@ -244,7 +222,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: BuyerColors.primaryLight.withOpacity(0.3),
+              color: BuyerColors.primaryLight.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -255,7 +233,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.history, color: Colors.white, size: 24),
@@ -277,7 +255,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
                     context.l10n.helpMyComplaintsSubtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -325,7 +303,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -336,7 +314,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 24),
@@ -356,49 +334,15 @@ class BuyerHelpFaqScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFaqItem(String question, String answer) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
-      ),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        title: Text(
-          question,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: CommonColors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        iconColor: BuyerColors.primaryLight,
-        collapsedIconColor: CommonColors.greyText,
-        children: [
-          Text(
-            answer,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: CommonColors.greyText,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildContactCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BuyerColors.primaryLight.withOpacity(0.2)),
+        border: Border.all(
+          color: BuyerColors.primaryLight.withValues(alpha: 0.2),
+        ),
       ),
       child: Column(
         children: [
@@ -425,7 +369,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _openSupportEmail(context),
                   icon: const Icon(Icons.email_outlined, size: 18),
                   label: Text(
                     context.l10n.commonEmail,
@@ -444,7 +388,7 @@ class BuyerHelpFaqScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _callSupport(context),
                   icon: const Icon(Icons.call_outlined, size: 18),
                   label: Text(
                     context.l10n.commonCall,
@@ -466,5 +410,25 @@ class BuyerHelpFaqScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openSupportEmail(BuildContext context) async {
+    final opened = await CustomerSupport.sendEmail();
+    if (!opened && context.mounted) {
+      _showContactError(context, 'Could not open an email app.');
+    }
+  }
+
+  Future<void> _callSupport(BuildContext context) async {
+    final opened = await CustomerSupport.call();
+    if (!opened && context.mounted) {
+      _showContactError(context, 'Could not open the phone dialer.');
+    }
+  }
+
+  void _showContactError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }

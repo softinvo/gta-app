@@ -86,6 +86,7 @@ class BuyerProfileController extends Notifier<AsyncValue<Buyer?>> {
 
 class BuyerAddressesController extends Notifier<AsyncValue<List<Address>>> {
   Future<List<Address>>? _addressesRequest;
+  String? lastActionError;
 
   @override
   AsyncValue<List<Address>> build() {
@@ -133,16 +134,47 @@ class BuyerAddressesController extends Notifier<AsyncValue<List<Address>>> {
     });
   }
 
+  /// Update an address in place so it retains the same ID.
+  Future<bool> updateAddress(Address address) async {
+    final result = await _repo.updateAddress(address);
+    return result.fold(
+      (failure) {
+        lastActionError = failure.message;
+        return false;
+      },
+      (updatedAddress) {
+        lastActionError = null;
+        final currentAddresses = state.asData?.value ?? [];
+        state = AsyncValue.data(
+          currentAddresses
+              .map(
+                (address) =>
+                    address.id == updatedAddress.id ? updatedAddress : address,
+              )
+              .toList(),
+        );
+        return true;
+      },
+    );
+  }
+
   /// Remove address
   Future<bool> removeAddress(String addressId) async {
     final result = await _repo.removeAddress(addressId);
-    return result.fold((failure) => false, (success) {
-      final currentAddresses = state.asData?.value ?? [];
-      state = AsyncValue.data(
-        currentAddresses.where((a) => a.id != addressId).toList(),
-      );
-      return true;
-    });
+    return result.fold(
+      (failure) {
+        lastActionError = failure.message;
+        return false;
+      },
+      (success) {
+        lastActionError = null;
+        final currentAddresses = state.asData?.value ?? [];
+        state = AsyncValue.data(
+          currentAddresses.where((a) => a.id != addressId).toList(),
+        );
+        return true;
+      },
+    );
   }
 
   /// Mark address as primary

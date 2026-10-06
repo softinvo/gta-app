@@ -23,6 +23,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
+  late TextEditingController _phoneController;
   late TextEditingController _emailController;
   String _gender = 'Other';
   bool _isLoading = false;
@@ -33,6 +34,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     _firstNameController = TextEditingController();
     _lastNameController = TextEditingController();
+    _phoneController = TextEditingController();
     _emailController = TextEditingController();
 
     // Call getProfile explicitly in initState
@@ -49,6 +51,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void _populateFields(Buyer buyer) {
     _firstNameController.text = buyer.firstName ?? '';
     _lastNameController.text = buyer.lastName ?? '';
+    _phoneController.text = buyer.phone ?? '';
     _emailController.text = buyer.email ?? '';
     _gender = buyer.gender?.value ?? 'Other';
     if (mounted) setState(() {});
@@ -58,6 +61,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _phoneController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -85,12 +89,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildUploadOption(Icons.camera_alt, context.l10n.commonCamera, () {
-                  Navigator.pop(context, ImageSource.camera);
-                }),
-                _buildUploadOption(Icons.photo_library, context.l10n.commonGallery, () {
-                  Navigator.pop(context, ImageSource.gallery);
-                }),
+                _buildUploadOption(
+                  Icons.camera_alt,
+                  context.l10n.commonCamera,
+                  () {
+                    Navigator.pop(context, ImageSource.camera);
+                  },
+                ),
+                _buildUploadOption(
+                  Icons.photo_library,
+                  context.l10n.commonGallery,
+                  () {
+                    Navigator.pop(context, ImageSource.gallery);
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -128,9 +140,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
             if (mounted) {
               if (success) {
-                SnackBarService.showSuccess(context, context.l10n.editProfilePictureUpdated);
+                SnackBarService.showSuccess(
+                  context,
+                  context.l10n.editProfilePictureUpdated,
+                );
               } else {
-                SnackBarService.showError(context, context.l10n.editProfileUpdateFailed);
+                SnackBarService.showError(
+                  context,
+                  context.l10n.editProfileUpdateFailed,
+                );
               }
             }
           },
@@ -204,7 +222,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               .when(
                 data: (buyer) {
                   if (buyer == null) {
-                    return Center(child: Text(context.l10n.editProfileDataNotFound));
+                    return Center(
+                      child: Text(context.l10n.editProfileDataNotFound),
+                    );
                   }
                   return _buildBody(buyer);
                 },
@@ -314,12 +334,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             // Form Fields
             _buildLabel(context.l10n.editProfileFirstNameLabel),
             const SizedBox(height: 8),
-            _buildTextField(_firstNameController, context.l10n.editProfileFirstNameHint),
+            _buildTextField(
+              _firstNameController,
+              context.l10n.editProfileFirstNameHint,
+            ),
 
             const SizedBox(height: 20),
             _buildLabel(context.l10n.editProfileLastNameLabel),
             const SizedBox(height: 8),
-            _buildTextField(_lastNameController, context.l10n.editProfileLastNameHint),
+            _buildTextField(
+              _lastNameController,
+              context.l10n.editProfileLastNameHint,
+            ),
+
+            const SizedBox(height: 20),
+            _buildLabel(context.l10n.addressPhoneLabel),
+            const SizedBox(height: 8),
+            _buildTextField(
+              _phoneController,
+              'Phone number',
+              keyboardType: TextInputType.phone,
+              enabled: false,
+            ),
 
             const SizedBox(height: 20),
             _buildLabel(context.l10n.editProfileEmailLabel),
@@ -418,10 +454,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     TextEditingController controller,
     String hint, {
     TextInputType keyboardType = TextInputType.text,
+    bool enabled = true,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      enabled: enabled,
       style: GoogleFonts.inter(fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
@@ -434,12 +472,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           vertical: 16,
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: enabled ? Colors.white : BuyerColors.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade200),
         ),
         enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade200),
+        ),
+        disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade200),
         ),
@@ -471,13 +513,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           isExpanded: true,
           icon: Icon(Icons.keyboard_arrow_down, color: CommonColors.greyText),
           style: GoogleFonts.inter(fontSize: 15, color: CommonColors.black),
-          items: {
-            'Male': context.l10n.genderMale,
-            'Female': context.l10n.genderFemale,
-            'Other': context.l10n.genderOther,
-          }.entries.map((e) {
-            return DropdownMenuItem<String>(value: e.key, child: Text(e.value));
-          }).toList(),
+          items:
+              {
+                'Male': context.l10n.genderMale,
+                'Female': context.l10n.genderFemale,
+                'Other': context.l10n.genderOther,
+              }.entries.map((e) {
+                return DropdownMenuItem<String>(
+                  value: e.key,
+                  child: Text(e.value),
+                );
+              }).toList(),
           onChanged: (newValue) {
             setState(() {
               _gender = newValue!;

@@ -169,6 +169,14 @@ class SellerProfileTab extends ConsumerWidget {
                           onTap: () =>
                               context.push(SellerEarningsScreen.routePath),
                         ),
+                        _MenuItem(
+                          icon: Icons.receipt_long_rounded,
+                          iconColor: const Color(0xFF5C6BC0),
+                          iconBg: const Color(0xFFE8EAF6),
+                          title: 'Transactions',
+                          onTap: () =>
+                              context.push(SellerTransactionsScreen.routePath),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),

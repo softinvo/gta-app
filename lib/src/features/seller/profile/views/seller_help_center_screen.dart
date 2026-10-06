@@ -4,6 +4,7 @@ import 'package:gta_app/src/features/common_features/chatbot/views/chatbot_scree
 import 'package:gta_app/src/features/seller/complaint/views/seller_complaints_list_screen.dart';
 import 'package:gta_app/src/features/seller/complaint/views/seller_create_complaint_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/customer_support.dart';
 
 class SellerHelpCenterScreen extends StatelessWidget {
   const SellerHelpCenterScreen({super.key});
@@ -414,7 +415,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _openSupportEmail(context),
                   icon: const Icon(Icons.email_outlined, size: 18),
                   label: Text(
                     'Email',
@@ -433,7 +434,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => _callSupport(context),
                   icon: const Icon(Icons.call_outlined, size: 18),
                   label: Text(
                     'Call',
@@ -455,5 +456,25 @@ class SellerHelpCenterScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openSupportEmail(BuildContext context) async {
+    final opened = await CustomerSupport.sendEmail();
+    if (!opened && context.mounted) {
+      _showContactError(context, 'Could not open an email app.');
+    }
+  }
+
+  Future<void> _callSupport(BuildContext context) async {
+    final opened = await CustomerSupport.call();
+    if (!opened && context.mounted) {
+      _showContactError(context, 'Could not open the phone dialer.');
+    }
+  }
+
+  void _showContactError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }

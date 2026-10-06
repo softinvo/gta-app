@@ -88,7 +88,7 @@ class _SellerOnboardingScreenState
           title: _stepLabels[_currentPage],
           showLogo: false,
           centerTitle: true,
-          leading: BackButton(onPressed: _goPrev),
+          leading: SellerBackButton(onPressed: _goPrev),
           automaticallyImplyLeading: false,
         ),
         body: Column(

@@ -24,6 +24,8 @@ class Endpoints {
   static const String updateBuyerProfile = "${baseUrl}buyer/profile";
   static const String getBuyerAddresses = "${baseUrl}buyer/address";
   static const String addBuyerAddress = "${baseUrl}buyer/address/add";
+  static String updateBuyerAddress(String addressId) =>
+      "${baseUrl}buyer/address/$addressId";
   static String removeBuyerAddress(String addressId) =>
       "${baseUrl}buyer/address/$addressId";
   static String markAddressPrimary(String addressId) =>

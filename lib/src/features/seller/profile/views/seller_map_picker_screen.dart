@@ -3,6 +3,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
 import 'package:gta_app/src/res/colors.dart';
 
 /// Result returned when a location is confirmed on [SellerMapPickerScreen].
@@ -160,6 +161,7 @@ class _SellerMapPickerScreenState extends State<SellerMapPickerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const SellerBackButton(),
         title: Text(
           'Set Business Location',
           style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700),

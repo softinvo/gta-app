@@ -255,12 +255,16 @@ class API {
     if (AppConfig.logHttp) {
       log('REQUEST TO : $url', name: LogLabel.httpDelete);
       log('requireAuth : $requireAuth', name: LogLabel.httpDelete);
-      log('BODY : ${_redactForLog(body)}', name: LogLabel.httpDelete);
+      log(
+        'BODY : ${body == null ? '<none>' : _redactForLog(body)}',
+        name: LogLabel.httpDelete,
+      );
     }
     try {
       final response = await delete(
         Uri.parse(url),
-        body: jsonEncode(body),
+        // Do not send the JSON literal `null` when this DELETE has no body.
+        body: body == null ? null : jsonEncode(body),
         headers: requestHeaders,
       );
       if (AppConfig.logHttp) {

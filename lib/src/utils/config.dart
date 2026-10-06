@@ -1,5 +1,5 @@
 class AppConfig {
-  static const devMode = false;
+  static const devMode = true;
   static const isLoggedIn = false;
   static const logHttp = true;
 }

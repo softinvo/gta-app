@@ -665,24 +665,12 @@ class _FormField extends StatelessWidget {
               fontSize: 14,
               color: SellerColors.accentLight,
             ),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: enabled
-                      ? SellerColors.fieldIconBg
-                      : SellerColors.fieldDisabledFill,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  size: 14,
-                  color: enabled
-                      ? SellerColors.primaryLight
-                      : SellerColors.accentLight,
-                ),
-              ),
+            prefixIcon: Icon(
+              icon,
+              size: 20,
+              color: enabled
+                  ? SellerColors.primaryLight
+                  : SellerColors.accentLight,
             ),
             prefixIconConstraints:
                 const BoxConstraints(minWidth: 52, minHeight: 48),
@@ -735,4 +723,3 @@ class _FormField extends StatelessWidget {
     );
   }
 }
-

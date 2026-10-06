@@ -128,7 +128,7 @@ class SellerComplaintsListScreen extends ConsumerWidget {
   Widget _buildComplaintCard(BuildContext context, dynamic complaint) {
     final statusColor = _getStatusColor(complaint.status);
     final formattedDate = DateFormat(
-      'MMM dd, yyyy',
+      'MMM dd, yyyy, hh:mm a',
     ).format(complaint.createdAt);
 
     return Container(

@@ -334,13 +334,25 @@ class _ManageAddressesScreenState extends ConsumerState<ManageAddressesScreen> {
                   );
 
                   if (confirmed == true && mounted) {
-                    final success = await ref
-                        .read(buyerAddressesProvider.notifier)
-                        .removeAddress(address.id!);
+                    final addressId = address.id;
+                    if (addressId == null || addressId.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(context.l10n.addressDeleteFailed)),
+                      );
+                      return;
+                    }
+
+                    final controller = ref.read(
+                      buyerAddressesProvider.notifier,
+                    );
+                    final success = await controller.removeAddress(addressId);
                     if (!success && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(context.l10n.addressDeleteFailed),
+                          content: Text(
+                            controller.lastActionError ??
+                                context.l10n.addressDeleteFailed,
+                          ),
                         ),
                       );
                     }

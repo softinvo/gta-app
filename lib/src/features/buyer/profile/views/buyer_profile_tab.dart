@@ -6,8 +6,8 @@ import 'package:gta_app/src/commons/controller/locale_controller.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_language_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_policies_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/buyer_rate_app_screen.dart';
+import 'package:gta_app/src/features/buyer/profile/views/buyer_faq_screen.dart';
 import 'package:gta_app/src/features/buyer/wishlist/views/buyer_wishlist_screen.dart';
-import 'package:gta_app/src/features/buyer/profile/views/buyer_verification_screen.dart';
 import 'package:gta_app/src/features/buyer/profile/views/widgets/logout_button.dart';
 import 'package:gta_app/src/features/buyer/saved/controller/saved_products_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -113,16 +113,18 @@ class BuyerProfileTab extends ConsumerWidget {
                         onTap: () =>
                             context.push(ManageAddressesScreen.routePath),
                       ),
-                      ProfileMenuItem(
-                        icon: Icons.verified_rounded,
-                        iconColor: const Color(0xFFD97706),
-                        iconBgColor: const Color(0xFFFFFBEB),
-                        title: context.l10n.profileVerificationStatusTitle,
-                        subtitle:
-                            context.l10n.profileVerificationStatusSubtitle,
-                        onTap: () =>
-                            context.push(BuyerVerificationScreen.routePath),
-                      ),
+                      // Buyer verification — re-enable when KYC submission
+                      // and status APIs are connected.
+                      // ProfileMenuItem(
+                      //   icon: Icons.verified_rounded,
+                      //   iconColor: const Color(0xFFD97706),
+                      //   iconBgColor: const Color(0xFFFFFBEB),
+                      //   title: context.l10n.profileVerificationStatusTitle,
+                      //   subtitle:
+                      //       context.l10n.profileVerificationStatusSubtitle,
+                      //   onTap: () =>
+                      //       context.push(BuyerVerificationScreen.routePath),
+                      // ),
                       // Payment methods — re-enable when payment flow is ready
                       // ProfileMenuItem(
                       //   icon: Icons.account_balance_wallet_rounded,
@@ -142,17 +144,17 @@ class BuyerProfileTab extends ConsumerWidget {
                         icon: Icons.help_rounded,
                         iconColor: const Color(0xFF0891B2),
                         iconBgColor: const Color(0xFFECFEFF),
-                        title: context.l10n.profileHelpFaqTitle,
-                        subtitle: context.l10n.profileHelpFaqSubtitle,
+                        title: context.l10n.helpFaqTitle,
+                        subtitle: context.l10n.profileContactSupportSubtitle,
                         onTap: () => context.push(BuyerHelpFaqScreen.routePath),
                       ),
                       ProfileMenuItem(
-                        icon: Icons.headset_mic_rounded,
+                        icon: Icons.quiz_outlined,
                         iconColor: const Color(0xFF4F46E5),
                         iconBgColor: const Color(0xFFEEF2FF),
-                        title: context.l10n.profileContactSupportTitle,
-                        subtitle: context.l10n.profileContactSupportSubtitle,
-                        onTap: () => context.push('/buyer/complaints'),
+                        title: context.l10n.helpFaqSectionTitle,
+                        subtitle: context.l10n.profileHelpFaqSubtitle,
+                        onTap: () => context.push(BuyerFaqScreen.routePath),
                       ),
                       ProfileMenuItem(
                         icon: Icons.star_rounded,
@@ -168,14 +170,6 @@ class BuyerProfileTab extends ConsumerWidget {
                   ProfileMenuSection(
                     title: context.l10n.profileSectionSettings,
                     items: [
-                      ProfileMenuItem(
-                        icon: Icons.notifications_rounded,
-                        iconColor: const Color(0xFFDC2626),
-                        iconBgColor: const Color(0xFFFEF2F2),
-                        title: context.l10n.profileNotificationsTitle,
-                        subtitle: context.l10n.profileNotificationsSubtitle,
-                        onTap: () {},
-                      ),
                       ProfileMenuItem(
                         icon: Icons.language_rounded,
                         iconColor: const Color(0xFF2563EB),
