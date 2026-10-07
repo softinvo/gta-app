@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/chat/views/chat_detail_screen.dart';
@@ -34,13 +35,15 @@ class _SellerQuoteDetailsScreenState
     final sellerId = ref.read(sellerProfileProvider).value?.id;
     if (sellerId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile not loaded. Try again.')),
+        SnackBar(content: Text(context.l10n.sellerProfileNotLoaded)),
       );
       return;
     }
     final buyerName = (quote.buyerSnapshot?.name?.isNotEmpty == true)
         ? quote.buyerSnapshot!.name!
-        : (quote.buyerName.isNotEmpty ? quote.buyerName : 'Buyer');
+        : (quote.buyerName.isNotEmpty
+              ? quote.buyerName
+              : context.l10n.sellerBuyerFallback);
 
     Navigator.push(
       context,
@@ -67,13 +70,15 @@ class _SellerQuoteDetailsScreenState
       data: SellerTheme.theme,
       child: Scaffold(
         backgroundColor: SellerColors.background,
-        appBar: const SellerAppBar(title: 'Quote Details', showLogo: false),
+        appBar: SellerAppBar(
+          title: context.l10n.sellerQuoteDetailsTitle,
+          showLogo: false,
+        ),
         body: quoteAsync.when(
           data: (quote) {
             final canUpdateReviewStatus =
                 !['cancelled', 'completed', 'paid'].contains(quote.status) &&
-                (quote.step == 'submitted' ||
-                    quote.step == 'seller_reviewing');
+                (quote.step == 'submitted' || quote.step == 'seller_reviewing');
             final canUpdateNegotiationStatus =
                 !['cancelled', 'completed', 'paid'].contains(quote.status) &&
                 quote.step == 'negotiation';
@@ -89,7 +94,7 @@ class _SellerQuoteDetailsScreenState
                     const SizedBox(height: 16),
 
                     _VariantSectionCard(
-                      title: 'Requested Variants',
+                      title: context.l10n.quoteSectionRequestedVariants,
                       count: quote.selectedVariants.length,
                       icon: Icons.list_alt_outlined,
                       children: quote.selectedVariants
@@ -103,17 +108,16 @@ class _SellerQuoteDetailsScreenState
 
                     if (quote.finalAgreedVariants.isNotEmpty) ...[
                       _VariantSectionCard(
-                        title: 'Final Agreed Variants',
+                        title: context.l10n.quoteSectionFinalAgreedVariants,
                         count: quote.finalAgreedVariants.length,
                         icon: Icons.check_circle_outline,
                         accentColor: const Color(0xFF27AE60),
                         children: quote.finalAgreedVariants
                             .map(
-                              (variant) =>
-                                  _FinalAgreedItemCard(
-                                    quote: quote,
-                                    variant: variant,
-                                  ),
+                              (variant) => _FinalAgreedItemCard(
+                                quote: quote,
+                                variant: variant,
+                              ),
                             )
                             .toList(),
                       ),
@@ -197,7 +201,7 @@ class _SellerQuoteDetailsScreenState
     if (error == null) {
       ref.invalidate(sellerQuotationDetailsProvider(quoteId));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Quotation moved to negotiation')),
+        SnackBar(content: Text(context.l10n.sellerQuoteMovedNegotiation)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -211,11 +215,11 @@ class _SellerQuoteDetailsScreenState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancel Quotation'),
+        title: Text(context.l10n.quoteCancelDialogTitle),
         content: TextField(
           controller: reasonController,
-          decoration: const InputDecoration(
-            hintText: 'Reason for cancellation',
+          decoration: InputDecoration(
+            hintText: context.l10n.quoteCancelReasonHint,
             border: OutlineInputBorder(),
           ),
           maxLines: 3,
@@ -223,7 +227,7 @@ class _SellerQuoteDetailsScreenState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Wait'),
+            child: Text(context.l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -235,14 +239,16 @@ class _SellerQuoteDetailsScreenState
                 Navigator.pop(context);
                 ref.invalidate(sellerQuotationDetailsProvider(quoteId));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Quotation cancelled')),
+                  SnackBar(
+                    content: Text(context.l10n.sellerQuoteCancelledSuccess),
+                  ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: CommonColors.error,
             ),
-            child: const Text('Confirm Cancel'),
+            child: Text(context.l10n.quoteYesCancelBtn),
           ),
         ],
       ),
@@ -266,7 +272,7 @@ class _SellerQuoteDetailsScreenState
         onSuccess: () {
           ref.invalidate(sellerQuotationDetailsProvider(quote.id));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Quotation finalized successfully')),
+            SnackBar(content: Text(context.l10n.sellerQuoteFinalizedSuccess)),
           );
         },
       ),
@@ -301,9 +307,11 @@ class _UpdateQuotationStatusSheetState
   void initState() {
     super.initState();
     _priceControllers = widget.quote.selectedVariants
-        .map((variant) => TextEditingController(
-              text: variant.quotedPrice.toStringAsFixed(2),
-            ))
+        .map(
+          (variant) => TextEditingController(
+            text: variant.quotedPrice.toStringAsFixed(2),
+          ),
+        )
         .toList();
     for (final controller in _priceControllers) {
       controller.addListener(_onPriceChanged);
@@ -334,7 +342,9 @@ class _UpdateQuotationStatusSheetState
       _error = null;
       for (var i = 0; i < widget.quote.selectedVariants.length; i++) {
         final variant = widget.quote.selectedVariants[i];
-        final price = value ? variant.quotedPrice : _sellerPriceFor(variant).quotedPrice;
+        final price = value
+            ? variant.quotedPrice
+            : _sellerPriceFor(variant).quotedPrice;
         _priceControllers[i].text = price.toStringAsFixed(2);
       }
     });
@@ -355,7 +365,7 @@ class _UpdateQuotationStatusSheetState
       final variant = widget.quote.selectedVariants[i];
       final price = double.tryParse(_priceControllers[i].text.trim());
       if (price == null || price <= 0) {
-        setState(() => _error = 'Enter a valid price for every variant.');
+        setState(() => _error = context.l10n.sellerValidPriceEveryVariant);
         return;
       }
       sellerResponse.add({
@@ -434,7 +444,9 @@ class _UpdateQuotationStatusSheetState
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: SellerColors.primaryLight.withValues(alpha: 0.12),
+                        color: SellerColors.primaryLight.withValues(
+                          alpha: 0.12,
+                        ),
                         borderRadius: BorderRadius.circular(13),
                       ),
                       child: const Icon(
@@ -448,7 +460,7 @@ class _UpdateQuotationStatusSheetState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Confirm negotiated prices',
+                            context.l10n.sellerConfirmNegotiatedPrices,
                             style: GoogleFonts.inter(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
@@ -456,7 +468,10 @@ class _UpdateQuotationStatusSheetState
                             ),
                           ),
                           Text(
-                            '${widget.quote.selectedVariants.length} variants · $totalQuantity units',
+                            context.l10n.quoteOrderSummaryLine(
+                              widget.quote.selectedVariants.length,
+                              totalQuantity,
+                            ),
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: CommonColors.greyText,
@@ -466,7 +481,9 @@ class _UpdateQuotationStatusSheetState
                       ),
                     ),
                     IconButton(
-                      onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.pop(context),
                       icon: const Icon(Icons.close_rounded),
                       color: CommonColors.greyText,
                     ),
@@ -479,7 +496,7 @@ class _UpdateQuotationStatusSheetState
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
                   children: [
                     Text(
-                      'Choose how to proceed',
+                      context.l10n.sellerChooseHowProceed,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -490,23 +507,23 @@ class _UpdateQuotationStatusSheetState
                     _PriceChoice(
                       selected: _acceptBuyerPrices,
                       icon: Icons.handshake_outlined,
-                      title: 'Accept buyer’s quoted price',
-                      subtitle: 'Use the prices submitted by the buyer.',
+                      title: context.l10n.sellerAcceptBuyerPriceTitle,
+                      subtitle: context.l10n.sellerAcceptBuyerPriceSubtitle,
                       onTap: () => _setAcceptBuyerPrices(true),
                     ),
                     const SizedBox(height: 10),
                     _PriceChoice(
                       selected: !_acceptBuyerPrices,
                       icon: Icons.edit_note_rounded,
-                      title: 'Set final quoted price',
-                      subtitle: 'Review or revise the price for each variant.',
+                      title: context.l10n.sellerSetFinalPriceTitle,
+                      subtitle: context.l10n.sellerSetFinalPriceSubtitle,
                       onTap: () => _setAcceptBuyerPrices(false),
                     ),
                     const SizedBox(height: 20),
                     Text(
                       _acceptBuyerPrices
-                          ? 'Buyer’s quoted prices'
-                          : 'Final price per variant',
+                          ? context.l10n.sellerBuyerQuotedPrices
+                          : context.l10n.sellerFinalPricePerVariant,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -518,7 +535,7 @@ class _UpdateQuotationStatusSheetState
                       final variant = widget.quote.selectedVariants[i];
                       final unit = variant.unit?.isNotEmpty == true
                           ? variant.unit!
-                          : 'unit';
+                          : context.l10n.orderUnitFallback;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: _NegotiationPriceField(
@@ -574,7 +591,9 @@ class _UpdateQuotationStatusSheetState
                           )
                         : const Icon(Icons.check_circle_outline),
                     label: Text(
-                      _isSubmitting ? 'Updating…' : 'Confirm agreement',
+                      _isSubmitting
+                          ? context.l10n.sellerUpdating
+                          : context.l10n.sellerConfirmAgreement,
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: SellerColors.primaryLight,
@@ -613,57 +632,57 @@ class _PriceChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(14),
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: selected ? SellerColors.surface : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            color: selected ? SellerColors.surface : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: selected ? SellerColors.primaryLight : Colors.grey.shade200,
-              width: selected ? 1.5 : 1,
+        border: Border.all(
+          color: selected ? SellerColors.primaryLight : Colors.grey.shade200,
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: selected ? SellerColors.primaryLight : CommonColors.greyText,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: CommonColors.black,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: CommonColors.greyText,
+                  ),
+                ),
+              ],
             ),
           ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: selected ? SellerColors.primaryLight : CommonColors.greyText,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: CommonColors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: CommonColors.greyText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                color: selected ? SellerColors.primaryLight : CommonColors.greyText,
-              ),
-            ],
+          Icon(
+            selected ? Icons.radio_button_checked : Icons.radio_button_off,
+            color: selected ? SellerColors.primaryLight : CommonColors.greyText,
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }
 
 class _NegotiationPriceField extends StatelessWidget {
@@ -679,85 +698,92 @@ class _NegotiationPriceField extends StatelessWidget {
     required this.enabled,
   });
 
-  String get _variantLabel {
+  String _variantLabel(BuildContext context) {
     final parts = [
       if (variant.variantColorCode?.isNotEmpty == true)
         GtaColors.nameFromHex(variant.variantColorCode) ??
             variant.variantColorCode!,
-      if (variant.size?.isNotEmpty == true) 'Size ${variant.size}',
+      if (variant.size?.isNotEmpty == true)
+        context.l10n.quoteSizeLabel(variant.size!),
     ];
-    return parts.isEmpty ? 'Variant' : parts.join(' · ');
+    return parts.isEmpty
+        ? context.l10n.sellerVariantFallback
+        : parts.join(' · ');
   }
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF9FAFC),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE8EAF0)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _variantLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: CommonColors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    'Buyer price ₹${variant.quotedPrice.toStringAsFixed(2)} · Qty ${variant.quantity} $unit',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: CommonColors.greyText,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            SizedBox(
-              width: 104,
-              child: TextField(
-                controller: controller,
-                enabled: enabled,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textAlign: TextAlign.end,
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF9FAFC),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: const Color(0xFFE8EAF0)),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _variantLabel(context),
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: CommonColors.black,
                 ),
-                decoration: InputDecoration(
-                  prefixText: '₹ ',
-                  isDense: true,
-                  filled: true,
-                  fillColor: enabled ? Colors.white : const Color(0xFFF0F1F4),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(9),
-                    borderSide: const BorderSide(color: Color(0xFFDDE1EA)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(9),
-                    borderSide: const BorderSide(color: Color(0xFFDDE1EA)),
-                  ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                context.l10n.sellerBuyerPriceSummary(
+                  variant.quotedPrice.toStringAsFixed(2),
+                  variant.quantity,
+                  unit,
+                ),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: CommonColors.greyText,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      );
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 104,
+          child: TextField(
+            controller: controller,
+            enabled: enabled,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.end,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: CommonColors.black,
+            ),
+            decoration: InputDecoration(
+              prefixText: '₹ ',
+              isDense: true,
+              filled: true,
+              fillColor: enabled ? Colors.white : const Color(0xFFF0F1F4),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 9,
+                vertical: 10,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(9),
+                borderSide: const BorderSide(color: Color(0xFFDDE1EA)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(9),
+                borderSide: const BorderSide(color: Color(0xFFDDE1EA)),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _NegotiationPriceBreakdown extends StatelessWidget {
@@ -771,70 +797,70 @@ class _NegotiationPriceBreakdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: SellerColors.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: SellerColors.primaryLight.withValues(alpha: 0.16),
-          ),
-        ),
-        child: Column(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: SellerColors.surface,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(
+        color: SellerColors.primaryLight.withValues(alpha: 0.16),
+      ),
+    ),
+    child: Column(
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.receipt_long_outlined,
-                  size: 17,
-                  color: SellerColors.primaryLight,
-                ),
-                const SizedBox(width: 7),
-                Text(
-                  'Price breakdown',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: SellerColors.primaryLight,
-                  ),
-                ),
-              ],
+            const Icon(
+              Icons.receipt_long_outlined,
+              size: 17,
+              color: SellerColors.primaryLight,
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Items subtotal ($totalQuantity units)',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: CommonColors.greyText,
-                  ),
-                ),
-                Text(
-                  '₹${subtotal.toStringAsFixed(2)}',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: CommonColors.black,
-                  ),
-                ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 9),
-              child: Divider(height: 1),
-            ),
+            const SizedBox(width: 7),
             Text(
-              'Taxes and delivery charges are calculated by the server after confirmation.',
+              context.l10n.orderPriceBreakdownTitle,
               style: GoogleFonts.inter(
-                fontSize: 11,
-                height: 1.4,
-                color: CommonColors.greyText,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: SellerColors.primaryLight,
               ),
             ),
           ],
         ),
-      );
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              context.l10n.sellerItemsSubtotal(totalQuantity),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: CommonColors.greyText,
+              ),
+            ),
+            Text(
+              '₹${subtotal.toStringAsFixed(2)}',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: CommonColors.black,
+              ),
+            ),
+          ],
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 9),
+          child: Divider(height: 1),
+        ),
+        Text(
+          context.l10n.sellerTaxesDeliveryCalculated,
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            height: 1.4,
+            color: CommonColors.greyText,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _VariantSectionCard extends StatelessWidget {

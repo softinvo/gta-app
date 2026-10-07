@@ -144,10 +144,7 @@ class SellerQuotationsController extends Notifier<QuotationListState> {
 
   Future<void> cancel(String quotationId, String reason) async {
     final result = await _repo.cancelQuotation(quotationId, reason);
-    result.fold(
-      (failure) {},
-      (_) async => fetchQuotations(refresh: true),
-    );
+    result.fold((failure) {}, (_) async => fetchQuotations(refresh: true));
   }
 
   /// Returns null on success, otherwise the API error message.
@@ -156,39 +153,34 @@ class SellerQuotationsController extends Notifier<QuotationListState> {
     List<Map<String, dynamic>> data,
   ) async {
     final result = await _repo.finalizeQuotation(quotationId, data);
-    return result.fold(
-      (failure) => failure.message,
-      (_) {
-        fetchQuotations(refresh: true);
-        return null;
-      },
-    );
+    return result.fold((failure) => failure.message, (_) {
+      fetchQuotations(refresh: true);
+      return null;
+    });
   }
 
   /// Returns null when the quote was moved into negotiation.
   Future<String?> startNegotiation(String quotationId) async {
     final result = await _repo.startNegotiation(quotationId);
-    return result.fold(
-      (failure) => failure.message,
-      (_) {
-        fetchQuotations(refresh: true);
-        return null;
-      },
-    );
+    return result.fold((failure) => failure.message, (_) {
+      fetchQuotations(refresh: true);
+      return null;
+    });
   }
 }
 
 // ── Single Quotation Providers ────────────────────────────────────────────────
 
-final sellerQuotationDetailsProvider =
-    FutureProvider.family<Quotation, String>((ref, id) async {
-      final repo = ref.read(sellerQuotationRepositoryProvider);
-      final result = await repo.getQuotationDetails(id);
-      return result.fold(
-        (failure) => throw failure.message,
-        (quotation) => quotation,
-      );
-    });
+final sellerQuotationDetailsProvider = FutureProvider.family<Quotation, String>(
+  (ref, id) async {
+    final repo = ref.read(sellerQuotationRepositoryProvider);
+    final result = await repo.getQuotationDetails(id);
+    return result.fold(
+      (failure) => throw failure.message,
+      (quotation) => quotation,
+    );
+  },
+);
 
 final sellerQuotationStatsProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, range) async {

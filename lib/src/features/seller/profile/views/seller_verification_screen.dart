@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,6 +23,14 @@ class _DocMeta {
   final IconData icon;
   const _DocMeta(this.type, this.icon);
 }
+
+String _documentLabel(BuildContext context, String type) => switch (type) {
+  'PAN Card' => context.l10n.sellerPanCard,
+  'GST Certificate' => context.l10n.sellerGstCertificate,
+  'Business License' => context.l10n.sellerBusinessLicense,
+  'Address Proof' => context.l10n.sellerAddressProof,
+  _ => type,
+};
 
 const _requiredDocs = [
   _DocMeta('PAN Card', Icons.credit_card_rounded),
@@ -75,9 +84,7 @@ class _SellerVerificationScreenState
   @override
   void initState() {
     super.initState();
-    _docStates = {
-      for (final d in _requiredDocs) d.type: _DocFormState(),
-    };
+    _docStates = {for (final d in _requiredDocs) d.type: _DocFormState()};
   }
 
   @override
@@ -152,7 +159,10 @@ class _SellerVerificationScreenState
     setState(() => _isSubmitting = false);
 
     if (error == null) {
-      SnackBarService.showSuccess(context, 'Documents submitted for verification');
+      SnackBarService.showSuccess(
+        context,
+        context.l10n.sellerDocumentsSubmitted,
+      );
     } else {
       SnackBarService.showError(context, error);
     }
@@ -185,18 +195,20 @@ class _SellerVerificationScreenState
     });
 
     final seller = sellerAsync.asData?.value;
-    final status = seller?.verificationStatus ?? VerificationStatus.notSubmitted;
+    final status =
+        seller?.verificationStatus ?? VerificationStatus.notSubmitted;
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Verification',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerVerificationTitle,
         showLogo: false,
         centerTitle: true,
       ),
       body: sellerAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text('${context.l10n.commonErrorPrefix}: $e')),
         data: (_) {
           switch (status) {
             case VerificationStatus.approved:
@@ -270,7 +282,7 @@ class _ApprovedBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Account Verified',
+                  context.l10n.verificationStatusApprovedTitle,
                   style: GoogleFonts.poppins(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -279,7 +291,7 @@ class _ApprovedBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your business is verified on Texax Marketplace.\nYou can now sell and receive payouts.',
+                  context.l10n.verificationStatusApprovedDesc,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
@@ -292,7 +304,7 @@ class _ApprovedBody extends StatelessWidget {
           ),
           const SizedBox(height: 28),
           Text(
-            'Verified Documents',
+            context.l10n.sellerVerifiedDocuments,
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -355,7 +367,7 @@ class _PendingBody extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Documents are under review. You cannot make changes until admin completes the verification.',
+                    context.l10n.verificationStatusPendingDesc,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: const Color(0xFFF57F17),
@@ -369,7 +381,7 @@ class _PendingBody extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Submitted Documents',
+            context.l10n.sellerSubmittedDocuments,
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -428,8 +440,8 @@ class _FormBody extends StatelessWidget {
           ],
           Text(
             status == VerificationStatus.rejected
-                ? 'Update Documents'
-                : 'Required Documents',
+                ? context.l10n.sellerUpdateDocuments
+                : context.l10n.sellerRequiredDocuments,
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -439,8 +451,8 @@ class _FormBody extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             status == VerificationStatus.rejected
-                ? 'Update and resubmit the documents that were rejected'
-                : 'Upload a clear image of each document',
+                ? context.l10n.sellerUpdateRejectedDocuments
+                : context.l10n.sellerUploadClearDocuments,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -490,22 +502,22 @@ class _SubmittedDocCard extends StatelessWidget {
     switch (statusVal) {
       case 'approved':
         statusColor = const Color(0xFF43A047);
-        statusLabel = 'Verified';
+        statusLabel = context.l10n.productVerifiedBadge;
         statusIcon = Icons.check_circle_rounded;
         break;
       case 'pending':
         statusColor = const Color(0xFFF57F17);
-        statusLabel = 'Pending';
+        statusLabel = context.l10n.quoteStatusPending;
         statusIcon = Icons.hourglass_top_rounded;
         break;
       case 'rejected':
         statusColor = CommonColors.error;
-        statusLabel = 'Rejected';
+        statusLabel = context.l10n.sellerStatusRejected;
         statusIcon = Icons.cancel_rounded;
         break;
       default:
         statusColor = CommonColors.greyText;
-        statusLabel = 'Not Uploaded';
+        statusLabel = context.l10n.sellerNotUploaded;
         statusIcon = Icons.upload_file_rounded;
     }
 
@@ -519,8 +531,8 @@ class _SubmittedDocCard extends StatelessWidget {
           color: statusVal == 'approved'
               ? const Color(0xFF43A047).withValues(alpha: 0.2)
               : statusVal == 'rejected'
-                  ? CommonColors.error.withValues(alpha: 0.2)
-                  : Colors.grey.shade100,
+              ? CommonColors.error.withValues(alpha: 0.2)
+              : Colors.grey.shade100,
         ),
         boxShadow: [
           BoxShadow(
@@ -547,7 +559,7 @@ class _SubmittedDocCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  meta.type,
+                  _documentLabel(context, meta.type),
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -643,22 +655,22 @@ class _DocumentFormCard extends StatelessWidget {
     switch (serverStatus) {
       case 'approved':
         statusColor = const Color(0xFF43A047);
-        statusLabel = 'Verified';
+        statusLabel = context.l10n.productVerifiedBadge;
         statusIcon = Icons.check_circle_rounded;
         break;
       case 'pending':
         statusColor = const Color(0xFFF57F17);
-        statusLabel = 'Pending';
+        statusLabel = context.l10n.quoteStatusPending;
         statusIcon = Icons.hourglass_top_rounded;
         break;
       case 'rejected':
         statusColor = CommonColors.error;
-        statusLabel = 'Rejected';
+        statusLabel = context.l10n.sellerStatusRejected;
         statusIcon = Icons.cancel_rounded;
         break;
       default:
         statusColor = CommonColors.greyText;
-        statusLabel = 'Not Uploaded';
+        statusLabel = context.l10n.sellerNotUploaded;
         statusIcon = Icons.upload_file_rounded;
     }
 
@@ -675,8 +687,8 @@ class _DocumentFormCard extends StatelessWidget {
           color: serverStatus == 'approved'
               ? const Color(0xFF43A047).withValues(alpha: 0.25)
               : serverStatus == 'rejected'
-                  ? CommonColors.error.withValues(alpha: 0.25)
-                  : Colors.grey.shade100,
+              ? CommonColors.error.withValues(alpha: 0.25)
+              : Colors.grey.shade100,
         ),
         boxShadow: [
           BoxShadow(
@@ -707,7 +719,7 @@ class _DocumentFormCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  meta.type,
+                  _documentLabel(context, meta.type),
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -716,8 +728,7 @@ class _DocumentFormCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -748,7 +759,7 @@ class _DocumentFormCard extends StatelessWidget {
               color: const Color(0xFF1C1C1E),
             ),
             decoration: InputDecoration(
-              hintText: 'Document number',
+              hintText: context.l10n.sellerDocumentNumber,
               hintStyle: GoogleFonts.inter(
                 fontSize: 13,
                 color: CommonColors.greyText,
@@ -834,10 +845,7 @@ class _Thumbnail extends StatelessWidget {
       child = _fallback();
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: child,
-    );
+    return ClipRRect(borderRadius: BorderRadius.circular(10), child: child);
   }
 
   Widget _fallback() {
@@ -871,8 +879,9 @@ class _UploadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent =
-        hasExisting ? CommonColors.greyText : SellerColors.primaryLight;
+    final accent = hasExisting
+        ? CommonColors.greyText
+        : SellerColors.primaryLight;
     final bg = hasExisting
         ? Colors.grey.shade50
         : SellerColors.primaryLight.withValues(alpha: 0.08);
@@ -903,15 +912,15 @@ class _UploadButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    hasExisting
-                        ? Icons.refresh_rounded
-                        : Icons.upload_rounded,
+                    hasExisting ? Icons.refresh_rounded : Icons.upload_rounded,
                     size: 18,
                     color: accent,
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    hasExisting ? 'Replace Image' : 'Upload Image',
+                    hasExisting
+                        ? context.l10n.sellerReplaceImage
+                        : context.l10n.sellerUploadImage,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -956,7 +965,9 @@ class _PickerSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Upload $docType',
+            context.l10n.sellerUploadDocumentName(
+              _documentLabel(context, docType),
+            ),
             style: GoogleFonts.poppins(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -965,7 +976,7 @@ class _PickerSheet extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Choose image source',
+            context.l10n.sellerChooseImageSource,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -977,7 +988,7 @@ class _PickerSheet extends StatelessWidget {
               Expanded(
                 child: _PickerOption(
                   icon: Icons.camera_alt_rounded,
-                  label: 'Camera',
+                  label: context.l10n.commonCamera,
                   onTap: () => onSource(ImageSource.camera),
                 ),
               ),
@@ -985,7 +996,7 @@ class _PickerSheet extends StatelessWidget {
               Expanded(
                 child: _PickerOption(
                   icon: Icons.photo_library_rounded,
-                  label: 'Gallery',
+                  label: context.l10n.commonGallery,
                   onTap: () => onSource(ImageSource.gallery),
                 ),
               ),
@@ -1079,7 +1090,7 @@ class _SubmitButton extends StatelessWidget {
                 ),
               )
             : Text(
-                'Submit for Verification',
+                context.l10n.sellerSubmitVerification,
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -1109,23 +1120,20 @@ class _StatusCard extends StatelessWidget {
       case VerificationStatus.pending:
         color = const Color(0xFFF57F17);
         icon = Icons.hourglass_top_rounded;
-        title = 'Under Review';
-        subtitle =
-            'Your documents are being reviewed. This usually takes 24–48 hours.';
+        title = context.l10n.verificationStatusPendingTitle;
+        subtitle = context.l10n.verificationStatusPendingDesc;
         break;
       case VerificationStatus.rejected:
         color = const Color(0xFFC62828);
         icon = Icons.cancel_rounded;
-        title = 'Verification Rejected';
-        subtitle =
-            'Please review the reason below and re-upload the required documents.';
+        title = context.l10n.verificationStatusRejectedTitle;
+        subtitle = context.l10n.verificationStatusRejectedDesc;
         break;
       default:
         color = CommonColors.greyText;
         icon = Icons.pending_actions_rounded;
-        title = 'Not Verified';
-        subtitle =
-            'Upload all required documents to start the verification process.';
+        title = context.l10n.verificationStatusNotSubmittedTitle;
+        subtitle = context.l10n.verificationStatusNotSubmittedDesc;
     }
 
     return Container(
@@ -1210,7 +1218,7 @@ class _ProgressCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Document Progress',
+                context.l10n.sellerDocumentProgress,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -1218,7 +1226,7 @@ class _ProgressCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '$approved / $total verified',
+                '$approved / $total ${context.l10n.productVerifiedBadge}',
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -1233,8 +1241,9 @@ class _ProgressCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: Colors.grey.shade100,
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(SellerColors.primaryLight),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                SellerColors.primaryLight,
+              ),
               minHeight: 7,
             ),
           ),
@@ -1259,21 +1268,23 @@ class _RejectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: CommonColors.error.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: CommonColors.error.withValues(alpha: 0.25),
-        ),
+        border: Border.all(color: CommonColors.error.withValues(alpha: 0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_rounded, color: CommonColors.error, size: 20),
+          Icon(
+            Icons.warning_amber_rounded,
+            color: CommonColors.error,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Rejection Reason',
+                  context.l10n.sellerRejectionReason,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,

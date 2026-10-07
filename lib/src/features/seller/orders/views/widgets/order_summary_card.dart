@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:gta_app/src/models/order_model.dart';
@@ -39,11 +40,17 @@ class _PricingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _CardHeader(icon: Icons.receipt_long_outlined, title: 'Price Breakdown'),
+          _CardHeader(
+            icon: Icons.receipt_long_outlined,
+            title: context.l10n.orderPriceBreakdownTitle,
+          ),
           const SizedBox(height: 16),
 
           // Subtotal
-          _PriceRow(label: 'Subtotal', value: '₹${_nf.format(p.subtotal)}'),
+          _PriceRow(
+            label: context.l10n.pricingSubtotal,
+            value: '₹${_nf.format(p.subtotal)}',
+          ),
 
           // Discount
           if (p.discountAmount > 0) ...[
@@ -52,8 +59,10 @@ class _PricingCard extends StatelessWidget {
               color: CommonColors.success,
               child: _PriceRow(
                 label: p.discountPercentage > 0
-                    ? 'Discount (${p.discountPercentage.toStringAsFixed(0)}% off)'
-                    : 'Discount',
+                    ? context.l10n.orderDiscountWithPercent(
+                        p.discountPercentage.toStringAsFixed(0),
+                      )
+                    : context.l10n.pricingDiscount,
                 value: '− ₹${_nf.format(p.discountAmount)}',
                 valueColor: CommonColors.success,
                 bold: false,
@@ -70,13 +79,17 @@ class _PricingCard extends StatelessWidget {
                 children: [
                   if (p.cgstAmount > 0 || p.sgstAmount > 0) ...[
                     _PriceRow(
-                      label: 'CGST (${_nf2.format(p.cgstPercentage)}%)',
+                      label: context.l10n.orderCgstLabel(
+                        _nf2.format(p.cgstPercentage),
+                      ),
                       value: '₹${_nf2.format(p.cgstAmount)}',
                       light: true,
                     ),
                     const SizedBox(height: 6),
                     _PriceRow(
-                      label: 'SGST (${_nf2.format(p.sgstPercentage)}%)',
+                      label: context.l10n.orderSgstLabel(
+                        _nf2.format(p.sgstPercentage),
+                      ),
                       value: '₹${_nf2.format(p.sgstAmount)}',
                       light: true,
                     ),
@@ -84,12 +97,14 @@ class _PricingCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Divider(
                         height: 1,
-                        color: SellerColors.primaryLight.withValues(alpha: 0.15),
+                        color: SellerColors.primaryLight.withValues(
+                          alpha: 0.15,
+                        ),
                       ),
                     ),
                   ],
                   _PriceRow(
-                    label: 'Total GST',
+                    label: context.l10n.orderTotalGstLabel,
                     value: '₹${_nf.format(p.totalGst)}',
                   ),
                 ],
@@ -100,10 +115,10 @@ class _PricingCard extends StatelessWidget {
           // Delivery
           const SizedBox(height: 10),
           _PriceRow(
-            label: 'Delivery',
+            label: context.l10n.pricingDelivery,
             value: p.deliveryCharges > 0
                 ? '₹${_nf.format(p.deliveryCharges)}'
-                : 'Free',
+                : context.l10n.orderFreeLabel,
             valueColor: p.deliveryCharges == 0 ? CommonColors.success : null,
           ),
 
@@ -130,7 +145,7 @@ class _PricingCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total Payable',
+                  context.l10n.orderTotalPayableLabel,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -188,7 +203,7 @@ class _PaymentCard extends StatelessWidget {
         children: [
           _CardHeader(
             icon: Icons.account_balance_wallet_outlined,
-            title: 'Payment',
+            title: context.l10n.orderPaymentTitle,
           ),
           const SizedBox(height: 14),
 
@@ -214,8 +229,8 @@ class _PaymentCard extends StatelessWidget {
                     isPaid
                         ? Icons.check_circle_outline
                         : isFailed
-                            ? Icons.error_outline
-                            : Icons.access_time_rounded,
+                        ? Icons.error_outline
+                        : Icons.access_time_rounded,
                     size: 20,
                     color: statusColor,
                   ),
@@ -227,10 +242,10 @@ class _PaymentCard extends StatelessWidget {
                     children: [
                       Text(
                         isPaid
-                            ? 'Payment Received'
+                            ? context.l10n.sellerPaymentReceived
                             : isFailed
-                                ? 'Payment Failed'
-                                : 'Awaiting Payment',
+                            ? context.l10n.sellerPaymentFailed
+                            : context.l10n.sellerPaymentPending,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -240,7 +255,9 @@ class _PaymentCard extends StatelessWidget {
                       if (isPaid && pay.amountPaid != null) ...[
                         const SizedBox(height: 2),
                         Text(
-                          '₹${_nf.format(pay.amountPaid!)} received',
+                          context.l10n.orderAmountReceived(
+                            '₹${_nf.format(pay.amountPaid!)}',
+                          ),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: statusColor.withValues(alpha: 0.8),
@@ -249,7 +266,9 @@ class _PaymentCard extends StatelessWidget {
                       ] else if (!isPaid) ...[
                         const SizedBox(height: 2),
                         Text(
-                          '₹${_nf.format(order.totalPayableAmount)} due',
+                          context.l10n.orderAmountDue(
+                            '₹${_nf.format(order.totalPayableAmount)}',
+                          ),
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: statusColor.withValues(alpha: 0.8),
@@ -269,7 +288,10 @@ class _PaymentCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    OrderUIHelpers.getPaymentLabel(pay.status).toUpperCase(),
+                    OrderUIHelpers.getPaymentLabel(
+                      context,
+                      pay.status,
+                    ).toUpperCase(),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
@@ -286,7 +308,7 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(height: 14),
             _PaymentRow(
               icon: _methodIcon(pay.method),
-              label: 'Payment Method',
+              label: context.l10n.orderMethodLabel,
               value: pay.method!,
             ),
           ],
@@ -296,8 +318,10 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(height: 10),
             _PaymentRow(
               icon: Icons.calendar_today_outlined,
-              label: 'Paid On',
-              value: DateFormat('d MMM y, h:mm a').format(pay.paidAt!.toLocal()),
+              label: context.l10n.orderPaidOnLabel,
+              value: DateFormat(
+                'd MMM y, h:mm a',
+              ).format(pay.paidAt!.toLocal()),
             ),
           ],
 
@@ -306,7 +330,7 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(height: 10),
             _PaymentRow(
               icon: Icons.tag_rounded,
-              label: 'Reference ID',
+              label: context.l10n.orderReferenceIdLabel,
               value: pay.cfPaymentId!,
               mono: true,
             ),
@@ -400,7 +424,9 @@ class _PriceRow extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: light ? 12 : 13,
             fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
-            color: valueColor ?? (light ? const Color(0xFFAAAAAA) : CommonColors.black),
+            color:
+                valueColor ??
+                (light ? const Color(0xFFAAAAAA) : CommonColors.black),
           ),
         ),
       ],
@@ -486,11 +512,7 @@ class _DashedLinePainter extends CustomPainter {
     const dashSpace = 4.0;
     double startX = 0;
     while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, 0),
-        Offset(startX + dashWidth, 0),
-        paint,
-      );
+      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
       startX += dashWidth + dashSpace;
     }
   }

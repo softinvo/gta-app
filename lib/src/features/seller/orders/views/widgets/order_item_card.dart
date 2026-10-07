@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:gta_app/src/models/order_model.dart';
@@ -30,7 +31,8 @@ class OrderItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final thumbUrl = _thumbnailUrl;
-    final hasColor = variant.variantColorCode != null &&
+    final hasColor =
+        variant.variantColorCode != null &&
         variant.variantColorCode!.isNotEmpty;
     final hasSize = variant.size != null && variant.size!.isNotEmpty;
     final unit = order.unit.isNotEmpty ? order.unit : 'unit';
@@ -75,7 +77,8 @@ class OrderItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  order.productSnapshot?.name ?? 'Product',
+                  order.productSnapshot?.name ??
+                      context.l10n.commonProductFallback,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -92,8 +95,14 @@ class OrderItemCard extends StatelessWidget {
                     if (hasColor)
                       _ColorTag(colorCode: variant.variantColorCode!),
                     if (hasSize)
-                      _Tag(label: 'Size ${variant.size!}'),
-                    _Tag(label: 'Qty ${variant.quantity} $unit'),
+                      _Tag(
+                        label:
+                            '${context.l10n.productTableSize} ${variant.size!}',
+                      ),
+                    _Tag(
+                      label:
+                          '${context.l10n.quoteTableQuantity} ${variant.quantity} $unit',
+                    ),
                   ],
                 ),
               ],
@@ -114,7 +123,7 @@ class OrderItemCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'per $unit',
+                context.l10n.orderPerUnitLabel(unit),
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   color: CommonColors.greyText,

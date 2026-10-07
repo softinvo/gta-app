@@ -31,11 +31,13 @@ class SellerProfileStatsRepository {
         final body = jsonDecode(r.body) as Map<String, dynamic>;
         if (body['success'] == true) {
           final d = body['data'] as Map<String, dynamic>;
-          return Right(SellerProfileStats(
-            products: (d['products'] as num?)?.toInt() ?? 0,
-            orders: (d['orders'] as num?)?.toInt() ?? 0,
-            avgRating: (d['avgRating'] as num?)?.toDouble() ?? 0.0,
-          ));
+          return Right(
+            SellerProfileStats(
+              products: (d['products'] as num?)?.toInt() ?? 0,
+              orders: (d['orders'] as num?)?.toInt() ?? 0,
+              avgRating: (d['avgRating'] as num?)?.toDouble() ?? 0.0,
+            ),
+          );
         }
         return Left(
           Failure(message: body['message'] ?? 'Failed to load stats'),
@@ -47,13 +49,11 @@ class SellerProfileStatsRepository {
   }
 }
 
-final sellerProfileStatsProvider =
-    FutureProvider<SellerProfileStats>((ref) async {
+final sellerProfileStatsProvider = FutureProvider<SellerProfileStats>((
+  ref,
+) async {
   final result = await ref
       .read(sellerProfileStatsRepositoryProvider)
       .getProfileStats();
-  return result.fold(
-    (failure) => throw failure.message,
-    (stats) => stats,
-  );
+  return result.fold((failure) => throw failure.message, (stats) => stats);
 });

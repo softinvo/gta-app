@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -61,13 +62,14 @@ class QuoteItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumbnailUrl = _thumbnailUrl;
     final quotedVariant = _quotedVariant;
-    final unit = variant.unit?.isNotEmpty == true ? variant.unit! : 'unit';
+    final unit = variant.unit?.isNotEmpty == true
+        ? variant.unit!
+        : context.l10n.orderUnitFallback;
     final price = displayPrice ?? quotedVariant.quotedPrice;
     final color = accentColor ?? SellerColors.primaryLight;
-    final total =
-        displayPrice != null
-            ? price * variant.quantity
-            : quotedVariant.totalPrice ?? price * variant.quantity;
+    final total = displayPrice != null
+        ? price * variant.quantity
+        : quotedVariant.totalPrice ?? price * variant.quantity;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -76,8 +78,8 @@ class QuoteItemCard extends StatelessWidget {
         color: accentColor?.withValues(alpha: 0.05) ?? Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: accentColor?.withValues(alpha: 0.22) ??
-              CommonColors.borderColor,
+          color:
+              accentColor?.withValues(alpha: 0.22) ?? CommonColors.borderColor,
         ),
         boxShadow: [
           BoxShadow(
@@ -109,7 +111,8 @@ class QuoteItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  quote.productSnapshot?.name ?? 'Product',
+                  quote.productSnapshot?.name ??
+                      context.l10n.commonProductFallback,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -126,8 +129,14 @@ class QuoteItemCard extends StatelessWidget {
                     if (variant.variantColorCode?.isNotEmpty == true)
                       _ColorTag(colorCode: variant.variantColorCode!),
                     if (variant.size?.isNotEmpty == true)
-                      _Tag(label: 'Size ${variant.size}'),
-                    _Tag(label: 'Qty ${variant.quantity} $unit'),
+                      _Tag(
+                        label:
+                            '${context.l10n.productTableSize} ${variant.size}',
+                      ),
+                    _Tag(
+                      label:
+                          '${context.l10n.quoteTableQuantity} ${variant.quantity} $unit',
+                    ),
                   ],
                 ),
               ],

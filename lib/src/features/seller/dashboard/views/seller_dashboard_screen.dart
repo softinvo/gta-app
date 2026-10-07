@@ -13,6 +13,7 @@ import '../../profile/repository/seller_profile_stats_repository.dart';
 import '../../quotes/controller/seller_quote_controller.dart';
 import '../../quotes/views/seller_quote_list_screen.dart';
 import 'package:gta_app/src/features/chat/views/chat_list_tab.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerDashboardScreen extends ConsumerStatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -51,32 +52,32 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen> {
       _NavItemData(
         Icons.dashboard_outlined,
         Icons.dashboard_rounded,
-        'Dashboard',
+        context.l10n.sellerDashboardTitle,
       ),
       _NavItemData(
         Icons.inventory_2_outlined,
         Icons.inventory_2_rounded,
-        'Products',
+        context.l10n.sellerProductsTitle,
       ),
       _NavItemData(
         Icons.request_quote_outlined,
         Icons.request_quote_rounded,
-        'Quotes',
+        context.l10n.navQuotations,
       ),
       _NavItemData(
         Icons.local_shipping_outlined,
         Icons.local_shipping_rounded,
-        'Orders',
+        context.l10n.navOrders,
       ),
       _NavItemData(
         Icons.chat_bubble_outline_rounded,
         Icons.chat_bubble_rounded,
-        'Chat',
+        context.l10n.navChat,
       ),
       _NavItemData(
         Icons.person_outline_rounded,
         Icons.person_rounded,
-        'Profile',
+        context.l10n.navProfile,
       ),
     ];
 
@@ -235,18 +236,18 @@ class _DashboardTab extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Stats row
-            _SectionHeader(title: "Today's Overview"),
+            _SectionHeader(title: context.l10n.sellerDashboardTodayOverview),
             const SizedBox(height: 14),
             const _StatsRow(),
 
             const SizedBox(height: 28),
 
             // Orders & Quotes Overview (real API data)
-            _SectionHeader(title: 'Orders Overview'),
+            _SectionHeader(title: context.l10n.sellerDashboardOrdersOverview),
             const SizedBox(height: 14),
             const _OrdersStatsCard(),
             const SizedBox(height: 28),
-            _SectionHeader(title: 'Quotes Overview'),
+            _SectionHeader(title: context.l10n.sellerDashboardQuotesOverview),
             const SizedBox(height: 14),
             const _QuotesStatsCard(),
 
@@ -325,7 +326,7 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Orders',
+                        context.l10n.navOrders,
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -333,7 +334,7 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                         ),
                       ),
                       Text(
-                        'Overview',
+                        context.l10n.sellerOverviewLabel,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.75),
@@ -358,7 +359,7 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                             ),
                           ),
                           Text(
-                            'total orders',
+                            context.l10n.sellerTotalOrdersSummary,
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               color: Colors.white.withValues(alpha: 0.75),
@@ -387,10 +388,10 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-                itemCount: _RangeFilter.filters.length,
+                itemCount: _RangeFilter.localized(context).length,
                 separatorBuilder: (_, __) => const SizedBox(width: 6),
                 itemBuilder: (_, i) {
-                  final f = _RangeFilter.filters[i];
+                  final f = _RangeFilter.localized(context)[i];
                   final selected = _range == f.value;
                   return GestureDetector(
                     onTap: () => setState(() => _range = f.value),
@@ -429,12 +430,12 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-              error: (_, __) => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
+              error: (_, __) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Center(
                   child: Text(
-                    'Failed to load',
-                    style: TextStyle(color: CommonColors.greyText),
+                    context.l10n.sellerFailedToLoadShort,
+                    style: const TextStyle(color: CommonColors.greyText),
                   ),
                 ),
               ),
@@ -458,13 +459,13 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                       Row(
                         children: [
                           _StatusTile(
-                            label: 'Processing',
+                            label: context.l10n.orderStatusProcessing,
                             value: processing,
                             color: const Color(0xFFE67E22),
                           ),
                           const SizedBox(width: 8),
                           _StatusTile(
-                            label: 'Shipped',
+                            label: context.l10n.sellerStatusShipped,
                             value: shipped,
                             color: const Color(0xFF3498DB),
                           ),
@@ -474,13 +475,13 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                       Row(
                         children: [
                           _StatusTile(
-                            label: 'Delivered',
+                            label: context.l10n.sellerStatusDelivered,
                             value: delivered,
                             color: const Color(0xFF27AE60),
                           ),
                           const SizedBox(width: 8),
                           _StatusTile(
-                            label: 'Cancelled',
+                            label: context.l10n.sellerStatusCancelled,
                             value: cancelled,
                             color: CommonColors.error,
                           ),
@@ -527,7 +528,7 @@ class _OrdersStatsCardState extends ConsumerState<_OrdersStatsCard> {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'Revenue Received',
+                              context.l10n.sellerRevenueReceived,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: CommonColors.greyText,
@@ -564,12 +565,12 @@ class _RangeFilter {
   final String value;
   const _RangeFilter(this.label, this.value);
 
-  static const filters = [
-    _RangeFilter('All Time', 'all'),
-    _RangeFilter('Today', 'today'),
-    _RangeFilter('Week', 'week'),
-    _RangeFilter('Month', 'month'),
-    _RangeFilter('Year', 'year'),
+  static List<_RangeFilter> localized(BuildContext context) => [
+    _RangeFilter(context.l10n.sellerFilterAllTime, 'all'),
+    _RangeFilter(context.l10n.sellerFilterToday, 'today'),
+    _RangeFilter(context.l10n.sellerFilterWeek, 'week'),
+    _RangeFilter(context.l10n.sellerFilterMonth, 'month'),
+    _RangeFilter(context.l10n.sellerFilterYear, 'year'),
   ];
 }
 
@@ -640,7 +641,7 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Quotations',
+                        context.l10n.navQuotations,
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -648,7 +649,7 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
                         ),
                       ),
                       Text(
-                        'Overview',
+                        context.l10n.sellerOverviewLabel,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.75),
@@ -673,7 +674,7 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
                             ),
                           ),
                           Text(
-                            'total quotes',
+                            context.l10n.sellerTotalQuotesSummary,
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               color: Colors.white.withValues(alpha: 0.75),
@@ -702,10 +703,10 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
-                itemCount: _RangeFilter.filters.length,
+                itemCount: _RangeFilter.localized(context).length,
                 separatorBuilder: (_, __) => const SizedBox(width: 6),
                 itemBuilder: (_, i) {
-                  final f = _RangeFilter.filters[i];
+                  final f = _RangeFilter.localized(context)[i];
                   final selected = _range == f.value;
                   return GestureDetector(
                     onTap: () => setState(() => _range = f.value),
@@ -744,12 +745,12 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
                 padding: EdgeInsets.symmetric(vertical: 24),
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
-              error: (_, __) => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
+              error: (_, __) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Center(
                   child: Text(
-                    'Failed to load',
-                    style: TextStyle(color: CommonColors.greyText),
+                    context.l10n.sellerFailedToLoadShort,
+                    style: const TextStyle(color: CommonColors.greyText),
                   ),
                 ),
               ),
@@ -766,13 +767,13 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
                       Row(
                         children: [
                           _StatusTile(
-                            label: 'Pending',
+                            label: context.l10n.sellerPending,
                             value: pending,
                             color: const Color(0xFF3498DB),
                           ),
                           const SizedBox(width: 8),
                           _StatusTile(
-                            label: 'In Progress',
+                            label: context.l10n.sellerStatusInProgress,
                             value: inProgress,
                             color: SellerColors.primaryLight,
                           ),
@@ -782,13 +783,13 @@ class _QuotesStatsCardState extends ConsumerState<_QuotesStatsCard> {
                       Row(
                         children: [
                           _StatusTile(
-                            label: 'Finalized',
+                            label: context.l10n.sellerFinalize,
                             value: finalized,
                             color: const Color(0xFF27AE60),
                           ),
                           const SizedBox(width: 8),
                           _StatusTile(
-                            label: 'Cancelled',
+                            label: context.l10n.sellerStatusCancelled,
                             value: cancelled,
                             color: CommonColors.error,
                           ),
@@ -942,7 +943,7 @@ class _HeroBanner extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome Back',
+                          context.l10n.sellerWelcomeTitle,
                           style: GoogleFonts.inter(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -1142,33 +1143,39 @@ class _StatsRow extends ConsumerWidget {
 
     final stats = [
       _StatData(
-        title: 'New Orders',
+        title: context.l10n.sellerTotalOrders,
         value: oLoading ? '--' : '$totalOrders',
-        trend: oLoading ? '...' : '$processing processing',
+        trend: oLoading
+            ? '...'
+            : context.l10n.sellerProcessingCount(processing),
         trendUp: true,
         icon: Icons.shopping_cart_outlined,
         color: const Color(0xFF4A90E2),
       ),
       _StatData(
-        title: 'Pending Quotes',
+        title: context.l10n.sellerPending,
         value: qLoading ? '--' : '$pendingQuotes',
-        trend: qLoading ? '...' : '$inProgressQ in progress',
+        trend: qLoading
+            ? '...'
+            : context.l10n.sellerInProgressCount(inProgressQ),
         trendUp: false,
         icon: Icons.pending_actions_outlined,
         color: const Color(0xFFE67E22),
       ),
       _StatData(
-        title: 'Revenue',
+        title: context.l10n.sellerTotalRevenue,
         value: oLoading ? '--' : _fmtRevenue(totalPaid),
-        trend: oLoading ? '...' : '$paidCount paid',
+        trend: oLoading ? '...' : context.l10n.sellerPaidCount(paidCount),
         trendUp: true,
         icon: Icons.account_balance_wallet_outlined,
         color: const Color(0xFF27AE60),
       ),
       _StatData(
-        title: 'New Quotes',
+        title: context.l10n.sellerTotalQuotes,
         value: qLoading ? '--' : '$totalQuotes',
-        trend: qLoading ? '...' : '$inProgressQ in progress',
+        trend: qLoading
+            ? '...'
+            : context.l10n.sellerInProgressCount(inProgressQ),
         trendUp: true,
         icon: Icons.request_quote_outlined,
         color: const Color(0xFF9B59B6),

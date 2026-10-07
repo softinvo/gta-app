@@ -5,6 +5,7 @@ import 'package:gta_app/src/features/seller/complaint/controller/seller_complain
 import 'package:gta_app/src/features/seller/complaint/views/seller_complaint_details_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerComplaintsListScreen extends ConsumerWidget {
   const SellerComplaintsListScreen({super.key});
@@ -26,7 +27,7 @@ class SellerComplaintsListScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'My Complaints',
+          context.l10n.helpMyComplaintsTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -52,7 +53,8 @@ class SellerComplaintsListScreen extends ConsumerWidget {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
+          error: (err, stack) =>
+              Center(child: Text('${context.l10n.commonErrorPrefix}: $err')),
         ),
       ),
     );
@@ -79,7 +81,7 @@ class SellerComplaintsListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 32),
             Text(
-              'All Clear!',
+              context.l10n.complaintsEmptyTitle,
               style: GoogleFonts.poppins(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -88,7 +90,7 @@ class SellerComplaintsListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "You haven't raised any support requests yet. Our team is here to help if you encounter any issues.",
+              context.l10n.complaintsEmptySubtitle,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
@@ -111,7 +113,7 @@ class SellerComplaintsListScreen extends ConsumerWidget {
                   elevation: 0,
                 ),
                 child: Text(
-                  'Get Help & Support',
+                  context.l10n.sellerContactSupport,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

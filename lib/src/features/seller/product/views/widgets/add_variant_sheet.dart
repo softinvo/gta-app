@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gta_app/src/models/product_model.dart';
@@ -86,7 +87,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Add Product Variant',
+                context.l10n.sellerAddProductVariant,
                 style: GoogleFonts.inter(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -95,7 +96,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Define images, color, size, and stock details.',
+                context.l10n.sellerVariantSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: CommonColors.greyText,
@@ -121,7 +122,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                   Expanded(
                     flex: 2,
                     child: CustomFormTextField(
-                      label: 'Size',
+                      label: context.l10n.productTableSize,
                       controller: _sizeController,
                       hint: 'e.g. XL',
                     ),
@@ -134,7 +135,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                   Expanded(
                     flex: 3,
                     child: CustomFormTextField(
-                      label: 'Price',
+                      label: context.l10n.sellerPriceLabel,
                       controller: _priceController,
                       keyboardType: TextInputType.number,
                       hint: '0.00',
@@ -150,7 +151,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                   Expanded(
                     flex: 2,
                     child: CustomFormTextField(
-                      label: 'Stock',
+                      label: context.l10n.sellerStockLabel,
                       controller: _stockController,
                       keyboardType: TextInputType.number,
                       hint: '0',
@@ -180,7 +181,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                         ),
                       ),
                       child: Text(
-                        'Cancel',
+                        context.l10n.commonCancel,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -229,7 +230,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                         elevation: 0,
                       ),
                       child: Text(
-                        'Add Variant',
+                        context.l10n.sellerAddVariant,
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -252,7 +253,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Variant Images',
+          context.l10n.sellerVariantImages,
           style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -265,7 +266,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
           children: [
             // Thumbnail
             _buildImagePickerItem(
-              label: 'Thumbnail',
+              label: context.l10n.sellerThumbnail,
               file: _thumbnail,
               onTap: _pickThumbnail,
               onRemove: () => setState(() => _thumbnail = null),
@@ -277,7 +278,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Preview Images',
+                    context.l10n.sellerPreviewImages,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: CommonColors.greyText,
@@ -408,7 +409,7 @@ class _AddVariantSheetState extends State<AddVariantSheet> {
               size: 24,
             ),
             Text(
-              'Add More',
+              context.l10n.sellerAddMore,
               style: GoogleFonts.inter(
                 fontSize: 10,
                 color: SellerColors.primaryLight,

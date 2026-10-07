@@ -10,6 +10,7 @@ import 'package:gta_app/src/features/seller/quotes/views/seller_quote_details_sc
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerQuoteListScreen extends ConsumerStatefulWidget {
   static const routePath = '/seller/quotes';
@@ -105,11 +106,11 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
 
   void _showFilterSheet(BuildContext context) {
     final statuses = [
-      {'id': '', 'label': 'All'},
-      {'id': 'submitted', 'label': 'New'},
-      {'id': 'in-progress', 'label': 'In Progress'},
-      {'id': 'agreed', 'label': 'Agreed'},
-      {'id': 'cancelled', 'label': 'Cancelled'},
+      {'id': '', 'label': context.l10n.quoteStatusAll},
+      {'id': 'submitted', 'label': context.l10n.sellerStatusNew},
+      {'id': 'in-progress', 'label': context.l10n.sellerStatusInProgress},
+      {'id': 'agreed', 'label': context.l10n.sellerStatusAgreed},
+      {'id': 'cancelled', 'label': context.l10n.sellerStatusCancelled},
     ];
 
     // '-1' = newest, '1' = oldest
@@ -161,7 +162,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Filter & Sort',
+                    context.l10n.sellerFilterSortTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -177,7 +178,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                       });
                     },
                     child: Text(
-                      'Reset',
+                      context.l10n.commonReset,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -191,7 +192,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
 
               // Sort section
               Text(
-                'Sort By',
+                context.l10n.filterSortBy,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -203,14 +204,14 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
               Row(
                 children: [
                   _SortChip(
-                    label: 'Newest First',
+                    label: context.l10n.sellerFilterNewestFirst,
                     icon: Icons.arrow_downward_rounded,
                     isSelected: sheetSort == '-1',
                     onTap: () => setSheet(() => sheetSort = '-1'),
                   ),
                   const SizedBox(width: 10),
                   _SortChip(
-                    label: 'Oldest First',
+                    label: context.l10n.sellerFilterOldestFirst,
                     icon: Icons.arrow_upward_rounded,
                     isSelected: sheetSort == '1',
                     onTap: () => setSheet(() => sheetSort = '1'),
@@ -224,7 +225,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
 
               // Status section
               Text(
-                'Status',
+                context.l10n.quoteStatusSection,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -296,7 +297,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                     ),
                   ),
                   child: Text(
-                    'Apply Filters',
+                    context.l10n.sellerApplyFilters,
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -320,7 +321,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
     return Scaffold(
       backgroundColor: SellerColors.background,
       appBar: widget.showAppBar
-          ? const SellerAppBar(title: 'Quotations')
+          ? SellerAppBar(title: context.l10n.navQuotations)
           : null,
       body: Column(
         children: [
@@ -332,7 +333,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                 Expanded(
                   child: SellerSearchField(
                     controller: _searchController,
-                    hintText: 'Search quote ID, buyer...',
+                    hintText: context.l10n.sellerQuoteSearchHint,
                     onClear: () => _applyFilter(status: _selectedStatus),
                   ),
                 ),
@@ -400,7 +401,9 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                 children: [
                   if (hasSort)
                     _ActiveChip(
-                      label: _sort == '1' ? 'Oldest First' : 'Newest First',
+                      label: _sort == '1'
+                          ? context.l10n.sellerFilterOldestFirst
+                          : context.l10n.sellerFilterNewestFirst,
                       icon: _sort == '1'
                           ? Icons.arrow_upward_rounded
                           : Icons.arrow_downward_rounded,
@@ -460,7 +463,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                                 .read(sellerQuotationsProvider.notifier)
                                 .fetchQuotations(refresh: true),
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
+                            label: Text(context.l10n.commonRetry),
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size(120, 44),
                             ),
@@ -485,7 +488,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No quotations found',
+                            context.l10n.sellerNoQuotesTitle,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -494,7 +497,7 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Quotations will appear here once submitted',
+                            context.l10n.sellerNoQuotesSubtitle,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: CommonColors.greyText,
@@ -540,16 +543,16 @@ class _SellerQuoteListScreenState extends ConsumerState<SellerQuoteListScreen> {
     );
   }
 
-  static String _statusLabel(String status) {
+  String _statusLabel(String status) {
     switch (status.toLowerCase()) {
       case 'submitted':
-        return 'New';
+        return context.l10n.sellerStatusNew;
       case 'in-progress':
-        return 'In Progress';
+        return context.l10n.sellerStatusInProgress;
       case 'agreed':
-        return 'Agreed';
+        return context.l10n.sellerStatusAgreed;
       case 'cancelled':
-        return 'Cancelled';
+        return context.l10n.sellerStatusCancelled;
       default:
         return status;
     }
@@ -704,16 +707,16 @@ class _QuoteListItem extends StatelessWidget {
     }
   }
 
-  static String _statusLabel(String status) {
+  static String _statusLabel(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'submitted':
-        return 'New';
+        return context.l10n.sellerStatusNew;
       case 'in-progress':
-        return 'In Progress';
+        return context.l10n.sellerStatusInProgress;
       case 'agreed':
-        return 'Agreed';
+        return context.l10n.sellerStatusAgreed;
       case 'cancelled':
-        return 'Cancelled';
+        return context.l10n.sellerStatusCancelled;
       default:
         return status;
     }
@@ -734,20 +737,20 @@ class _QuoteListItem extends StatelessWidget {
     }
   }
 
-  static String _stepLabel(String step) {
+  static String _stepLabel(BuildContext context, String step) {
     switch (step) {
       case 'submitted':
-        return 'Awaiting Review';
+        return context.l10n.quoteStepUnderReview;
       case 'seller_reviewing':
-        return 'You are Reviewing';
+        return context.l10n.quoteStepUnderReview;
       case 'negotiation':
-        return 'In Negotiation';
+        return context.l10n.quoteStepNegotiation;
       case 'agreement_reached':
-        return 'Agreement Reached';
+        return context.l10n.quoteStepAgreementReached;
       case 'payment_done':
-        return 'Payment Received';
+        return context.l10n.sellerPaymentReceived;
       case 'completed':
-        return 'Completed';
+        return context.l10n.quoteStatusCompleted;
       default:
         return step.replaceAll('_', ' ');
     }
@@ -804,7 +807,9 @@ class _QuoteListItem extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                'Quote #${quote.quotationNumber}',
+                                context.l10n.sellerQuoteNumber(
+                                  quote.quotationNumber,
+                                ),
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
@@ -831,7 +836,10 @@ class _QuoteListItem extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    _statusLabel(quote.status).toUpperCase(),
+                                    _statusLabel(
+                                      context,
+                                      quote.status,
+                                    ).toUpperCase(),
                                     style: GoogleFonts.inter(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w700,
@@ -871,7 +879,7 @@ class _QuoteListItem extends StatelessWidget {
                                 children: [
                                   Text(
                                     quote.productSnapshot?.name ??
-                                        'Product Details',
+                                        context.l10n.sellerProductDetailsTitle,
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -912,7 +920,9 @@ class _QuoteListItem extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 3),
                                       Text(
-                                        '$totalQty units requested',
+                                        context.l10n.quoteUnitsRequested(
+                                          totalQty.toString(),
+                                        ),
                                         style: GoogleFonts.inter(
                                           fontSize: 12,
                                           color: CommonColors.greyText,
@@ -948,7 +958,7 @@ class _QuoteListItem extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                _stepLabel(quote.step),
+                                _stepLabel(context, quote.step),
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,

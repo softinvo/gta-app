@@ -72,6 +72,7 @@ class BuyerColors {
   static const Color gridCardTextPrimary = Color(0xFF1E2A3A);
   static const Color gridCardTextMuted = Color(0xFF4A3F35);
   static const Color gridCardTextHint = Color(0xFF6B5E52);
+  static const Color productPrice = Color(0xFF2E7D32);
 
   // Price / star accent – amber/gold
   static const Color gridCardAmber = Color(0xFFC9842A);

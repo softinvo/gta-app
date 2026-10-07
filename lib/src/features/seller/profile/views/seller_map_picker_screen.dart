@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -100,8 +101,8 @@ class _SellerMapPickerScreenState extends State<SellerMapPickerScreen> {
           permission == LocationPermission.deniedForever) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Location permission is required to use this'),
+            SnackBar(
+              content: Text(context.l10n.sellerLocationPermissionRequired),
             ),
           );
         }
@@ -112,7 +113,7 @@ class _SellerMapPickerScreenState extends State<SellerMapPickerScreen> {
       if (!serviceEnabled) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please enable location services')),
+            SnackBar(content: Text(context.l10n.sellerEnableLocationServices)),
           );
         }
         return;
@@ -163,7 +164,7 @@ class _SellerMapPickerScreenState extends State<SellerMapPickerScreen> {
       appBar: AppBar(
         leading: const SellerBackButton(),
         title: Text(
-          'Set Business Location',
+          context.l10n.sellerSetBusinessLocation,
           style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700),
         ),
         backgroundColor: Colors.white,
@@ -219,14 +220,14 @@ class _SellerMapPickerScreenState extends State<SellerMapPickerScreen> {
               previewAddress: _isResolvingAddress
                   ? null
                   : (_placemark != null
-                      ? [
-                          _placemark!.street,
-                          _placemark!.subLocality,
-                          _placemark!.locality,
-                          _placemark!.administrativeArea,
-                          _placemark!.postalCode,
-                        ].where((e) => e != null && e.isNotEmpty).join(', ')
-                      : null),
+                        ? [
+                            _placemark!.street,
+                            _placemark!.subLocality,
+                            _placemark!.locality,
+                            _placemark!.administrativeArea,
+                            _placemark!.postalCode,
+                          ].where((e) => e != null && e.isNotEmpty).join(', ')
+                        : null),
               onConfirm: _confirm,
             ),
           ),
@@ -257,7 +258,11 @@ class _ConfirmPanel extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 16, offset: Offset(0, -4)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 16,
+            offset: Offset(0, -4),
+          ),
         ],
       ),
       child: Column(
@@ -266,8 +271,11 @@ class _ConfirmPanel extends StatelessWidget {
         children: [
           if (!hasPin)
             Text(
-              'Tap anywhere on the map to drop a pin',
-              style: GoogleFonts.inter(fontSize: 13, color: CommonColors.greyText),
+              context.l10n.sellerTapMapDropPin,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: CommonColors.greyText,
+              ),
             )
           else if (isResolving)
             Row(
@@ -279,8 +287,11 @@ class _ConfirmPanel extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Fetching address...',
-                  style: GoogleFonts.inter(fontSize: 13, color: CommonColors.greyText),
+                  context.l10n.sellerFetchingAddress,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: CommonColors.greyText,
+                  ),
                 ),
               ],
             )
@@ -288,8 +299,11 @@ class _ConfirmPanel extends StatelessWidget {
             Text(
               previewAddress?.isNotEmpty == true
                   ? previewAddress!
-                  : 'Pin dropped. Address not found — you can edit it manually.',
-              style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+                  : context.l10n.sellerPinAddressNotFound,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           const SizedBox(height: 14),
           SizedBox(
@@ -301,12 +315,17 @@ class _ConfirmPanel extends StatelessWidget {
                 backgroundColor: SellerColors.primary,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.grey.shade200,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 elevation: 0,
               ),
               child: Text(
-                'Confirm Location',
-                style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
+                context.l10n.sellerConfirmLocation,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),

@@ -42,8 +42,9 @@ class SellerQuotationRepository {
         final Map<String, dynamic> data = jsonDecode(r.body);
         if (data['success'] == true) {
           final List quotationsJson = data['data'] ?? [];
-          final quotations =
-              quotationsJson.map((json) => Quotation.fromJson(json)).toList();
+          final quotations = quotationsJson
+              .map((json) => Quotation.fromJson(json))
+              .toList();
           final rawMeta = data['meta'] as Map<String, dynamic>?;
           final meta = {
             'page': rawMeta?['page'] ?? page,

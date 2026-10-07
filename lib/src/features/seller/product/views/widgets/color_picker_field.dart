@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -10,14 +11,14 @@ import 'color_hex_utils.dart';
 /// the name shown is always derived from the hex via gta_colors, never
 /// typed or stored separately, so it can't drift from what's saved.
 class ColorSelectField extends StatelessWidget {
-  final String label;
+  final String? label;
   final String? valueHex;
   final ValueChanged<String> onChanged;
   final Widget? trailingLabel;
 
   const ColorSelectField({
     super.key,
-    this.label = 'Color',
+    this.label,
     required this.valueHex,
     required this.onChanged,
     this.trailingLabel,
@@ -37,7 +38,7 @@ class ColorSelectField extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              label,
+              label ?? context.l10n.productColorLabel,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -61,10 +62,7 @@ class ColorSelectField extends StatelessWidget {
               if (picked != null) onChanged(picked);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: SellerColors.surfaceLight,
                 borderRadius: BorderRadius.circular(10),
@@ -84,7 +82,7 @@ class ColorSelectField extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      name ?? 'Select a color',
+                      name ?? context.l10n.sellerSelectColor,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
                         fontSize: 14,
@@ -151,7 +149,9 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
               .toList();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.85,
@@ -181,7 +181,7 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Select Color',
+                      context.l10n.sellerSelectColorTitle,
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -201,10 +201,11 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
               child: TextField(
                 controller: _searchController,
-                onChanged: (v) => setState(() => _query = v.trim().toLowerCase()),
+                onChanged: (v) =>
+                    setState(() => _query = v.trim().toLowerCase()),
                 style: GoogleFonts.inter(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'Search colors, e.g. Navy',
+                  hintText: context.l10n.sellerSearchColorsHint,
                   hintStyle: GoogleFonts.inter(
                     fontSize: 14,
                     color: Colors.grey.shade400,
@@ -257,7 +258,9 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'No colors match "${_searchController.text}"',
+                            context.l10n.sellerNoColorsMatch(
+                              _searchController.text,
+                            ),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: CommonColors.greyText,
@@ -279,7 +282,8 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
                       itemCount: results.length,
                       itemBuilder: (context, index) {
                         final c = results[index];
-                        final isSelected = widget.currentHex != null &&
+                        final isSelected =
+                            widget.currentHex != null &&
                             widget.currentHex!.toUpperCase() == c.hex;
                         return _ColorGridTile(
                           color: c,
@@ -304,7 +308,7 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
                     }
                   },
                   icon: const Icon(Icons.colorize_rounded, size: 18),
-                  label: const Text("Can't find it? Mix a custom color"),
+                  label: Text(context.l10n.sellerCustomColorAction),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: SellerColors.primaryLight,
                     side: const BorderSide(color: SellerColors.primaryLight),
@@ -341,8 +345,8 @@ class _ColorGridTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final swatchColor = Color(color.argb);
-    final needsDarkCheck = ThemeData.estimateBrightnessForColor(swatchColor) ==
-        Brightness.light;
+    final needsDarkCheck =
+        ThemeData.estimateBrightnessForColor(swatchColor) == Brightness.light;
 
     return GestureDetector(
       onTap: onTap,
@@ -386,7 +390,9 @@ class _ColorGridTile extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 10.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? SellerColors.primaryLight : CommonColors.greyText,
+              color: isSelected
+                  ? SellerColors.primaryLight
+                  : CommonColors.greyText,
             ),
           ),
         ],
@@ -427,7 +433,7 @@ Future<Color?> showCustomHexPickerDialog(
           ),
           const SizedBox(width: 10),
           Text(
-            'Custom Color',
+            context.l10n.sellerCustomColor,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -447,7 +453,10 @@ Future<Color?> showCustomHexPickerDialog(
         TextButton(
           onPressed: () => Navigator.pop(dialogContext),
           style: TextButton.styleFrom(foregroundColor: CommonColors.greyText),
-          child: Text('Cancel', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+          child: Text(
+            context.l10n.commonCancel,
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          ),
         ),
         ElevatedButton(
           onPressed: () => Navigator.pop(dialogContext, picked),
@@ -455,10 +464,15 @@ Future<Color?> showCustomHexPickerDialog(
             backgroundColor: SellerColors.primaryLight,
             foregroundColor: Colors.white,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           ),
-          child: Text('Apply', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+          child: Text(
+            context.l10n.commonApply,
+            style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+          ),
         ),
       ],
     ),

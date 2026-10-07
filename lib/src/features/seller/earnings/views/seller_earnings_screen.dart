@@ -6,6 +6,7 @@ import 'package:gta_app/src/features/seller/common/widgets/seller_app_bar.dart';
 import 'package:gta_app/src/features/seller/orders/controller/seller_order_controller.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerEarningsScreen extends ConsumerStatefulWidget {
   const SellerEarningsScreen({super.key});
@@ -20,12 +21,12 @@ class SellerEarningsScreen extends ConsumerStatefulWidget {
 class _SellerEarningsScreenState extends ConsumerState<SellerEarningsScreen> {
   String _range = 'all';
 
-  static const _filters = [
-    ('All Time', 'all'),
-    ('Today', 'today'),
-    ('Week', 'week'),
-    ('Month', 'month'),
-    ('Year', 'year'),
+  List<(String, String)> _filters(BuildContext context) => [
+    (context.l10n.sellerFilterAllTime, 'all'),
+    (context.l10n.sellerFilterToday, 'today'),
+    (context.l10n.sellerFilterWeek, 'week'),
+    (context.l10n.sellerFilterMonth, 'month'),
+    (context.l10n.sellerFilterYear, 'year'),
   ];
 
   static String _fmt(double amount) {
@@ -46,8 +47,8 @@ class _SellerEarningsScreenState extends ConsumerState<SellerEarningsScreen> {
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Earnings',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerEarningsTitle,
         showLogo: false,
         centerTitle: true,
       ),
@@ -63,7 +64,7 @@ class _SellerEarningsScreenState extends ConsumerState<SellerEarningsScreen> {
               // ── Range filter ──────────────────────────────────────
               _RangeFilterRow(
                 selected: _range,
-                filters: _filters,
+                filters: _filters(context),
                 onSelect: (v) => setState(() => _range = v),
               ),
 
@@ -202,14 +203,14 @@ class _EarningsContent extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Payment summary ───────────────────────────────────────
-        const _SectionTitle(title: 'Payment Summary'),
+        _SectionTitle(title: context.l10n.sellerPaymentSummary),
         const SizedBox(height: 12),
         LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth >= 600;
             final cards = [
               _SummaryCard(
-                label: 'Paid',
+                label: context.l10n.sellerPaid,
                 amount: totalPaid,
                 count: paidCount,
                 color: const Color(0xFF27AE60),
@@ -218,7 +219,7 @@ class _EarningsContent extends StatelessWidget {
                 horizontal: !isWide,
               ),
               _SummaryCard(
-                label: 'Pending',
+                label: context.l10n.sellerPending,
                 amount: totalPending,
                 count: pendingCount,
                 color: const Color(0xFFF57F17),
@@ -227,7 +228,7 @@ class _EarningsContent extends StatelessWidget {
                 horizontal: !isWide,
               ),
               _SummaryCard(
-                label: 'Refunded',
+                label: context.l10n.sellerRefunded,
                 amount: totalRefunded,
                 count: refundedCount,
                 color: CommonColors.error,
@@ -266,25 +267,25 @@ class _EarningsContent extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Revenue metrics ───────────────────────────────────────
-        const _SectionTitle(title: 'Revenue Insights'),
+        _SectionTitle(title: context.l10n.sellerRevenueInsights),
         const SizedBox(height: 12),
         _MetricStrip(
           items: [
             _MetricItem(
               icon: Icons.receipt_long_rounded,
-              label: 'Total Revenue',
+              label: context.l10n.sellerTotalRevenue,
               value: fmt(totalRevenue),
               color: SellerColors.primaryLight,
             ),
             _MetricItem(
               icon: Icons.bar_chart_rounded,
-              label: 'Avg Order Value',
+              label: context.l10n.sellerAverageOrderValue,
               value: fmt(avgOrderValue),
               color: const Color(0xFF8E24AA),
             ),
             _MetricItem(
               icon: Icons.trending_up_rounded,
-              label: 'Avg Paid Value',
+              label: context.l10n.sellerAveragePaidValue,
               value: fmt(avgPaidValue),
               color: const Color(0xFF27AE60),
             ),
@@ -294,30 +295,30 @@ class _EarningsContent extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Payment status breakdown ──────────────────────────────
-        _SectionTitle(title: 'Payment Breakdown'),
+        _SectionTitle(title: context.l10n.sellerPaymentBreakdown),
         const SizedBox(height: 12),
         _BreakdownCard(
           rows: [
             _BreakdownRow(
-              label: 'Paid Orders',
+              label: context.l10n.sellerPaidOrders,
               count: byPayment['paid'] as int? ?? 0,
               color: const Color(0xFF27AE60),
               icon: Icons.check_circle_rounded,
             ),
             _BreakdownRow(
-              label: 'Pending Payment',
+              label: context.l10n.sellerPendingPayment,
               count: byPayment['pending'] as int? ?? 0,
               color: const Color(0xFFF57F17),
               icon: Icons.hourglass_top_rounded,
             ),
             _BreakdownRow(
-              label: 'Refunded',
+              label: context.l10n.sellerRefunded,
               count: byPayment['refunded'] as int? ?? 0,
               color: CommonColors.error,
               icon: Icons.replay_rounded,
             ),
             _BreakdownRow(
-              label: 'Failed',
+              label: context.l10n.sellerFailed,
               count: byPayment['failed'] as int? ?? 0,
               color: Colors.grey,
               icon: Icons.cancel_outlined,
@@ -328,43 +329,42 @@ class _EarningsContent extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Order status breakdown ────────────────────────────────
-        _SectionTitle(title: 'Order Status'),
+        _SectionTitle(title: context.l10n.sellerOrderStatusTitle),
         const SizedBox(height: 12),
         _BreakdownCard(
           rows: [
             _BreakdownRow(
-              label: 'Processing',
+              label: context.l10n.orderStatusProcessing,
               count: byStatus['processing'] as int? ?? 0,
               color: const Color(0xFFE67E22),
               icon: Icons.autorenew_rounded,
             ),
             _BreakdownRow(
-              label: 'Packed',
+              label: context.l10n.sellerStatusPacked,
               count: byStatus['packed'] as int? ?? 0,
               color: const Color(0xFF5C6BC0),
               icon: Icons.inventory_2_outlined,
             ),
             _BreakdownRow(
-              label: 'Shipped',
+              label: context.l10n.sellerStatusShipped,
               count: byStatus['shipped'] as int? ?? 0,
               color: const Color(0xFF1E88E5),
               icon: Icons.local_shipping_outlined,
             ),
             _BreakdownRow(
-              label: 'Delivered',
+              label: context.l10n.sellerStatusDelivered,
               count: byStatus['delivered'] as int? ?? 0,
               color: const Color(0xFF27AE60),
               icon: Icons.done_all_rounded,
             ),
             _BreakdownRow(
-              label: 'Cancelled',
+              label: context.l10n.sellerStatusCancelled,
               count: byStatus['cancelled'] as int? ?? 0,
               color: CommonColors.error,
               icon: Icons.cancel_outlined,
             ),
           ],
         ),
-
       ],
     );
   }
@@ -422,8 +422,8 @@ class _SellerTransactionsScreenState
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Transactions',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerTransactionsTitle,
         showLogo: false,
         centerTitle: true,
       ),
@@ -507,7 +507,8 @@ class _TransactionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final status = order.payment.status.toLowerCase();
     final color = _paymentColor(status);
-    final amount = order.payment.amountPaid != null && order.payment.amountPaid! > 0
+    final amount =
+        order.payment.amountPaid != null && order.payment.amountPaid! > 0
         ? order.payment.amountPaid!
         : order.totalPayableAmount;
     final date = order.payment.paidAt ?? order.createdAt;
@@ -533,8 +534,8 @@ class _TransactionTile extends StatelessWidget {
               children: [
                 Text(
                   order.orderNumber.isNotEmpty
-                      ? 'Order #${order.orderNumber}'
-                      : 'Order transaction',
+                      ? '${context.l10n.commonOrderFallback} #${order.orderNumber}'
+                      : context.l10n.sellerOrderTransaction,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -573,7 +574,7 @@ class _TransactionTile extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                _paymentLabel(status),
+                _paymentLabel(context, status),
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -615,8 +616,8 @@ class _TransactionTile extends StatelessWidget {
     }
   }
 
-  static String _paymentLabel(String status) {
-    if (status.isEmpty) return 'Unknown';
+  static String _paymentLabel(BuildContext context, String status) {
+    if (status.isEmpty) return context.l10n.sellerUnknown;
     return '${status[0].toUpperCase()}${status.substring(1)}';
   }
 }
@@ -643,8 +644,8 @@ class _TransactionsEmptyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _TransactionMessageCard(
       icon: Icons.receipt_long_outlined,
-      title: 'No transactions yet',
-      subtitle: 'Transactions from new orders will appear here.',
+      title: context.l10n.sellerNoTransactionsTitle,
+      subtitle: context.l10n.sellerNoTransactionsSubtitle,
     );
   }
 }
@@ -656,8 +657,8 @@ class _TransactionsErrorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _TransactionMessageCard(
       icon: Icons.receipt_long_outlined,
-      title: 'Could not load transactions',
-      subtitle: 'Use View All to check your order history.',
+      title: context.l10n.sellerTransactionsLoadError,
+      subtitle: context.l10n.sellerNoTransactionsSubtitle,
     );
   }
 }
@@ -699,7 +700,10 @@ class _TransactionMessageCard extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(fontSize: 11, color: CommonColors.greyText),
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: CommonColors.greyText,
+            ),
           ),
         ],
       ),
@@ -798,7 +802,7 @@ class _HeroEarningsCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'TOTAL EARNED',
+                            context.l10n.sellerTotalEarned,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -808,7 +812,7 @@ class _HeroEarningsCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Paid earnings in the selected period',
+                            context.l10n.sellerSelectedPeriodEarnings,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.inter(
@@ -855,7 +859,7 @@ class _HeroEarningsCard extends StatelessWidget {
                       Expanded(
                         child: _HeroMetric(
                           icon: Icons.shopping_bag_outlined,
-                          label: 'Paid orders',
+                          label: context.l10n.sellerPaidOrders,
                           value: '$paidOrders',
                         ),
                       ),
@@ -868,7 +872,7 @@ class _HeroEarningsCard extends StatelessWidget {
                       Expanded(
                         child: _HeroMetric(
                           icon: Icons.receipt_long_outlined,
-                          label: 'Average value',
+                          label: context.l10n.sellerAverageValue,
                           value: fmt(avgOrderValue),
                         ),
                       ),
@@ -1027,7 +1031,7 @@ class _SummaryCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '$count orders',
+                    '$count ${context.l10n.navOrders}',
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       color: color,
@@ -1054,7 +1058,7 @@ class _SummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$count orders',
+                  '$count ${context.l10n.navOrders}',
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     color: CommonColors.greyText,
@@ -1381,7 +1385,7 @@ class _ErrorCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Failed to load earnings',
+            context.l10n.sellerFailedLoadEarnings,
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w600,

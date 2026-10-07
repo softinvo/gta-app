@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gta_app/src/commons/controller/locale_controller.dart';
 import 'package:gta_app/src/features/common_features/auth/controller/auth_controller.dart';
 import 'package:gta_app/src/features/common_features/auth/views/login_screen.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/logout_confirmation_dialog.dart';
 import 'package:gta_app/src/features/common_features/auth/views/widgets/delete_account_button.dart';
 import 'package:gta_app/src/models/seller_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:gta_app/src/features/seller/profile/controller/seller_profile_controller.dart';
 import 'package:gta_app/src/features/seller/profile/repository/seller_profile_stats_repository.dart';
 import 'seller_personal_details_screen.dart';
 import 'seller_business_address_screen.dart';
 import 'seller_onboarding_screen.dart';
 import 'seller_help_center_screen.dart';
+import 'seller_language_screen.dart';
 import 'seller_policies_screen.dart';
 import 'package:gta_app/src/features/seller/earnings/views/seller_earnings_screen.dart';
 
@@ -82,15 +85,16 @@ class SellerProfileTab extends ConsumerWidget {
             SliverToBoxAdapter(
               child: sellerAsync.when(
                 data: (seller) => _ProfileHeader(
-                  name: seller?.name ?? 'Textile Seller',
-                  phone: seller?.phone ?? '+91 9876543210',
-                  businessName: seller?.businessName ?? 'Global Textiles Co.',
+                  name: seller?.name ?? context.l10n.sellerFallbackName,
+                  phone: seller?.phone ?? '',
+                  businessName:
+                      seller?.businessName ?? context.l10n.sellerFallbackName,
                   avatarUrl: seller?.avatar?.fileUrl,
                   verificationStatus: seller?.verificationStatus,
                 ),
                 loading: () => const _ProfileHeaderSkeleton(),
                 error: (_, __) => _ProfileHeader(
-                  name: 'Error Loading',
+                  name: context.l10n.profileErrorLoading,
                   phone: '',
                   businessName: '',
                 ),
@@ -113,13 +117,13 @@ class SellerProfileTab extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _MenuSection(
-                      title: 'Business',
+                      title: context.l10n.sellerBusinessSection,
                       items: [
                         _MenuItem(
                           icon: Icons.person_rounded,
                           iconColor: const Color(0xFF3F51B5),
                           iconBg: const Color(0xFFE8EAF6),
-                          title: 'Personal Details',
+                          title: context.l10n.sellerPersonalDetailsTitle,
                           onTap: () => context.push(
                             SellerPersonalDetailsScreen.routePath,
                           ),
@@ -128,7 +132,7 @@ class SellerProfileTab extends ConsumerWidget {
                           icon: Icons.location_on_rounded,
                           iconColor: const Color(0xFFE53935),
                           iconBg: const Color(0xFFFFEBEE),
-                          title: 'Business Address',
+                          title: context.l10n.sellerBusinessAddressTitle,
                           onTap: () => context.push(
                             SellerBusinessAddressScreen.routePath,
                           ),
@@ -137,7 +141,7 @@ class SellerProfileTab extends ConsumerWidget {
                           icon: Icons.storefront_rounded,
                           iconColor: const Color(0xFF5C6BC0),
                           iconBg: const Color(0xFFE8EAF6),
-                          title: 'Store Setup',
+                          title: context.l10n.sellerStoreSetupTitle,
                           subtitle: sellerAsync
                               .asData
                               ?.value
@@ -159,13 +163,13 @@ class SellerProfileTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     _MenuSection(
-                      title: 'Management',
+                      title: context.l10n.sellerManagementSection,
                       items: [
                         _MenuItem(
                           icon: Icons.currency_rupee_rounded,
                           iconColor: const Color(0xFFFF7043),
                           iconBg: const Color(0xFFFBE9E7),
-                          title: 'Earnings',
+                          title: context.l10n.sellerEarningsTitle,
                           onTap: () =>
                               context.push(SellerEarningsScreen.routePath),
                         ),
@@ -173,7 +177,7 @@ class SellerProfileTab extends ConsumerWidget {
                           icon: Icons.receipt_long_rounded,
                           iconColor: const Color(0xFF5C6BC0),
                           iconBg: const Color(0xFFE8EAF6),
-                          title: 'Transactions',
+                          title: context.l10n.sellerTransactionsTitle,
                           onTap: () =>
                               context.push(SellerTransactionsScreen.routePath),
                         ),
@@ -181,13 +185,13 @@ class SellerProfileTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     _MenuSection(
-                      title: 'Support',
+                      title: context.l10n.profileSectionSupport,
                       items: [
                         _MenuItem(
                           icon: Icons.help_rounded,
                           iconColor: const Color(0xFF00ACC1),
                           iconBg: const Color(0xFFE0F7FA),
-                          title: 'Seller Help Center',
+                          title: context.l10n.sellerHelpCenterTitle,
                           onTap: () =>
                               context.push(SellerHelpCenterScreen.routePath),
                         ),
@@ -195,9 +199,37 @@ class SellerProfileTab extends ConsumerWidget {
                           icon: Icons.policy_rounded,
                           iconColor: const Color(0xFF546E7A),
                           iconBg: const Color(0xFFECEFF1),
-                          title: 'Seller Policies',
+                          title: context.l10n.profileLegalPoliciesTitle,
                           onTap: () =>
                               context.push(SellerPoliciesScreen.routePath),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _MenuSection(
+                      title: context.l10n.profileSectionSettings,
+                      items: [
+                        _MenuItem(
+                          icon: Icons.language_rounded,
+                          iconColor: const Color(0xFF2563EB),
+                          iconBg: const Color(0xFFEFF6FF),
+                          title: context.l10n.languageMenuTitle,
+                          subtitle: kAppLanguages
+                              .firstWhere(
+                                (language) =>
+                                    language.code ==
+                                    ref
+                                        .watch(localeControllerProvider)
+                                        .languageCode,
+                                orElse: () => kAppLanguages.first,
+                              )
+                              .nativeName,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const SellerLanguageScreen(),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -213,7 +245,7 @@ class SellerProfileTab extends ConsumerWidget {
 
                     Center(
                       child: Text(
-                        'Version 1.0.0',
+                        context.l10n.profileVersionLabel('1.0.0'),
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           color: CommonColors.greyText,
@@ -447,28 +479,28 @@ class _VerificationBadge extends StatelessWidget {
         bg = StatusColors.verifiedBg;
         text = StatusColors.verifiedText;
         icon = Icons.verified_rounded;
-        label = 'Verified';
+        label = context.l10n.productVerifiedBadge;
         break;
       case VerificationStatus.pending:
         color = StatusColors.pendingDot;
         bg = StatusColors.pendingBg;
         text = StatusColors.pendingText;
         icon = Icons.hourglass_top_rounded;
-        label = 'Under Review';
+        label = context.l10n.sellerStatusUnderReview;
         break;
       case VerificationStatus.rejected:
         color = StatusColors.rejectedDot;
         bg = StatusColors.rejectedBg;
         text = StatusColors.rejectedText;
         icon = Icons.cancel_rounded;
-        label = 'Rejected';
+        label = context.l10n.sellerStatusRejected;
         break;
       default:
         color = CommonColors.greyText;
         bg = const Color(0xFFF4F6F9);
         text = CommonColors.greyText;
         icon = Icons.pending_actions_rounded;
-        label = 'Not Verified';
+        label = context.l10n.sellerStatusNotVerified;
     }
 
     return _Badge(
@@ -542,7 +574,7 @@ class _StatsRow extends ConsumerWidget {
               icon: Icons.inventory_2_rounded,
               iconColor: SellerColors.primaryLight,
               iconBg: SellerColors.surface,
-              label: 'Products',
+              label: context.l10n.sellerProductsTitle,
               value: '--',
             ),
             _StatDivider(),
@@ -550,7 +582,7 @@ class _StatsRow extends ConsumerWidget {
               icon: Icons.local_shipping_rounded,
               iconColor: const Color(0xFF1E88E5),
               iconBg: const Color(0xFFE3F2FD),
-              label: 'Orders',
+              label: context.l10n.profileStatOrders,
               value: '--',
             ),
             _StatDivider(),
@@ -558,7 +590,7 @@ class _StatsRow extends ConsumerWidget {
               icon: Icons.star_rounded,
               iconColor: const Color(0xFFFFB300),
               iconBg: const Color(0xFFFFF8E1),
-              label: 'Rating',
+              label: context.l10n.sellerStatRating,
               value: '--',
             ),
           ],
@@ -569,7 +601,7 @@ class _StatsRow extends ConsumerWidget {
               icon: Icons.inventory_2_rounded,
               iconColor: SellerColors.primaryLight,
               iconBg: SellerColors.surface,
-              label: 'Products',
+              label: context.l10n.sellerProductsTitle,
               value: '${stats.products}',
             ),
             _StatDivider(),
@@ -577,7 +609,7 @@ class _StatsRow extends ConsumerWidget {
               icon: Icons.local_shipping_rounded,
               iconColor: const Color(0xFF1E88E5),
               iconBg: const Color(0xFFE3F2FD),
-              label: 'Orders',
+              label: context.l10n.profileStatOrders,
               value: '${stats.orders}',
             ),
             _StatDivider(),
@@ -585,10 +617,10 @@ class _StatsRow extends ConsumerWidget {
               icon: Icons.star_rounded,
               iconColor: const Color(0xFFFFB300),
               iconBg: const Color(0xFFFFF8E1),
-              label: 'Rating',
+              label: context.l10n.sellerStatRating,
               value: stats.avgRating > 0
                   ? stats.avgRating.toStringAsFixed(1)
-                  : 'N/A',
+                  : context.l10n.sellerNotAvailable,
             ),
           ],
         ),
@@ -870,7 +902,7 @@ class _LogoutButton extends ConsumerWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              'Log Out',
+              context.l10n.commonLogout,
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,

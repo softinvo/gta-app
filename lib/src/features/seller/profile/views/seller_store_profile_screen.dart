@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,21 @@ import 'package:gta_app/src/features/seller/profile/controller/seller_profile_co
 import 'package:gta_app/src/models/seller_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
+
+String _specializationLabel(BuildContext context, String value) =>
+    switch (value) {
+      'Bridal' => context.l10n.sellerSpecializationBridal,
+      'Party Wear' => context.l10n.sellerSpecializationPartyWear,
+      'Custom Tailoring' => context.l10n.sellerSpecializationCustomTailoring,
+      'Fashion Consultation' =>
+        context.l10n.sellerSpecializationFashionConsultation,
+      'Ethnic Wear' => context.l10n.sellerSpecializationEthnicWear,
+      'Western Wear' => context.l10n.sellerSpecializationWesternWear,
+      'Kids Wear' => context.l10n.sellerSpecializationKidsWear,
+      'Accessories' => context.l10n.sellerSpecializationAccessories,
+      'Other' => context.l10n.sellerSpecializationOther,
+      _ => value,
+    };
 
 class SellerStoreProfileScreen extends ConsumerStatefulWidget {
   const SellerStoreProfileScreen({super.key});
@@ -131,7 +147,9 @@ class _SellerStoreProfileScreenState
       };
     }
 
-    final success = await ref.read(sellerProfileProvider.notifier).updateProfile(
+    final success = await ref
+        .read(sellerProfileProvider.notifier)
+        .updateProfile(
           businessName: _businessNameController.text.trim(),
           extraData: extraData,
         );
@@ -139,10 +157,16 @@ class _SellerStoreProfileScreenState
 
     if (mounted) {
       if (success) {
-        SnackBarService.showSuccess(context, 'Store profile updated');
+        SnackBarService.showSuccess(
+          context,
+          context.l10n.sellerStoreProfileUpdated,
+        );
         Navigator.pop(context);
       } else {
-        SnackBarService.showError(context, 'Failed to update store profile');
+        SnackBarService.showError(
+          context,
+          context.l10n.sellerStoreProfileUpdateFailed,
+        );
       }
     }
   }
@@ -163,18 +187,21 @@ class _SellerStoreProfileScreenState
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Store Profile',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerStoreProfileTitle,
         showLogo: false,
         centerTitle: true,
       ),
       body: sellerAsync.when(
         data: (seller) {
-          if (seller == null) return const Center(child: Text('No data'));
+          if (seller == null) {
+            return Center(child: Text(context.l10n.editProfileDataNotFound));
+          }
           return _buildContent();
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, _) =>
+            Center(child: Text('${context.l10n.commonErrorPrefix}: $err')),
       ),
     );
   }
@@ -190,13 +217,13 @@ class _SellerStoreProfileScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionCard(
-              title: 'Business Information',
+              title: context.l10n.sellerBusinessInformation,
               icon: Icons.store_rounded,
               children: [
                 _FormField(
-                  label: 'Business Name',
+                  label: context.l10n.sellerBusinessNameLabel,
                   controller: _businessNameController,
-                  hint: 'Enter your business name',
+                  hint: context.l10n.sellerEnterBusinessName,
                   icon: Icons.storefront_outlined,
                 ),
                 const SizedBox(height: 16),
@@ -209,15 +236,15 @@ class _SellerStoreProfileScreenState
             if (isDesigner) ...[
               const SizedBox(height: 16),
               _SectionCard(
-                title: 'Designer Profile',
+                title: context.l10n.sellerDesignerProfile,
                 icon: Icons.palette_outlined,
                 children: [
                   _buildAvailabilitySelector(),
                   const SizedBox(height: 16),
                   _FormField(
-                    label: 'Professional Bio',
+                    label: context.l10n.sellerProfessionalBio,
                     controller: _bioController,
-                    hint: 'Describe your expertise and style...',
+                    hint: context.l10n.sellerBioHint,
                     icon: Icons.notes_rounded,
                     maxLines: 4,
                     maxLength: 1000,
@@ -225,7 +252,7 @@ class _SellerStoreProfileScreenState
                   ),
                   const SizedBox(height: 16),
                   _FormField(
-                    label: 'Years of Experience',
+                    label: context.l10n.sellerYearsExperience,
                     controller: _yearsController,
                     hint: 'e.g. 5',
                     icon: Icons.timeline_rounded,
@@ -237,20 +264,20 @@ class _SellerStoreProfileScreenState
               ),
               const SizedBox(height: 16),
               _SectionCard(
-                title: 'Specializations',
+                title: context.l10n.sellerSpecializations,
                 icon: Icons.star_outline_rounded,
                 children: [_buildSpecializationChips()],
               ),
               const SizedBox(height: 16),
               _SectionCard(
-                title: 'Price Range (INR)',
+                title: context.l10n.sellerPriceRange,
                 icon: Icons.currency_rupee_rounded,
                 children: [
                   Row(
                     children: [
                       Expanded(
                         child: _FormField(
-                          label: 'Min Price',
+                          label: context.l10n.sellerMinimumPrice,
                           controller: _priceMinController,
                           hint: '500',
                           icon: Icons.arrow_downward_rounded,
@@ -264,7 +291,7 @@ class _SellerStoreProfileScreenState
                       const SizedBox(width: 12),
                       Expanded(
                         child: _FormField(
-                          label: 'Max Price',
+                          label: context.l10n.sellerMaximumPrice,
                           controller: _priceMaxController,
                           hint: '50000',
                           icon: Icons.arrow_upward_rounded,
@@ -305,7 +332,7 @@ class _SellerStoreProfileScreenState
                         ),
                       )
                     : Text(
-                        'Save Changes',
+                        context.l10n.sellerSaveChanges,
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -320,19 +347,39 @@ class _SellerStoreProfileScreenState
   }
 
   Widget _buildBusinessTypeSelector() {
-    const types = [
-      (BusinessType.wholeseller, 'Wholeseller', Icons.warehouse_rounded),
-      (BusinessType.retailer, 'Retailer', Icons.shopping_bag_outlined),
-      (BusinessType.manufacturer, 'Manufacturer', Icons.factory_outlined),
-      (BusinessType.designer, 'Designer', Icons.palette_outlined),
-      (BusinessType.service, 'Service', Icons.miscellaneous_services_rounded),
+    final types = [
+      (
+        BusinessType.wholeseller,
+        context.l10n.sellerBusinessTypeWholesaler,
+        Icons.warehouse_rounded,
+      ),
+      (
+        BusinessType.retailer,
+        context.l10n.sellerBusinessTypeRetailer,
+        Icons.shopping_bag_outlined,
+      ),
+      (
+        BusinessType.manufacturer,
+        context.l10n.sellerBusinessTypeManufacturer,
+        Icons.factory_outlined,
+      ),
+      (
+        BusinessType.designer,
+        context.l10n.sellerBusinessTypeDesigner,
+        Icons.palette_outlined,
+      ),
+      (
+        BusinessType.service,
+        context.l10n.sellerBusinessTypeService,
+        Icons.miscellaneous_services_rounded,
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Business Type',
+          context.l10n.sellerBusinessTypeLabel,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -389,10 +436,12 @@ class _SellerStoreProfileScreenState
                       t.$2,
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color:
-                            isSelected ? Colors.white : CommonColors.greyText,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : CommonColors.greyText,
                       ),
                     ),
                   ],
@@ -408,13 +457,13 @@ class _SellerStoreProfileScreenState
   Widget _buildDatePicker() {
     final label = _registrationDate != null
         ? '${_registrationDate!.day.toString().padLeft(2, '0')}/${_registrationDate!.month.toString().padLeft(2, '0')}/${_registrationDate!.year}'
-        : 'Select date';
+        : context.l10n.sellerSelectDate;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Business Registration Date',
+          context.l10n.sellerBusinessRegistrationDate,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -465,17 +514,29 @@ class _SellerStoreProfileScreenState
   }
 
   Widget _buildAvailabilitySelector() {
-    const options = [
-      (AvailabilityStatus.available, 'Available', Color(0xFF43A047)),
-      (AvailabilityStatus.busy, 'Busy', Color(0xFFF57F17)),
-      (AvailabilityStatus.notTakingOrders, 'Closed', Color(0xFFE53935)),
+    final options = [
+      (
+        AvailabilityStatus.available,
+        context.l10n.commonAvailable,
+        const Color(0xFF43A047),
+      ),
+      (
+        AvailabilityStatus.busy,
+        context.l10n.sellerBusy,
+        const Color(0xFFF57F17),
+      ),
+      (
+        AvailabilityStatus.notTakingOrders,
+        context.l10n.sellerClosed,
+        const Color(0xFFE53935),
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Availability',
+          context.l10n.sellerAvailability,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -523,8 +584,7 @@ class _SellerStoreProfileScreenState
                           fontWeight: isSelected
                               ? FontWeight.w700
                               : FontWeight.w500,
-                          color:
-                              isSelected ? opt.$3 : CommonColors.greyText,
+                          color: isSelected ? opt.$3 : CommonColors.greyText,
                         ),
                       ),
                     ],
@@ -558,7 +618,9 @@ class _SellerStoreProfileScreenState
             duration: const Duration(milliseconds: 150),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: isSelected ? SellerColors.primaryLight : Colors.grey.shade50,
+              color: isSelected
+                  ? SellerColors.primaryLight
+                  : Colors.grey.shade50,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isSelected
@@ -578,11 +640,10 @@ class _SellerStoreProfileScreenState
                   const SizedBox(width: 4),
                 ],
                 Text(
-                  spec,
+                  _specializationLabel(context, spec),
                   style: GoogleFonts.inter(
                     fontSize: 12,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected ? Colors.white : CommonColors.greyText,
                   ),
                 ),
@@ -709,9 +770,7 @@ class _FormField extends StatelessWidget {
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
-          keyboardType: maxLines > 1
-              ? TextInputType.multiline
-              : keyboardType,
+          keyboardType: maxLines > 1 ? TextInputType.multiline : keyboardType,
           maxLines: maxLines,
           maxLength: maxLength,
           inputFormatters: inputFormatters,
@@ -746,8 +805,10 @@ class _FormField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide:
-                  const BorderSide(color: SellerColors.primaryLight, width: 1.5),
+              borderSide: const BorderSide(
+                color: SellerColors.primaryLight,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -757,7 +818,7 @@ class _FormField extends StatelessWidget {
           validator: required
               ? (v) {
                   if (v == null || v.trim().isEmpty) {
-                    return 'This field is required';
+                    return context.l10n.commonFieldRequired;
                   }
                   return null;
                 }

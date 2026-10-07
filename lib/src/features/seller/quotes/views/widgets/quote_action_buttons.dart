@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 
 class QuoteActionButtons extends StatelessWidget {
@@ -21,7 +22,7 @@ class QuoteActionButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onCancel,
             icon: const Icon(Icons.close, size: 20),
-            label: const Text('Cancel'),
+            label: Text(context.l10n.commonCancel),
             style: OutlinedButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
               side: BorderSide(
@@ -40,7 +41,7 @@ class QuoteActionButtons extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: onFinalize,
             icon: const Icon(Icons.check_circle_outline, size: 20),
-            label: const Text('Finalize'),
+            label: Text(context.l10n.sellerFinalize),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).primaryColor,
               foregroundColor: Colors.white,

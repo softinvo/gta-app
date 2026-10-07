@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -132,10 +133,16 @@ class _SellerBusinessAddressScreenState
     if (!mounted) return;
 
     if (success) {
-      SnackBarService.showSuccess(context, 'Business address updated successfully');
+      SnackBarService.showSuccess(
+        context,
+        context.l10n.sellerBusinessAddressUpdated,
+      );
       Navigator.pop(context);
     } else {
-      SnackBarService.showError(context, 'Failed to update business address');
+      SnackBarService.showError(
+        context,
+        context.l10n.sellerBusinessAddressUpdateFailed,
+      );
     }
   }
 
@@ -155,18 +162,21 @@ class _SellerBusinessAddressScreenState
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Business Address',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerBusinessAddressTitle,
         showLogo: false,
         centerTitle: true,
       ),
       body: sellerAsync.when(
         data: (seller) {
-          if (seller == null) return const Center(child: Text('No data'));
+          if (seller == null) {
+            return Center(child: Text(context.l10n.editProfileDataNotFound));
+          }
           return _buildContent(seller);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, _) =>
+            Center(child: Text('${context.l10n.commonErrorPrefix}: $err')),
       ),
     );
   }
@@ -180,35 +190,34 @@ class _SellerBusinessAddressScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Map preview ──────────────────────────────────────────
-            _MapPreview(
-              geolocation: _geolocation,
-              onTap: _openMapPicker,
-            ),
+            _MapPreview(geolocation: _geolocation, onTap: _openMapPicker),
 
             const SizedBox(height: 20),
 
             // ── Contact Details ──────────────────────────────────────
             _SectionCard(
-              title: 'Contact Details',
+              title: context.l10n.sellerContactDetails,
               icon: Icons.contacts_outlined,
               children: [
                 _FormField(
-                  label: 'Business Name',
+                  label: context.l10n.sellerBusinessNameLabel,
                   controller: _nameController,
-                  hint: 'Enter business name',
+                  hint: context.l10n.sellerEnterBusinessName,
                   icon: Icons.store_outlined,
                 ),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'Phone Number',
+                  label: context.l10n.commonPhoneLabel,
                   controller: _phoneController,
-                  hint: 'Phone number',
+                  hint: context.l10n.addressPhoneLabel,
                   icon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
                   enabled: false,
                   trailingWidget: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(6),
@@ -216,11 +225,14 @@ class _SellerBusinessAddressScreenState
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.lock_outline_rounded,
-                            size: 11, color: CommonColors.greyText),
+                        Icon(
+                          Icons.lock_outline_rounded,
+                          size: 11,
+                          color: CommonColors.greyText,
+                        ),
                         const SizedBox(width: 3),
                         Text(
-                          'Locked',
+                          context.l10n.sellerLocked,
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -238,28 +250,28 @@ class _SellerBusinessAddressScreenState
 
             // ── Address Details ──────────────────────────────────────
             _SectionCard(
-              title: 'Address Details',
+              title: context.l10n.sellerAddressDetails,
               icon: Icons.location_on_outlined,
               children: [
                 _FormField(
-                  label: 'Full Address',
+                  label: context.l10n.sellerFullAddress,
                   controller: _addressController,
-                  hint: 'House no., Building, Street, Area',
+                  hint: context.l10n.addressDetailsHint,
                   icon: Icons.home_outlined,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'Locality',
+                  label: context.l10n.addressLocalityLabel,
                   controller: _localityController,
-                  hint: 'Enter locality / area',
+                  hint: context.l10n.addressLocalityHint,
                   icon: Icons.location_city_outlined,
                 ),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'Landmark (Optional)',
+                  label: context.l10n.sellerLandmarkOptional,
                   controller: _landmarkController,
-                  hint: 'Near landmark',
+                  hint: context.l10n.addressLandmarkHint,
                   icon: Icons.place_outlined,
                   isRequired: false,
                 ),
@@ -269,18 +281,18 @@ class _SellerBusinessAddressScreenState
                   children: [
                     Expanded(
                       child: _FormField(
-                        label: 'City',
+                        label: context.l10n.addressCityLabel,
                         controller: _cityController,
-                        hint: 'City',
+                        hint: context.l10n.addressCityHint,
                         icon: Icons.location_city,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _FormField(
-                        label: 'Pincode',
+                        label: context.l10n.addressPincodeLabel,
                         controller: _pincodeController,
-                        hint: 'Pincode',
+                        hint: context.l10n.addressPincodeLabel,
                         icon: Icons.pin_drop_outlined,
                         keyboardType: TextInputType.number,
                       ),
@@ -289,9 +301,9 @@ class _SellerBusinessAddressScreenState
                 ),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'State',
+                  label: context.l10n.addressStateLabel,
                   controller: _stateController,
-                  hint: 'Enter state',
+                  hint: context.l10n.addressStateHint,
                   icon: Icons.map_outlined,
                 ),
               ],
@@ -301,7 +313,7 @@ class _SellerBusinessAddressScreenState
 
             // ── Save button ──────────────────────────────────────────
             SellerGradientButton(
-              label: 'Save Address',
+              label: context.l10n.addressSaveCta,
               isLoading: _isLoading,
               onTap: _saveAddress,
             ),
@@ -369,7 +381,9 @@ class _MapPreviewState extends State<_MapPreview> {
           permission == LocationPermission.deniedForever) {
         return;
       }
-      if (!await Geolocator.isLocationServiceEnabled()) { return; }
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        return;
+      }
 
       // Last-known position is instant; fall back to a live fix with a
       // hard timeout so the spinner never hangs on emulators / slow GPS.
@@ -398,7 +412,10 @@ class _MapPreviewState extends State<_MapPreview> {
     final LatLng target;
     final double zoom;
     if (hasPin) {
-      target = LatLng(widget.geolocation!.latitude, widget.geolocation!.longitude);
+      target = LatLng(
+        widget.geolocation!.latitude,
+        widget.geolocation!.longitude,
+      );
       zoom = 15;
     } else if (_currentLocation != null) {
       target = _currentLocation!;
@@ -417,7 +434,10 @@ class _MapPreviewState extends State<_MapPreview> {
             // Actual map — gestures disabled so it acts as a static preview
             IgnorePointer(
               child: GoogleMap(
-                initialCameraPosition: CameraPosition(target: target, zoom: zoom),
+                initialCameraPosition: CameraPosition(
+                  target: target,
+                  zoom: zoom,
+                ),
                 onMapCreated: (c) => _mapController = c,
                 markers: hasPin
                     ? {
@@ -455,8 +475,10 @@ class _MapPreviewState extends State<_MapPreview> {
               right: 0,
               bottom: 0,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.transparent, Colors.black54],
@@ -466,13 +488,16 @@ class _MapPreviewState extends State<_MapPreview> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.location_on_rounded,
-                        color: Colors.white, size: 16),
+                    const Icon(
+                      Icons.location_on_rounded,
+                      color: Colors.white,
+                      size: 16,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       hasPin
-                          ? 'Tap to update location'
-                          : 'Tap to set location on map',
+                          ? context.l10n.sellerTapUpdateLocation
+                          : context.l10n.sellerTapSetLocation,
                       style: GoogleFonts.inter(
                         color: Colors.white,
                         fontSize: 12,
@@ -482,15 +507,20 @@ class _MapPreviewState extends State<_MapPreview> {
                     const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.5)),
+                          color: Colors.white.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: Text(
-                        hasPin ? 'Update' : 'Open Map',
+                        hasPin
+                            ? context.l10n.commonEdit
+                            : context.l10n.sellerOpenMap,
                         style: GoogleFonts.inter(
                           color: Colors.white,
                           fontSize: 11,
@@ -672,8 +702,10 @@ class _FormField extends StatelessWidget {
                   ? SellerColors.primaryLight
                   : SellerColors.accentLight,
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 52, minHeight: 48),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 52,
+              minHeight: 48,
+            ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 15,
@@ -692,13 +724,16 @@ class _FormField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: SellerColors.primaryLight, width: 2),
+              borderSide: const BorderSide(
+                color: SellerColors.primaryLight,
+                width: 2,
+              ),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: SellerColors.fieldDisabledBorder),
+              borderSide: const BorderSide(
+                color: SellerColors.fieldDisabledBorder,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -706,14 +741,16 @@ class _FormField extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: CommonColors.error, width: 1.5),
+              borderSide: const BorderSide(
+                color: CommonColors.error,
+                width: 1.5,
+              ),
             ),
           ),
           validator: isRequired && enabled
               ? (value) {
                   if (value == null || value.isEmpty) {
-                    return 'This field is required';
+                    return context.l10n.commonFieldRequired;
                   }
                   return null;
                 }

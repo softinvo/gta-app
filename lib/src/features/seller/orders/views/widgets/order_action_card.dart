@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -36,7 +37,7 @@ class OrderActionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Manage Order',
+            context.l10n.sellerManageOrder,
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -58,7 +59,7 @@ class OrderActionCard extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text('Update Status'),
+                  child: Text(context.l10n.sellerUpdateStatus),
                 ),
               ),
             ],

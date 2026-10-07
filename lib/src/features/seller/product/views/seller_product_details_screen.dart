@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/product_model.dart';
@@ -53,7 +54,7 @@ class _SellerProductDetailsScreenState
             data: (product) => _buildAppBar(context, product),
           ) ??
           SellerAppBar(
-            title: 'Product Details',
+            title: context.l10n.sellerProductDetailsTitle,
             showLogo: false,
             centerTitle: true,
           ),
@@ -69,7 +70,7 @@ class _SellerProductDetailsScreenState
 
   SellerAppBar _buildAppBar(BuildContext context, Product product) {
     return SellerAppBar(
-      title: 'Product Details',
+      title: context.l10n.sellerProductDetailsTitle,
       showLogo: false,
       centerTitle: true,
       actions: [
@@ -108,7 +109,7 @@ class _SellerProductDetailsScreenState
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Edit Product',
+                    context.l10n.sellerEditProductTitle,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -137,7 +138,7 @@ class _SellerProductDetailsScreenState
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Delete Product',
+                    context.l10n.sellerDeleteProduct,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -170,7 +171,7 @@ class _SellerProductDetailsScreenState
             ),
             const SizedBox(height: 16),
             Text(
-              'Failed to load product',
+              context.l10n.sellerFailedLoadProduct,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -195,7 +196,7 @@ class _SellerProductDetailsScreenState
               ),
               icon: const Icon(Icons.refresh_rounded),
               label: Text(
-                'Retry',
+                context.l10n.commonRetry,
                 style: GoogleFonts.inter(fontWeight: FontWeight.w600),
               ),
               style: ElevatedButton.styleFrom(
@@ -373,7 +374,7 @@ class _SellerProductDetailsScreenState
             ),
             const SizedBox(height: 8),
             Text(
-              'No image',
+              context.l10n.sellerNoImage,
               style: GoogleFonts.inter(
                 fontSize: 12,
                 color: CommonColors.greyText,
@@ -404,19 +405,19 @@ class _SellerProductDetailsScreenState
               if (product.isMultiColor)
                 _Pill(
                   icon: Icons.palette_rounded,
-                  label: 'Multi Color',
+                  label: context.l10n.productSpecMultiColor,
                   color: SellerColors.primaryLight,
                 ),
               if (product.sampleAvailable)
                 _Pill(
                   icon: Icons.science_rounded,
-                  label: 'Sample Available',
+                  label: context.l10n.productSampleAvailableTitle,
                   color: const Color(0xFF26A69A),
                 ),
               if (product.hasVariants)
                 _Pill(
                   icon: Icons.layers_rounded,
-                  label: 'Has Variants',
+                  label: context.l10n.sellerHasMultipleVariants,
                   color: const Color(0xFF8E24AA),
                 ),
             ],
@@ -537,7 +538,10 @@ class _SellerProductDetailsScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(icon: Icons.palette_rounded, title: 'Color Variants'),
+          _SectionHeader(
+            icon: Icons.palette_rounded,
+            title: context.l10n.sellerColorVariants,
+          ),
           const SizedBox(height: 14),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -665,10 +669,10 @@ class _SellerProductDetailsScreenState
         ? StatusColors.pendingDot
         : StatusColors.verifiedDot;
     final stockLabel = !inStock
-        ? 'Out of Stock'
+        ? context.l10n.sellerOutOfStock
         : isLow
-        ? 'Low Stock'
-        : 'In Stock';
+        ? context.l10n.sellerLowStock
+        : context.l10n.sellerInStock;
 
     // Stock fill ratio capped at 1.0 (assume 100 as "full" if no context)
     final stockRatio = !inStock
@@ -698,7 +702,7 @@ class _SellerProductDetailsScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Pricing & Availability',
+                    context.l10n.sellerPricingAvailability,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -714,7 +718,10 @@ class _SellerProductDetailsScreenState
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        'Min. order qty · ${product.minimumOrderQuantity} $unit',
+                        context.l10n.sellerMinOrderQty(
+                          product.minimumOrderQuantity,
+                          unit,
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: CommonColors.greyText,
@@ -903,7 +910,7 @@ class _SellerProductDetailsScreenState
                     Text(
                       inStock
                           ? '${first.stock.quantity} $unit'
-                          : 'No stock',
+                          : context.l10n.sellerNoStock,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -931,7 +938,7 @@ class _SellerProductDetailsScreenState
                           ),
                         ),
                         child: Text(
-                          'Update',
+                          context.l10n.sellerUpdate,
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -956,7 +963,7 @@ class _SellerProductDetailsScreenState
                 if (isLow) ...[
                   const SizedBox(height: 6),
                   Text(
-                    'Running low — consider restocking soon',
+                    context.l10n.sellerLowStockHint,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: stockColor.withValues(alpha: 0.8),
@@ -974,11 +981,11 @@ class _SellerProductDetailsScreenState
               icon: Icons.science_rounded,
               iconColor: const Color(0xFF26A69A),
               iconBg: const Color(0xFFE0F2F1),
-              label: 'Sample',
+              label: context.l10n.productAttrSample,
               value: product.sampleCost != null && product.sampleCost! > 0
                   ? '₹${_fmt(product.sampleCost!)}'
-                  : 'Free',
-              sub: 'on request',
+                  : context.l10n.orderFreeLabel,
+              sub: context.l10n.sellerOnRequest,
             ),
         ],
       ),
@@ -1005,7 +1012,7 @@ class _SellerProductDetailsScreenState
         children: [
           _SectionHeader(
             icon: Icons.straighten_rounded,
-            title: 'Sizes & Pricing',
+            title: context.l10n.productSizePricingTitle,
           ),
           const SizedBox(height: 16),
 
@@ -1018,13 +1025,24 @@ class _SellerProductDetailsScreenState
             ),
             child: Row(
               children: [
-                SizedBox(width: 56, child: Text('SIZE', style: headerStyle)),
-                Expanded(child: Text('PRICE', style: headerStyle)),
+                SizedBox(
+                  width: 56,
+                  child: Text(
+                    context.l10n.productTableSize,
+                    style: headerStyle,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    context.l10n.sellerPriceLabel,
+                    style: headerStyle,
+                  ),
+                ),
                 if (hasAnyDiscount)
                   SizedBox(
                     width: 52,
                     child: Text(
-                      'OFF',
+                      context.l10n.sellerOffLabel,
                       style: headerStyle,
                       textAlign: TextAlign.center,
                     ),
@@ -1032,7 +1050,7 @@ class _SellerProductDetailsScreenState
                 SizedBox(
                   width: 80,
                   child: Text(
-                    'STOCK',
+                    context.l10n.sellerStockLabel.toUpperCase(),
                     style: headerStyle,
                     textAlign: TextAlign.right,
                   ),
@@ -1056,7 +1074,9 @@ class _SellerProductDetailsScreenState
         : isLow
         ? StatusColors.pendingDot
         : StatusColors.verifiedDot;
-    final stockLabel = !inStock ? 'Out' : '${v.stock.quantity}';
+    final stockLabel = !inStock
+        ? context.l10n.productStockOut
+        : '${v.stock.quantity}';
     final hasDiscount = (v.price.discountPercent ?? 0) > 0;
     final discounted = hasDiscount
         ? v.price.value * (1 - v.price.discountPercent! / 100)
@@ -1224,7 +1244,10 @@ class _SellerProductDetailsScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(icon: Icons.description_rounded, title: 'Description'),
+          _SectionHeader(
+            icon: Icons.description_rounded,
+            title: context.l10n.productDescriptionTitle,
+          ),
 
           // ── Short / summary ───────────────────────────────────────
           if (hasShort) ...[
@@ -1261,7 +1284,7 @@ class _SellerProductDetailsScreenState
           if (hasLong) ...[
             SizedBox(height: hasShort ? 20 : 16),
             if (hasShort) ...[
-              const _SpecGroupLabel(label: 'FULL DETAILS'),
+              _SpecGroupLabel(label: context.l10n.sellerFullDetails),
               const SizedBox(height: 10),
             ],
             _ExpandableText(text: product.description.long!),
@@ -1291,13 +1314,13 @@ class _SellerProductDetailsScreenState
         children: [
           _SectionHeader(
             icon: Icons.format_list_bulleted_rounded,
-            title: 'Specifications',
+            title: context.l10n.productSpecificationsTitle,
           ),
 
           // ── Fabric Properties ─────────────────────────────────
           if (hasTextile) ...[
             const SizedBox(height: 18),
-            const _SpecGroupLabel(label: 'FABRIC PROPERTIES'),
+            _SpecGroupLabel(label: context.l10n.sellerFabricProperties),
             const SizedBox(height: 10),
             if (hasGsm || hasWidth)
               Row(
@@ -1306,7 +1329,7 @@ class _SellerProductDetailsScreenState
                     Expanded(
                       child: _MetricTile(
                         icon: Icons.compress_rounded,
-                        label: 'GSM',
+                        label: context.l10n.productAttrGsm,
                         value: product.gsm!,
                       ),
                     ),
@@ -1315,7 +1338,7 @@ class _SellerProductDetailsScreenState
                     Expanded(
                       child: _MetricTile(
                         icon: Icons.straighten_rounded,
-                        label: 'Width',
+                        label: context.l10n.productAttrWidth,
                         value: product.width!,
                       ),
                     ),
@@ -1328,7 +1351,7 @@ class _SellerProductDetailsScreenState
             if (hasComposition)
               _SpecDetailRow(
                 icon: Icons.science_outlined,
-                label: 'Composition',
+                label: context.l10n.productSpecComposition,
                 value: product.compositions!,
               ),
           ],
@@ -1336,7 +1359,7 @@ class _SellerProductDetailsScreenState
           // ── Classification + Origin ────────────────────────────
           if (hasClassification || hasOrigin) ...[
             const SizedBox(height: 18),
-            const _SpecGroupLabel(label: 'CLASSIFICATION'),
+            _SpecGroupLabel(label: context.l10n.sellerClassification),
             const SizedBox(height: 10),
             if (hasClassification)
               _SpecBreadcrumb(
@@ -1348,7 +1371,7 @@ class _SellerProductDetailsScreenState
             if (hasOrigin)
               _SpecDetailRow(
                 icon: Icons.public_rounded,
-                label: 'Country of Origin',
+                label: context.l10n.sellerCountryOfOrigin,
                 value: product.countryOfOrigin!,
               ),
           ],
@@ -1364,7 +1387,10 @@ class _SellerProductDetailsScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(icon: Icons.tune_rounded, title: 'Additional Attributes'),
+          _SectionHeader(
+            icon: Icons.tune_rounded,
+            title: context.l10n.sellerAdditionalAttributes,
+          ),
           const SizedBox(height: 6),
           ProductAttributeRows(attributes: attributes, alignValueEnd: true),
         ],
@@ -1404,7 +1430,7 @@ class _SellerProductDetailsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Product Needs Attention',
+                  context.l10n.sellerProductNeedsAttention,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -1413,7 +1439,7 @@ class _SellerProductDetailsScreenState
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'This product was rejected during review. Edit it to fix any issues and resubmit.',
+                  context.l10n.sellerProductRejectedHint,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: StatusColors.rejectedText,
@@ -1492,7 +1518,9 @@ class _SellerProductDetailsScreenState
                             decoration: BoxDecoration(
                               color: colorSwatch ?? SellerColors.surface,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFD0D4EE)),
+                              border: Border.all(
+                                color: const Color(0xFFD0D4EE),
+                              ),
                             ),
                             child: colorSwatch == null
                                 ? const Icon(
@@ -1508,7 +1536,7 @@ class _SellerProductDetailsScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Update Stock',
+                                  context.l10n.sellerUpdateStock,
                                   style: GoogleFonts.poppins(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -1536,7 +1564,9 @@ class _SellerProductDetailsScreenState
                             decoration: BoxDecoration(
                               color: SellerColors.surface,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFD0D4EE)),
+                              border: Border.all(
+                                color: const Color(0xFFD0D4EE),
+                              ),
                             ),
                             child: Text(
                               '${variantDetails.length} size${variantDetails.length == 1 ? '' : 's'}',
@@ -1566,7 +1596,9 @@ class _SellerProductDetailsScreenState
                             border: Border.all(color: const Color(0xFFE0E3F0)),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF3F51B5).withValues(alpha: 0.04),
+                                color: const Color(
+                                  0xFF3F51B5,
+                                ).withValues(alpha: 0.04),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -1576,7 +1608,12 @@ class _SellerProductDetailsScreenState
                             children: [
                               // Top bar: size + price | stock toggle
                               Container(
-                                padding: const EdgeInsets.fromLTRB(14, 10, 10, 10),
+                                padding: const EdgeInsets.fromLTRB(
+                                  14,
+                                  10,
+                                  10,
+                                  10,
+                                ),
                                 decoration: BoxDecoration(
                                   color: SellerColors.surface,
                                   borderRadius: const BorderRadius.vertical(
@@ -1594,7 +1631,9 @@ class _SellerProductDetailsScreenState
                                         decoration: BoxDecoration(
                                           color: SellerColors.primaryLight
                                               .withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: Text(
                                           v.size!,
@@ -1621,7 +1660,9 @@ class _SellerProductDetailsScreenState
                                         () => inStockList[i] = !inStockList[i],
                                       ),
                                       child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 200),
+                                        duration: const Duration(
+                                          milliseconds: 200,
+                                        ),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 10,
                                           vertical: 5,
@@ -1630,13 +1671,15 @@ class _SellerProductDetailsScreenState
                                           color: isInStock
                                               ? StatusColors.verifiedBg
                                               : StatusColors.rejectedBg,
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                           border: Border.all(
                                             color: isInStock
                                                 ? StatusColors.verifiedDot
-                                                    .withValues(alpha: 0.4)
+                                                      .withValues(alpha: 0.4)
                                                 : StatusColors.rejectedDot
-                                                    .withValues(alpha: 0.4),
+                                                      .withValues(alpha: 0.4),
                                           ),
                                         ),
                                         child: Row(
@@ -1655,8 +1698,10 @@ class _SellerProductDetailsScreenState
                                             const SizedBox(width: 5),
                                             Text(
                                               isInStock
-                                                  ? 'In Stock'
-                                                  : 'Out of Stock',
+                                                  ? context.l10n.sellerInStock
+                                                  : context
+                                                        .l10n
+                                                        .sellerOutOfStock,
                                               style: GoogleFonts.inter(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w700,
@@ -1683,20 +1728,26 @@ class _SellerProductDetailsScreenState
 
                               // Quantity stepper
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  12,
+                                  12,
+                                  14,
+                                ),
                                 child: Row(
                                   children: [
                                     // Minus
                                     _StepperButton(
                                       icon: Icons.remove_rounded,
                                       onTap: () => setSheetState(() {
-                                        final cur = int.tryParse(
+                                        final cur =
+                                            int.tryParse(
                                               qtyControllers[i].text.trim(),
                                             ) ??
                                             0;
                                         if (cur > 0) {
-                                          qtyControllers[i].text =
-                                              (cur - 1).toString();
+                                          qtyControllers[i].text = (cur - 1)
+                                              .toString();
                                         }
                                       }),
                                     ),
@@ -1721,19 +1772,21 @@ class _SellerProductDetailsScreenState
                                           isDense: true,
                                           contentPadding:
                                               const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 10,
-                                          ),
+                                                horizontal: 10,
+                                                vertical: 10,
+                                              ),
                                           filled: true,
                                           fillColor: SellerColors.background,
                                           border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                             borderSide: BorderSide.none,
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                             borderSide: const BorderSide(
                                               color: SellerColors.primaryLight,
                                               width: 1.5,
@@ -1747,12 +1800,13 @@ class _SellerProductDetailsScreenState
                                     _StepperButton(
                                       icon: Icons.add_rounded,
                                       onTap: () => setSheetState(() {
-                                        final cur = int.tryParse(
+                                        final cur =
+                                            int.tryParse(
                                               qtyControllers[i].text.trim(),
                                             ) ??
                                             0;
-                                        qtyControllers[i].text =
-                                            (cur + 1).toString();
+                                        qtyControllers[i].text = (cur + 1)
+                                            .toString();
                                       }),
                                     ),
                                   ],
@@ -1775,7 +1829,9 @@ class _SellerProductDetailsScreenState
                             color: StatusColors.pendingBg,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: StatusColors.pendingDot.withValues(alpha: 0.3),
+                              color: StatusColors.pendingDot.withValues(
+                                alpha: 0.3,
+                              ),
                             ),
                           ),
                           child: Row(
@@ -1788,7 +1844,11 @@ class _SellerProductDetailsScreenState
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Only "${colorName.isEmpty ? group.variantColorCode : colorName}" will be updated.',
+                                  context.l10n.sellerOnlyColorUpdated(
+                                    colorName.isEmpty
+                                        ? group.variantColorCode
+                                        : colorName,
+                                  ),
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     color: StatusColors.pendingText,
@@ -1814,13 +1874,15 @@ class _SellerProductDetailsScreenState
                                 side: const BorderSide(
                                   color: Color(0xFFD0D4EE),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                               child: Text(
-                                'Cancel',
+                                context.l10n.commonCancel,
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1907,7 +1969,9 @@ class _SellerProductDetailsScreenState
                                           if (context.mounted) {
                                             SnackBarService.showSuccess(
                                               context,
-                                              'Stock updated successfully',
+                                              context
+                                                  .l10n
+                                                  .sellerStockUpdatedSuccess,
                                             );
                                           }
                                         },
@@ -1916,8 +1980,9 @@ class _SellerProductDetailsScreenState
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: SellerColors.primaryLight,
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -1933,7 +1998,7 @@ class _SellerProductDetailsScreenState
                                       ),
                                     )
                                   : Text(
-                                      'Save Changes',
+                                      context.l10n.sellerSaveChanges,
                                       style: GoogleFonts.poppins(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
@@ -1992,7 +2057,7 @@ class _SellerProductDetailsScreenState
             ),
             const SizedBox(height: 16),
             Text(
-              'Delete Product?',
+              context.l10n.sellerDeleteProductQuestion,
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -2001,7 +2066,7 @@ class _SellerProductDetailsScreenState
             ),
             const SizedBox(height: 8),
             Text(
-              'This will permanently remove "${product.name}" and all its variants. This action cannot be undone.',
+              context.l10n.sellerDeleteProductMessage(product.name),
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,
@@ -2023,7 +2088,7 @@ class _SellerProductDetailsScreenState
                       side: BorderSide(color: Colors.grey.shade300),
                     ),
                     child: Text(
-                      'Cancel',
+                      context.l10n.commonCancel,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: CommonColors.greyText,
@@ -2047,7 +2112,7 @@ class _SellerProductDetailsScreenState
                       elevation: 0,
                     ),
                     child: Text(
-                      'Delete',
+                      context.l10n.commonDelete,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -2164,21 +2229,21 @@ class _StatusBadge extends StatelessWidget {
         bg = StatusColors.verifiedBg;
         text = StatusColors.verifiedText;
         icon = Icons.verified_rounded;
-        label = 'Verified';
+        label = context.l10n.productVerifiedBadge;
         break;
       case 'rejected':
         dot = StatusColors.rejectedDot;
         bg = StatusColors.rejectedBg;
         text = StatusColors.rejectedText;
         icon = Icons.cancel_rounded;
-        label = 'Rejected';
+        label = context.l10n.sellerStatusRejected;
         break;
       default:
         dot = StatusColors.pendingDot;
         bg = StatusColors.pendingBg;
         text = StatusColors.pendingText;
         icon = Icons.schedule_rounded;
-        label = 'Pending Review';
+        label = context.l10n.productPendingVerification;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -2658,7 +2723,9 @@ class _ExpandableTextState extends State<_ExpandableText> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _expanded ? 'Show less' : 'Read more',
+                    _expanded
+                        ? context.l10n.commonShowLess
+                        : context.l10n.commonReadMore,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,

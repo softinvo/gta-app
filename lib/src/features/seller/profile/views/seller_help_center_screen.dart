@@ -5,6 +5,7 @@ import 'package:gta_app/src/features/seller/complaint/views/seller_complaints_li
 import 'package:gta_app/src/features/seller/complaint/views/seller_create_complaint_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/customer_support.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerHelpCenterScreen extends StatelessWidget {
   const SellerHelpCenterScreen({super.key});
@@ -24,7 +25,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Seller Help & Support',
+          context.l10n.sellerHelpCenterTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -40,10 +41,10 @@ class SellerHelpCenterScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _buildMyComplaintsCard(context),
           const SizedBox(height: 24),
-          _buildSectionTitle('Raise a Complaint'),
+          _buildSectionTitle(context.l10n.helpRaiseComplaintTitle),
           const SizedBox(height: 8),
           Text(
-            'Select a category to raise a new complaint',
+            context.l10n.helpRaiseComplaintSubtitle,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -58,7 +59,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.shopping_bag_outlined,
-                  'Orders',
+                  context.l10n.navOrders,
                   SellerColors.primaryLight,
                 ),
               ),
@@ -67,7 +68,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.payment_outlined,
-                  'Payments',
+                  context.l10n.helpCategoryPayments,
                   const Color(0xFFE67E22),
                 ),
               ),
@@ -80,7 +81,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.inventory_2_outlined,
-                  'Products',
+                  context.l10n.sellerProductsTitle,
                   const Color(0xFF3498DB),
                 ),
               ),
@@ -89,7 +90,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.account_circle_outlined,
-                  'Account',
+                  context.l10n.profileSectionMyAccount,
                   const Color(0xFF9B59B6),
                 ),
               ),
@@ -102,7 +103,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.local_shipping_outlined,
-                  'Logistics',
+                  context.l10n.helpCategoryShipping,
                   const Color(0xFF2ECC71),
                 ),
               ),
@@ -111,7 +112,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 child: _buildHelpCategory(
                   context,
                   Icons.more_horiz,
-                  'Other',
+                  context.l10n.helpCategoryOther,
                   const Color(0xFF34495E),
                 ),
               ),
@@ -119,27 +120,27 @@ class SellerHelpCenterScreen extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          _buildSectionTitle('Frequently Asked Questions'),
+          _buildSectionTitle(context.l10n.sellerFaqTitle),
           const SizedBox(height: 16),
           _buildFaqItem(
-            'How do I add a new product?',
-            'Go to the Products tab and click on the "Add Product" button. Fill in the details, categories, and variants to submit for approval.',
+            context.l10n.sellerHelpFaqAddProductQ,
+            context.l10n.sellerHelpFaqAddProductA,
           ),
           _buildFaqItem(
-            'What documents are needed for verification?',
-            'You typically need GST details, Business PAN, Bank Account proof, and Address proof to complete your seller verification.',
+            context.l10n.sellerHelpFaqDocumentsQ,
+            context.l10n.sellerHelpFaqDocumentsA,
           ),
           _buildFaqItem(
-            'When will I receive my payouts?',
-            'Payouts are processed weekly. You can track your earnings and upcoming payouts from the Profile > My Earnings section.',
+            context.l10n.sellerHelpFaqPayoutQ,
+            context.l10n.sellerHelpFaqPayoutA,
           ),
           _buildFaqItem(
-            'How can I manage order returns?',
-            'Return requests will appear in your Orders tab. You can review the request and images before accepting or disputing it.',
+            context.l10n.sellerHelpFaqReturnsQ,
+            context.l10n.sellerHelpFaqReturnsA,
           ),
           _buildFaqItem(
-            'Can I update my business location?',
-            'Yes, you can update your business address from Profile > Business Details. This might trigger a re-verification process.',
+            context.l10n.sellerHelpFaqLocationQ,
+            context.l10n.sellerHelpFaqLocationA,
           ),
           const SizedBox(height: 24),
 
@@ -191,7 +192,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Chat with Texax Assistant',
+                    context.l10n.helpChatbotTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -199,7 +200,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Get instant answers to your queries',
+                    context.l10n.helpChatbotSubtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: CommonColors.greyText,
@@ -259,7 +260,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'My Complaints',
+                    context.l10n.helpMyComplaintsTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -267,7 +268,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'View and track your previous complaints',
+                    context.l10n.helpMyComplaintsSubtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: Colors.white.withOpacity(0.9),
@@ -395,7 +396,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
           Icon(Icons.support_agent, size: 48, color: SellerColors.primaryLight),
           const SizedBox(height: 12),
           Text(
-            'Still need help?',
+            context.l10n.helpStillNeedHelp,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -404,7 +405,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Contact our support team',
+            context.l10n.helpContactSupportTeam,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -418,7 +419,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                   onPressed: () => _openSupportEmail(context),
                   icon: const Icon(Icons.email_outlined, size: 18),
                   label: Text(
-                    'Email',
+                    context.l10n.commonEmail,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                   style: OutlinedButton.styleFrom(
@@ -437,7 +438,7 @@ class SellerHelpCenterScreen extends StatelessWidget {
                   onPressed: () => _callSupport(context),
                   icon: const Icon(Icons.call_outlined, size: 18),
                   label: Text(
-                    'Call',
+                    context.l10n.commonCall,
                     style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -461,14 +462,14 @@ class SellerHelpCenterScreen extends StatelessWidget {
   Future<void> _openSupportEmail(BuildContext context) async {
     final opened = await CustomerSupport.sendEmail();
     if (!opened && context.mounted) {
-      _showContactError(context, 'Could not open an email app.');
+      _showContactError(context, context.l10n.sellerEmailAppError);
     }
   }
 
   Future<void> _callSupport(BuildContext context) async {
     final opened = await CustomerSupport.call();
     if (!opened && context.mounted) {
-      _showContactError(context, 'Could not open the phone dialer.');
+      _showContactError(context, context.l10n.sellerPhoneDialerError);
     }
   }
 

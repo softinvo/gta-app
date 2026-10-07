@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/order_model.dart';
@@ -13,10 +14,12 @@ class OrderShippingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final snap = order.buyerSnapshot;
-    final buyerName = snap?.name ??
-        [snap?.firstName, snap?.lastName]
-            .where((p) => p != null && p.isNotEmpty)
-            .join(' ');
+    final buyerName =
+        snap?.name ??
+        [
+          snap?.firstName,
+          snap?.lastName,
+        ].where((p) => p != null && p.isNotEmpty).join(' ');
     final phone = snap?.mobileNumber;
     final email = order.buyerEmail;
     final addr = order.deliveryAddress;
@@ -47,7 +50,7 @@ class OrderShippingCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Shipping Details',
+                context.l10n.sellerShippingDetails,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -108,7 +111,9 @@ class OrderShippingCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: SellerColors.primaryLight.withValues(alpha: 0.12),
+                            color: SellerColors.primaryLight.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -226,7 +231,7 @@ class _ContactRow extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Copied to clipboard',
+                    context.l10n.sellerCopiedClipboard,
                     style: GoogleFonts.inter(fontSize: 13),
                   ),
                   behavior: SnackBarBehavior.floating,

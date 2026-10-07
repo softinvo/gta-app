@@ -1,0 +1,962 @@
+{
+  "@@locale": "fr",
+  "commonRetry": "Réessayer",
+  "commonReset": "Réinitialiser",
+  "commonSeeAll": "Tout voir",
+  "commonCancel": "Annuler",
+  "commonSave": "Enregistrer",
+  "commonApply": "Postuler",
+  "commonDelete": "Supprimer",
+  "commonEdit": "Modifier",
+  "commonClose": "Fermer",
+  "commonDone": "Terminé",
+  "commonSubmit": "Soumettre",
+  "commonYes": "Oui",
+  "commonNo": "Non",
+  "commonOk": "D'accord",
+  "commonFailedToLoad": "Échec du chargement",
+  "commonNoProductsAvailable": "Aucun produit disponible",
+  "commonCategories": "Catégories",
+  "commonSomethingWentWrong": "Quelque chose s'est mal passé",
+  "commonLoading": "Chargement...",
+  "navHome": "Accueil",
+  "navQuotations": "Citations",
+  "navOrders": "Commandes",
+  "navChat": "Discuter",
+  "navProfile": "Profil",
+  "homeSearchHint": "Rechercher des produits, des catégories...",
+  "homeFlashSale": "Vente Flash",
+  "homeBestSellers": "Meilleures ventes",
+  "homeBadgeBestSeller": "MEILLEUR VENDEUR",
+  "homeTopRated": "Les mieux notés",
+  "homeBadgeTopRated": "LES MIEUX NOTÉS",
+  "homeNewArrivals": "Nouveautés",
+  "homeBadgeNew": "NOUVEAU",
+  "homeFailedToLoadProducts": "Échec du chargement des produits",
+  "homeFailedToLoadCategories": "Échec du chargement des catégories",
+  "homeGreeting": "Bonjour, Acheteur !",
+  "homeGreetingSubtitle": "Trouvez les meilleurs produits textiles",
+  "productFromPricePrefix": "De",
+  "productDiscountOff": "{percent} % de réduction",
+  "@productDiscountOff": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "categoriesAllTitle": "Toutes les catégories",
+  "categoriesSubCategoriesFallback": "Sous-catégories",
+  "categoriesProductTypesFallback": "Types de produits",
+  "categoriesEmptyCategories": "Aucune catégorie disponible",
+  "categoriesEmptySubCategories": "Aucune sous-catégorie disponible",
+  "categoriesEmptyProductTypes": "Aucun type de produit disponible",
+  "categoriesViewAllIn": "Afficher tous les produits dans \"{name}\"",
+  "@categoriesViewAllIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTitle": "Filtrer et trier",
+  "filterSortBy": "Trier par",
+  "filterSortNewest": "Le plus récent en premier",
+  "filterSortPriceLowHigh": "Prix : faible à élevé",
+  "filterSortPriceHighLow": "Prix : haut à bas",
+  "filterSortRelevance": "Le plus pertinent",
+  "filterCategory": "Catégorie",
+  "filterAllCategories": "Tout",
+  "filterPriceRange": "Gamme de prix",
+  "filterPriceRangeTo": "à",
+  "filterApplyFilters": "Appliquer des filtres",
+  "searchResultsForQuery": "{count, plural, one{{count} résultat pour \"{query}\"} other{{count} résultats pour \"{query}\"}}",
+  "@searchResultsForQuery": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsInFilter": "{count, plural, one{{count} produit dans {filter}} other{{count} produits dans {filter}}}",
+  "@searchResultsInFilter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsCount": "{count, plural, one{{count} produit} other{{count} produits}}",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchEmptyTitle": "Rechercher des produits",
+  "searchEmptySubtitle": "Tapez et appuyez sur Entrée pour trouver ce dont vous avez besoin",
+  "searchNoResultsForQuery": "Aucun résultat pour \"{query}\"",
+  "@searchNoResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoProductsInFilter": "Aucun produit dans {filter}",
+  "@searchNoProductsInFilter": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoProductsFound": "Aucun produit trouvé",
+  "searchTryDifferentKeywords": "Essayez différents mots-clés ou supprimez les filtres",
+  "searchFailed": "La recherche a échoué",
+  "languageMenuTitle": "Langue",
+  "languagePickerSubtitle": "Choisissez votre langue préférée",
+  "commonShowLess": "Afficher moins",
+  "commonReadMore": "Lire la suite",
+  "commonAvailable": "Disponible",
+  "productVerifiedBadge": "Vérifié",
+  "productMinOrder": "Min. Commande",
+  "productUnitsCount": "{count} unités",
+  "@productUnitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "productStartingPricePerUnit": "Prix de départ · par unité",
+  "productAttrGsm": "GSM",
+  "productAttrWidth": "Largeur",
+  "productAttrFabric": "Tissu",
+  "productAttrOrigin": "Origine",
+  "productAttrSample": "Échantillon",
+  "productSpecComposition": "Composition",
+  "productSpecMoq": "Quantité minimale de commande",
+  "productSpecMultiColor": "Multicolore",
+  "productSpecificationsTitle": "Spécifications",
+  "productColorLabel": "Couleur",
+  "productColorCustom": "Personnalisé",
+  "productSizePricingTitle": "Taille et prix",
+  "productTableSize": "Taille",
+  "productTablePricePerUnit": "Prix / unité",
+  "productTableStock": "Actions",
+  "productStockOut": "Sortie",
+  "productDescriptionTitle": "Descriptif",
+  "productSampleAvailableTitle": "Échantillon disponible",
+  "productRequestSampleFor": "Demander un échantillon pour{cost} ₹",
+  "@productRequestSampleFor": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "productRequestSampleGeneric": "Demander un échantillon pour vérifier la qualité",
+  "productSellerInfoTitle": "Informations sur le vendeur",
+  "productVerifiedSeller": "Vendeur vérifié",
+  "productPendingVerification": "En attente de vérification",
+  "productTrustedBadge": "Confiance",
+  "productFreeToRequest": "Libre de demander",
+  "productMoqPcs": "MOQ {count} pièces",
+  "@productMoqPcs": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "productNegotiatePrice": "Négocier le prix",
+  "productRequestQuoteCta": "Demander un devis",
+  "productRequestQuoteSubtitle": "Obtenez le meilleur prix du vendeur",
+  "productReviewsCount": "{count, plural, one{{count} avis} other{{count} avis}}",
+  "@productReviewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "productSizeFallback": "Taille unique",
+  "quoteErrorSelectVariant": "Veuillez sélectionner au moins une variante",
+  "quoteErrorInvalidPrice": "Saisissez un prix valide pour la taille {size}",
+  "@quoteErrorInvalidPrice": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteSizeFallbackLower": "taille unique",
+  "quoteMinOrderQtyMsg": "La quantité minimale de commande est de {moq} pièces",
+  "@quoteMinOrderQtyMsg": {
+    "placeholders": {
+      "moq": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteErrorSelectAddress": "Veuillez sélectionner une adresse de livraison",
+  "quoteErrorNoSellerInfo": "Informations sur le vendeur non disponibles",
+  "quoteSentSuccess": "Demande de devis envoyée avec succès !",
+  "quoteContactInfoTitle": "Coordonnées",
+  "quotePrefilledSubtitle": "Pré-rempli depuis votre profil",
+  "quoteFullNameLabel": "Nom complet",
+  "quoteFullNameHint": "Votre nom complet",
+  "quoteNameRequired": "Le nom est requis",
+  "quoteMobileLabel": "Numéro de portable",
+  "quoteMobileHint": "Numéro de portable à 10 chiffres",
+  "quotePhoneRequired": "Le téléphone est requis",
+  "quoteInvalidPhone": "Entrez un numéro valide à 10 chiffres",
+  "quoteAltMobileLabel": "Autre mobile (facultatif)",
+  "quoteAltMobileHint": "Un autre numéro de contact",
+  "quoteEmailLabel": "E-mail (facultatif)",
+  "quoteEmailHint": "Pour les mises à jour des commandes",
+  "quoteInvalidEmail": "Entrez une adresse e-mail valide",
+  "quoteDeliveryAddressTitle": "Adresse de livraison",
+  "quoteVariantsTitle": "Variantes et quantité",
+  "quoteVariantsSubtitle": "MOQ : {moq} pcs · Négociez votre prix",
+  "@quoteVariantsSubtitle": {
+    "placeholders": {
+      "moq": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteNoVariantsForColor": "Aucune variante disponible pour la couleur sélectionnée.",
+  "quoteTableVariant": "Variante",
+  "quoteTableQuantity": "Quantité",
+  "quoteTableYourPrice": "Votre prix",
+  "quoteOrderSummaryTitle": "Récapitulatif de la commande",
+  "quoteOrderSummaryLine": "{count, plural, one{{count} variante} other{{count} variantes}} · {totalQty} pièces au total",
+  "@quoteOrderSummaryLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "totalQty": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteQuotedTotalLabel": "Total cité",
+  "quoteSendRequestCta": "Envoyer une demande de devis",
+  "quoteFailedLoadAddresses": "Échec du chargement des adresses",
+  "addressPrimaryBadge": "Primaire",
+  "quoteNoSavedAddresses": "Aucune adresse enregistrée",
+  "quoteAddAddressToContinue": "Ajoutez une adresse de livraison pour continuer",
+  "quoteAddAddressCta": "+ Ajouter une adresse",
+  "quoteListPriceDiscounted": "Liste : {price} ₹ ({discount} % de réduction)",
+  "@quoteListPriceDiscounted": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "discount": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteListPrice": "Liste : ₹{price}",
+  "@quoteListPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "quotePriceFieldLabel": "₹ Prix",
+  "quoteMinOrderQtyWarning": "Min. La quantité commandée est de {moq} pièces",
+  "@quoteMinOrderQtyWarning": {
+    "placeholders": {
+      "moq": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteStatusAll": "Tout",
+  "quoteStatusPending": "En attente",
+  "quoteStatusInProgress": "En cours",
+  "quoteStatusAgreed": "D'accord",
+  "quoteStatusCompleted": "Terminé",
+  "quoteStatusCancelled": "Annulé",
+  "quoteStatusInvoiced": "Facturé",
+  "quoteStatusPaid": "Payé",
+  "quoteSortBySection": "TRIER PAR",
+  "quoteSortOldestFirst": "Le plus âgé en premier",
+  "quoteStatusSection": "STATUT",
+  "quoteSearchHint": "Rechercher des citations...",
+  "quoteEmptyTitle": "Pas encore de devis",
+  "quoteEmptySubtitle": "Vos demandes de devis apparaîtront ici.",
+  "commonProductFallback": "Produit",
+  "quoteUnitsRequested": "{count} unités demandées",
+  "@quoteUnitsRequested": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteDetailsTitle": "Détails du devis",
+  "quoteSectionSeller": "Vendeur",
+  "quoteSectionProduct": "Produit",
+  "quoteSectionRequestedVariants": "Variantes demandées",
+  "quoteSectionFinalAgreedVariants": "Variantes définitives convenues",
+  "quoteSectionPricing": "Tarifs",
+  "quoteSectionTimeline": "Chronologie",
+  "quoteVariantLabelQuoted": "Cité",
+  "quoteTimelineStepOf": "Étape {index} de {total} · {stepName}",
+  "@quoteTimelineStepOf": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      },
+      "stepName": {
+        "type": "String"
+      }
+    }
+  },
+  "commonSellerFallback": "Vendeur",
+  "commonNameLabel": "Nom",
+  "commonPhoneLabel": "Téléphone",
+  "quoteSubCategoryLabel": "Sous-catégorie",
+  "quoteFallbackName": "Devis",
+  "quoteStepSubmitted": "Soumis",
+  "quoteStepUnderReview": "En cours de révision",
+  "quoteStepNegotiation": "Négociation",
+  "quoteStepAgreementReached": "Accord conclu",
+  "quoteStepPaymentDone": "Paiement effectué",
+  "quoteNoVariantsLabel": "Aucune variante",
+  "quoteSizeLabel": "Taille : {size}",
+  "@quoteSizeLabel": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteQtyLabel": "Quantité : {qty}",
+  "@quoteQtyLabel": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "quotePerUnitLabel": "{label} / unité",
+  "@quotePerUnitLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteTotalLabel": "Total : {amount} ₹",
+  "@quoteTotalLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteColorLabel": "Couleur : {code}",
+  "@quoteColorLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteFinalLabel": "Finale",
+  "pricingSubtotal": "Sous-total",
+  "pricingDiscount": "Remise",
+  "pricingGst": "TPS",
+  "pricingDelivery": "Livraison",
+  "quoteTotalAgreedLabel": "Total convenu",
+  "quoteStepDescSubmitted": "Devis envoyé au vendeur",
+  "quoteStepDescReviewing": "Le vendeur examine votre demande",
+  "quoteStepDescNegotiation": "Négociation des prix en cours",
+  "quoteStepDescAgreement": "Conditions convenues, prêt à passer la commande",
+  "quoteStepDescPayment": "Paiement effectué avec succès",
+  "quoteStepDescCompleted": "Commande exécutée et livrée",
+  "quoteHintSubmitted": "En attente que le vendeur commence à examiner votre devis.",
+  "quoteHintReviewing": "Le vendeur est en train d'examiner - vous pourriez bientôt recevoir une contre-offre.",
+  "quoteHintNegotiation": "Examinez toute contre-offre du vendeur et répondez pour convenir d’un prix.",
+  "quoteHintAgreement": "Les deux parties étaient d’accord. Passez votre commande et finalisez le paiement.",
+  "quoteHintPayment": "Paiement reçu. Le vendeur prépare maintenant votre commande pour la livraison.",
+  "quoteHintCompleted": "Votre commande a été complétée. Merci!",
+  "quoteBadgeActive": "ACTIF",
+  "quoteBadgeNext": "Suivant",
+  "quoteBadgeCancelled": "ANNULÉ",
+  "quoteCancelledMessage": "Cette citation a été annulée.",
+  "quoteCancelDialogTitle": "Annuler le devis",
+  "quoteCancelConfirmMessage": "Êtes-vous sûr de vouloir annuler ce devis ?",
+  "quoteCancelReasonHint": "Raison (facultatif)",
+  "quoteYesCancelBtn": "Oui, annuler",
+  "quotePaymentFailed": "Échec du paiement",
+  "quotePaymentNotVerified": "Le paiement n'a pas pu être vérifié",
+  "quotePlaceOrderPay": "Passer une commande et payer {amount} ₹",
+  "@quotePlaceOrderPay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSearchHint": "Rechercher des commandes...",
+  "orderStatusProcessing": "Traitement",
+  "orderStatusPacked": "Emballé",
+  "orderStatusShipped": "Expédié",
+  "orderStatusDelivered": "Livré",
+  "commonOrderFallback": "Commande",
+  "orderEmptyTitle": "Aucune commande pour l'instant",
+  "orderEmptySubtitle": "Vos commandes passées apparaîtront ici.",
+  "orderVariantsSummary": "{totalQty} unités · {count, plural, one{{count} variante} other{{count} variantes}}",
+  "@orderVariantsSummary": {
+    "placeholders": {
+      "totalQty": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderPaymentUnpaid": "Impayé",
+  "orderPaymentFailed": "Échec",
+  "orderPaymentRefunded": "Remboursé",
+  "orderDetailsTitle": "Détails de la commande",
+  "orderItemsTitle": "Articles de commande",
+  "orderUnitFallback": "unité",
+  "orderSizeTag": "Taille {size}",
+  "@orderSizeTag": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "orderQtyTag": "Quantité {qty} {unit}",
+  "@orderQtyTag": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPerUnitLabel": "par {unit}",
+  "@orderPerUnitLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPriceBreakdownTitle": "Répartition des prix",
+  "orderDiscountWithPercent": "Remise ({percent} % de réduction)",
+  "@orderDiscountWithPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "orderCgstLabel": "CGST ({percent} %)",
+  "@orderCgstLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSgstLabel": "SGST ({percent} %)",
+  "@orderSgstLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTotalGstLabel": "TPS totale",
+  "orderFreeLabel": "Gratuit",
+  "orderTotalPayableLabel": "Total à payer",
+  "orderPaymentTitle": "Paiement",
+  "orderPaymentSuccessful": "Paiement réussi",
+  "orderPaymentFailedStatus": "Échec du paiement",
+  "orderPaymentPendingStatus": "Paiement en attente",
+  "orderAmountReceived": "{amount} ₹ reçus",
+  "@orderAmountReceived": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAmountPaid": "{amount} ₹ payé",
+  "@orderAmountPaid": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAmountDue": "{amount} ₹ à payer",
+  "@orderAmountDue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "orderMethodLabel": "Méthode",
+  "orderPaidOnLabel": "Payé le",
+  "orderReferenceIdLabel": "Numéro de référence",
+  "orderTrackingTitle": "Suivi des commandes",
+  "orderStepPlaced": "Commande passée",
+  "orderStepDescPlaced": "Commande confirmée et reçue",
+  "orderStepDescProcessing": "Le vendeur prépare votre commande",
+  "orderStepDescPacked": "Articles emballés et prêts à être expédiés",
+  "orderStepDescShipped": "La commande est en route vers vous",
+  "orderStepDescDelivered": "Commande livrée à votre adresse",
+  "orderStepCounter": "Étape {completed} sur {total}",
+  "@orderStepCounter": {
+    "placeholders": {
+      "completed": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "orderInProgressLabel": "En cours...",
+  "orderStepCancelledLabel": "Commande annulée",
+  "orderStepDescCancelled": "Cette commande a été annulée",
+  "orderCancelDialogTitle": "Annuler la commande",
+  "orderCancelConfirmMessage": "Êtes-vous sûr de vouloir annuler cette commande ?",
+  "profileGuestUser": "Utilisateur invité",
+  "profileErrorLoading": "Erreur de chargement",
+  "profileSectionMyAccount": "Mon compte",
+  "profileEditProfileTitle": "Modifier le profil",
+  "profileEditProfileSubtitle": "Mettez à jour votre nom, votre email et votre photo",
+  "profileManageAddressesTitle": "Gérer les adresses",
+  "profileManageAddressesSubtitle": "Ajouter ou modifier des adresses de livraison",
+  "profileVerificationStatusTitle": "Statut de vérification",
+  "profileVerificationStatusSubtitle": "Vérification KYC complète",
+  "profileSectionSupport": "Assistance",
+  "profileHelpFaqTitle": "Aide et FAQ",
+  "profileHelpFaqSubtitle": "Parcourir les questions courantes",
+  "profileContactSupportTitle": "Contacter l'assistance",
+  "profileContactSupportSubtitle": "Discutez ou déposez une plainte",
+  "profileRateAppTitle": "Évaluez l'application",
+  "profileRateAppSubtitle": "Partagez vos commentaires",
+  "rateAppHeading": "Votre avis compte",
+  "rateAppDescription": "Aidez-nous à améliorer Texax en partageant votre expérience.",
+  "rateAppQuestion": "Comment évalueriez-vous votre expérience ?",
+  "rateAppTapHint": "Appuyez sur une étoile pour noter",
+  "rateAppFeedbackLabel": "Dites-nous en plus (facultatif)",
+  "rateAppFeedbackHint": "Qu’avez-vous aimé ou que pouvons-nous améliorer ?",
+  "rateAppSubmit": "Envoyer des commentaires",
+  "rateAppThankYou": "Merci pour votre retour !",
+  "profileSectionSettings": "Paramètres",
+  "profileNotificationsTitle": "Notifications",
+  "profileNotificationsSubtitle": "Gérer les alertes et les mises à jour",
+  "profileLegalPoliciesTitle": "Mentions légales et politiques",
+  "profileLegalPoliciesSubtitle": "Conditions, politique de confidentialité et de remboursement",
+  "profileVersionLabel": "Version {version}",
+  "@profileVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileBuyerAccountBadge": "Compte acheteur",
+  "profileSellerAccountBadge": "Compte vendeur",
+  "profileStatOrders": "Commandes",
+  "profileStatQuotes": "Citations",
+  "profileStatWishlist": "Liste de souhaits",
+  "commonLogout": "Déconnexion",
+  "profileLogoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+  "commonCamera": "Appareil photo",
+  "commonGallery": "Galerie",
+  "commonFieldRequired": "Ce champ est obligatoire",
+  "commonErrorPrefix": "Erreur : {error}",
+  "@commonErrorPrefix": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editProfileUploadTitle": "Télécharger une photo de profil",
+  "editProfileDataNotFound": "Données de l'acheteur introuvables",
+  "editProfilePictureUpdated": "Photo de profil mise à jour",
+  "editProfileUpdateFailed": "Échec de la mise à jour du profil",
+  "editProfileFirstNameLabel": "Prénom",
+  "editProfileFirstNameHint": "Entrez le prénom",
+  "editProfileLastNameLabel": "Nom de famille",
+  "editProfileLastNameHint": "Entrez le nom de famille",
+  "editProfileEmailLabel": "Adresse e-mail",
+  "editProfileEmailHint": "Entrez l'adresse e-mail",
+  "editProfileGenderLabel": "Sexe",
+  "editProfileUpdateCta": "Mettre à jour le profil",
+  "editProfileUpdateSuccess": "Profil mis à jour avec succès",
+  "genderMale": "Mâle",
+  "genderFemale": "Femme",
+  "genderOther": "Autre",
+  "commonConfirm": "Confirmer",
+  "addressEmptyTitle": "Aucune adresse enregistrée",
+  "addressEmptySubtitle": "Ajoutez votre première adresse pour commencer",
+  "addressMarkPrimaryTitle": "Marquer comme principal",
+  "addressMarkPrimaryConfirm": "Voulez-vous la définir comme adresse principale ?",
+  "addressMarkedPrimarySuccess": "Adresse marquée comme principale",
+  "addressMarkPrimaryFailed": "Échec du marquage de l'adresse comme adresse principale",
+  "addressDeleteDialogTitle": "Supprimer l'adresse",
+  "addressDeleteConfirm": "Êtes-vous sûr de vouloir supprimer cette adresse ?",
+  "addressDeleteFailed": "Échec de la suppression de l'adresse",
+  "addressAddNewCta": "Ajouter une nouvelle adresse",
+  "addressFullNameLabel": "Nom complet",
+  "addressReceiverNameHint": "Nom du destinataire",
+  "addressPhoneLabel": "Numéro de téléphone",
+  "addressFlatLabel": "Appartement / Numéro de maison / Bâtiment",
+  "addressDetailsHint": "Entrez les détails de l'adresse",
+  "addressLocalityLabel": "Localité / Zone",
+  "addressLocalityHint": "Entrez la localité",
+  "addressLandmarkLabel": "Point de repère (facultatif)",
+  "addressLandmarkHint": "Par ex. Près de l'hôpital Apollo",
+  "addressPincodeLabel": "Code PIN",
+  "addressCityLabel": "Ville",
+  "addressCityHint": "Entrez la ville",
+  "addressStateLabel": "État",
+  "addressStateHint": "Entrez l'état",
+  "addressSetPrimaryLabel": "Définir comme adresse principale",
+  "addressSaveCta": "Enregistrer l'adresse",
+  "addressAddedSuccess": "Adresse ajoutée avec succès",
+  "addressAddFailed": "Échec de l'ajout de l'adresse",
+  "addressEditTitle": "Modifier l'adresse",
+  "addressUpdateFailed": "Échec de la mise à jour de l'adresse",
+  "addressUpdatedSuccess": "Adresse mise à jour avec succès",
+  "addressUpdateCta": "Mettre à jour l'adresse",
+  "verificationTitle": "Vérification",
+  "verificationKycTitle": "Documents KYC",
+  "verificationKycSubtitle": "Soumettez vos documents pour vérification pour débloquer toutes les fonctionnalités",
+  "verificationNameLabel": "Nom (selon les documents)",
+  "verificationNameHint": "Entrez le nom selon Aadhar/PAN",
+  "verificationDobLabel": "Date de naissance",
+  "verificationAddressLabel": "Adresse (selon les documents)",
+  "verificationAddressHint": "Entrez l'adresse selon Aadhar",
+  "verificationAadharLabel": "Numéro Aadhar",
+  "verificationAadharRequired": "Veuillez entrer le numéro Aadhar",
+  "verificationAadharInvalid": "Le numéro Aadhar doit être composé de 12 chiffres",
+  "verificationPanLabel": "Numéro PAN",
+  "verificationPanRequired": "Veuillez saisir le numéro PAN",
+  "verificationPanInvalid": "Saisissez un PAN valide (par exemple, ABCDE1234F)",
+  "verificationInfoNote": "Vos documents seront vérifiés dans les 24 à 48 heures.",
+  "verificationSubmitCta": "Soumettre pour vérification",
+  "verificationSubmitSuccess": "Détails de vérification soumis avec succès",
+  "verificationStatusPendingTitle": "Vérification en attente",
+  "verificationStatusPendingDesc": "Vos documents sont en cours de révision",
+  "verificationStatusApprovedTitle": "Vérifié",
+  "verificationStatusApprovedDesc": "Votre compte est vérifié",
+  "verificationStatusRejectedTitle": "Vérification rejetée",
+  "verificationStatusRejectedDesc": "Veuillez soumettre à nouveau vos documents",
+  "verificationStatusNotSubmittedTitle": "Non vérifié",
+  "verificationStatusNotSubmittedDesc": "Soumettre des documents pour être vérifié",
+  "verificationSelectDobHint": "Sélectionnez la date de naissance",
+  "helpFaqTitle": "Aide et assistance",
+  "helpChatbotTitle": "Discutez avec l'assistant Texax",
+  "helpChatbotSubtitle": "Obtenez des réponses instantanées à vos questions",
+  "helpMyComplaintsTitle": "Mes réclamations",
+  "helpMyComplaintsSubtitle": "Consultez et suivez vos réclamations précédentes",
+  "helpRaiseComplaintTitle": "Déposer une plainte",
+  "helpRaiseComplaintSubtitle": "Sélectionnez une catégorie pour déposer une nouvelle plainte",
+  "helpCategoryPayments": "Paiements",
+  "helpCategoryShipping": "Expédition",
+  "helpCategoryProfile": "Profil",
+  "helpCategoryProducts": "Produits",
+  "helpCategoryOther": "Autre",
+  "helpFaqSectionTitle": "Foire aux questions",
+  "helpFaq1Q": "Comment puis-je suivre le statut de ma commande ?",
+  "helpFaq1A": "Vous pouvez suivre votre commande depuis l'onglet Commandes. Cliquez sur n'importe quelle commande pour voir son statut actuel et les détails de suivi.",
+  "helpFaq2Q": "Quelle est la politique de retour ?",
+  "helpFaq2A": "Les produits peuvent être retournés dans les 7 jours suivant la livraison s'ils sont inutilisés et dans leur emballage d'origine. Consultez notre page Politiques pour plus de détails.",
+  "helpFaq3Q": "Comment puis-je contacter directement un vendeur ?",
+  "helpFaq3A": "Vous pouvez envoyer un message aux vendeurs directement depuis la page du produit ou la page des détails de la commande à l'aide du bouton Message.",
+  "helpFaq4Q": "Puis-je annuler ma demande de devis ?",
+  "helpFaq4A": "Oui, vous pouvez annuler une demande de devis depuis l'onglet Devis tant qu'elle n'a pas été acceptée par le vendeur.",
+  "helpFaq5Q": "Comment mettre à jour mon adresse de livraison ?",
+  "helpFaq5A": "Accédez à Profil > Gérer les adresses pour ajouter, modifier ou supprimer des adresses de livraison.",
+  "helpStillNeedHelp": "Vous avez encore besoin d'aide ?",
+  "helpContactSupportTeam": "Contactez notre équipe d'assistance",
+  "commonEmail": "Courriel",
+  "commonCall": "Appeler",
+  "complaintSubjectTemplate": "{category} Problème",
+  "@complaintSubjectTemplate": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintSubjectLabel": "Sujet",
+  "complaintSubjectHint": "Bref objet de votre plainte",
+  "complaintSubjectRequired": "Le sujet est obligatoire",
+  "complaintOrderNumberLabel": "Numéro de commande (facultatif)",
+  "complaintOrderNumberHint": "Entrez le numéro de commande le cas échéant",
+  "complaintDescriptionLabel": "Descriptif",
+  "complaintDescriptionHint": "Décrivez votre problème en détail...",
+  "complaintDescriptionRequired": "Une description est requise",
+  "complaintSubmitCta": "Soumettre une plainte",
+  "complaintSubmitSuccess": "Plainte soumise avec succès !",
+  "complaintSubmitFailed": "Échec de la soumission de la plainte. Essayer à nouveau.",
+  "policyTermsTitle": "Conditions générales",
+  "policyTermsDesc": "Lisez nos conditions d’utilisation et nos directives d’utilisation.",
+  "policyPrivacyTitle": "Politique de confidentialité",
+  "policyPrivacyDesc": "Comment nous collectons, utilisons et protégeons vos données.",
+  "policyRefundTitle": "Politique de remboursement et de retour",
+  "policyRefundDesc": "Informations sur les remboursements et les retours de produits.",
+  "policyShippingTitle": "Politique d'expédition",
+  "policyShippingDesc": "Délais de livraison et informations d’expédition.",
+  "policyTermsContent": "Conditions générales\n\nDernière mise à jour : janvier 2026\n\n1. Acceptation des conditions\nEn accédant et en utilisant l'application Texax, vous acceptez d'être lié par les présentes Conditions générales. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser nos services.\n\n2. Comptes d'utilisateurs\n- Vous devez avoir au moins 18 ans pour créer un compte.\n- Vous êtes responsable du maintien de la confidentialité des informations d'identification de votre compte.\n- Vous devez fournir des informations exactes et complètes lors de la création de votre compte.\n\n3. Utilisation des Services\n- Notre plateforme met en relation les acheteurs avec les vendeurs de textile.\n- Vous acceptez d'utiliser la plateforme uniquement à des fins licites.\n- Vous ne pouvez pas utiliser la plateforme pour vous livrer à des activités frauduleuses.\n\n4. Commandes et paiements\n- Tous les prix sont indiqués en roupies indiennes (INR).\n- Le paiement doit être effectué avant le traitement de la commande.\n- Nous nous réservons le droit d'annuler les commandes en cas d'erreurs de prix.\n\n5. Propriété intellectuelle\n- Tout le contenu de la plateforme est protégé par le droit d'auteur.\n- Vous ne pouvez pas copier, reproduire ou distribuer tout contenu sans autorisation.\n\n6. Limitation de responsabilité\n- Nous ne sommes pas responsables des dommages indirects ou consécutifs.\n- Notre responsabilité est limitée au montant payé pour la transaction spécifique.\n\n7. Modifications des conditions\nNous nous réservons le droit de modifier ces conditions à tout moment. La poursuite de l'utilisation de la plateforme vaut acceptation des conditions modifiées.\n\n8. Contactez-nous\nPour toute question concernant ces conditions, veuillez nous contacter à support@texax.in",
+  "policyPrivacyContent": "Politique de confidentialité\n\nDernière mise à jour : janvier 2026\n\n1. Informations que nous collectons\nNous collectons les informations que vous nous fournissez directement, notamment :\n- Informations personnelles (nom, email, numéro de téléphone)\n- Informations d'adresse à des fins de livraison\n- Informations de paiement pour le traitement des commandes\n- Informations sur l'appareil et son utilisation\n\n2. Comment nous utilisons vos informations\nNous utilisons les informations que nous collectons pour :\n- Traiter et exécuter vos commandes\n- Envoyer des mises à jour et des notifications de commande\n- Améliorer nos services et l'expérience utilisateur\n- Communiquer sur les promotions et les nouvelles fonctionnalités\n- Assurer la sécurité de la plateforme\n\n3. Partage d'informations\nNous ne vendons pas vos informations personnelles. Nous pouvons partager vos informations avec :\n- Des vendeurs pour exécuter vos commandes\n- Processeurs de paiement pour le traitement des transactions\n- Partenaires de livraison pour l'expédition des commandes\n- Autorités judiciaires lorsque la loi l'exige\n\n4. Sécurité des données\nNous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles, notamment le cryptage et le stockage sécurisé des données.\n\n5. Vos droits\nVous avez le droit de :\n- Accédez à vos informations personnelles\n- Corriger les informations inexactes\n- Supprimez votre compte et les données associées\n- Se désinscrire des communications marketing\n\n6. Cookies\nNous utilisons des cookies pour améliorer votre expérience de navigation et analyser l'utilisation de la plateforme.\n\n7. Contactez-nous\nPour toute demande relative à la confidentialité, veuillez nous contacter à Privacy@texax.in",
+  "policyRefundContent": "Politique de remboursement et de retour\n\nDernière mise à jour : janvier 2026\n\n1. Admissibilité au retour\n- Les articles doivent être retournés dans les 7 jours suivant la livraison.\n- Les produits doivent être inutilisés et dans leur emballage d'origine.\n- Les articles fabriqués sur mesure ou personnalisés ne peuvent pas être retournés.\n\n2. Processus de retour\n- Initiez une demande de retour via l'application.\n- Emballez l'article en toute sécurité dans son emballage d'origine.\n- Notre partenaire de livraison viendra chercher l'article.\n- Le remboursement sera traité dans un délai de 5 à 7 jours ouvrables.\n\n3. Méthodes de remboursement\n- Le mode de paiement original sera crédité.\n- Les virements bancaires peuvent prendre 3 à 5 jours ouvrables supplémentaires.\n- Les crédits de portefeuille sont instantanés.\n\n4. Articles non retournables\n- Sous-vêtements et vêtements d'intérieur\n- Articles marqués comme « Vente finale »\n- Produits endommagés en raison d'une mauvaise utilisation du client\n- Produits avec balises supprimées\n\n5. Articles endommagés ou défectueux\n- Rapport dans les 24 heures suivant la livraison avec photos.\n- Nous organiserons le ramassage sans frais supplémentaires.\n- Un remboursement complet ou un remplacement sera fourni.\n\n6. Politique d'annulation\n- Les commandes peuvent être annulées avant expédition.\n- Remboursement intégral des commandes annulées.\n- Remboursements partiels pour les commandes en transit.\n\n7. Contactez-nous\nPour les demandes de remboursement, contactez support@texax.in",
+  "policyShippingContent": "Politique d'expédition\n\nDernière mise à jour : janvier 2026\n\n1. Couverture d'expédition\n- Nous livrons dans toute l'Inde.\n- La disponibilité du code PIN peut être vérifiée à la caisse.\n- Certaines régions éloignées peuvent avoir un service limité.\n\n2. Délais de livraison\n- Villes métropolitaines : 3 à 5 jours ouvrables\n- Villes de niveau 2 : 5 à 7 jours ouvrables\n- Autres zones : 7 à 10 jours ouvrés\n\n3. Frais d'expédition\n- Livraison gratuite pour les commandes supérieures à 999 ₹.\n- Livraison standard : 49 ₹ pour les commandes inférieures à 999 ₹.\n- Livraison express disponible moyennant des frais supplémentaires.\n\n4. Suivi des commandes\n- Lien de suivi envoyé par SMS et email.\n- Suivi en temps réel disponible dans l'application.\n- Notifications pour les étapes clés de livraison.\n\n5. Tentatives de livraison\n- Jusqu'à 3 tentatives de livraison seront effectuées.\n- Les livraisons échouées seront retournées au vendeur.\n- Le client sera informé avant chaque tentative.\n\n6. Exactitude des adresses\n- Veuillez vous assurer que l'adresse de livraison est exacte.\n- Nous ne sommes pas responsables des retards dus à des adresses incorrectes.\n- Les changements d'adresse doivent être demandés avant l'expédition.\n\n7. Contactez-nous\nPour les questions d'expédition, contactez support@texax.in",
+  "complaintsFailedToLoad": "Échec du chargement des réclamations",
+  "complaintsEmptyTitle": "Aucune plainte pour l'instant",
+  "complaintsEmptySubtitle": "Vous n'avez soulevé aucune plainte.\nNous espérons que votre expérience sera formidable !",
+  "complaintsMessagesCount": "{count, plural, one{{count} message} other{{count} messages}}",
+  "@complaintsMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "complaintStatusActive": "Actif",
+  "complaintStatusResolved": "Résolu",
+  "complaintStatusOnHold": "En attente",
+  "complaintDetailsTitle": "Détails de la plainte",
+  "complaintNotFound": "Aucune plainte trouvée",
+  "complaintInfoTitle": "Informations sur la plainte",
+  "complaintIdLabel": "Numéro de plainte",
+  "complaintOrderNumberDisplayLabel": "Numéro de commande",
+  "complaintCreatedOnLabel": "Créé le",
+  "complaintDescriptionTitle": "Descriptif",
+  "complaintNoDescription": "Aucune description fournie",
+  "complaintMessagesTitle": "Messages",
+  "complaintAdminBadge": "ADMINISTRATEUR",
+  "complaintResolvedTitle": "Plainte résolue",
+  "complaintResolvedMessage": "Cette plainte a été résolue. Le chat est maintenant fermé.",
+  "complaintMessageHint": "Tapez votre message...",
+  "complaintMessageSent": "Message envoyé",
+  "wishlistTitle": "Ma liste de souhaits",
+  "wishlistEmptyTitle": "Votre liste de souhaits est vide",
+  "wishlistEmptySubtitle": "Enregistrez les produits que vous aimez et retrouvez-les ici.",
+  "wishlistBrowseCta": "Parcourir les produits",
+  "sellerDashboardTitle": "Tableau de bord",
+  "sellerProductsTitle": "Produits",
+  "sellerEarningsTitle": "Revenus",
+  "sellerTransactionsTitle": "Transactions",
+  "sellerBusinessSection": "Entreprise",
+  "sellerManagementSection": "Gestion",
+  "sellerPersonalDetailsTitle": "Détails personnels",
+  "sellerBusinessAddressTitle": "Adresse professionnelle",
+  "sellerStoreSetupTitle": "Configuration du magasin",
+  "sellerHelpCenterTitle": "Centre d'aide aux vendeurs",
+  "sellerPoliciesTitle": "Politiques du vendeur",
+  "sellerStatusUnderReview": "En cours de révision",
+  "sellerStatusRejected": "Rejeté",
+  "sellerStatusNotVerified": "Non vérifié",
+  "sellerStatRating": "Notation",
+  "sellerNotAvailable": "N / A",
+  "sellerFallbackName": "Vendeur de textiles",
+  "sellerDashboardTodayOverview": "Aperçu du jour",
+  "sellerDashboardOrdersOverview": "Aperçu des commandes",
+  "sellerDashboardQuotesOverview": "Aperçu des devis",
+  "sellerWelcomeTitle": "Content de te revoir",
+  "sellerWelcomeSubtitle": "Gérez votre entreprise textile à partir d'un seul endroit",
+  "sellerFilterAllTime": "Tout le temps",
+  "sellerFilterToday": "Aujourd'hui",
+  "sellerFilterWeek": "Semaine",
+  "sellerFilterMonth": "Mois",
+  "sellerFilterYear": "Année",
+  "sellerTotalOrders": "Total des commandes",
+  "sellerTotalQuotes": "Total des cotations",
+  "sellerTotalProducts": "Produits totaux",
+  "sellerTotalRevenue": "Revenu total",
+  "sellerProductsSearchHint": "Rechercher des produits...",
+  "sellerAddProductTitle": "Ajouter un produit",
+  "sellerEditProductTitle": "Modifier le produit",
+  "sellerNoProductsTitle": "Aucun produit pour l'instant",
+  "sellerNoProductsSubtitle": "Ajoutez votre premier produit et commencez à toucher des acheteurs sur toute la plateforme.",
+  "sellerAddFirstProduct": "Ajoutez votre premier produit",
+  "sellerQuoteDetailsTitle": "Détails du devis",
+  "sellerQuoteSearchHint": "Rechercher un identifiant de devis, un acheteur...",
+  "sellerFilterSortTitle": "Filtrer et trier",
+  "sellerFilterNewestFirst": "Le plus récent en premier",
+  "sellerFilterOldestFirst": "Le plus âgé en premier",
+  "sellerStatusNew": "Nouveau",
+  "sellerStatusInProgress": "En cours",
+  "sellerStatusAgreed": "Convenu",
+  "sellerStatusCancelled": "Annulé",
+  "sellerApplyFilters": "Appliquer des filtres",
+  "sellerNoQuotesTitle": "Aucune citation trouvée",
+  "sellerNoQuotesSubtitle": "Les devis apparaîtront ici une fois soumis",
+  "sellerOrderDetailsTitle": "Détails de la commande",
+  "sellerOrderSearchHint": "Recherche par numéro de commande, acheteur...",
+  "sellerStatusPacked": "Emballé",
+  "sellerStatusShipped": "Expédié",
+  "sellerStatusDelivered": "Livré",
+  "sellerNoOrdersTitle": "Aucune commande trouvée",
+  "sellerNoOrdersSubtitle": "Les commandes apparaîtront ici une fois passées",
+  "sellerPaymentReceived": "Paiement reçu",
+  "sellerPaymentPending": "Paiement en attente",
+  "sellerPaymentFailed": "Échec du paiement",
+  "sellerPaymentRefunded": "Remboursé",
+  "sellerPaymentSummary": "Récapitulatif des paiements",
+  "sellerRevenueInsights": "Informations sur les revenus",
+  "sellerPaymentBreakdown": "Répartition des paiements",
+  "sellerOrderStatusTitle": "Statut de la commande",
+  "sellerPaid": "Payé",
+  "sellerPending": "En attente",
+  "sellerRefunded": "Remboursé",
+  "sellerFailed": "Échoué",
+  "sellerAverageOrderValue": "Valeur moyenne des commandes",
+  "sellerAveragePaidValue": "Valeur payée moyenne",
+  "sellerPaidOrders": "Commandes payées",
+  "sellerPendingPayment": "En attente de paiement",
+  "sellerNoTransactionsTitle": "Aucune transaction pour l'instant",
+  "sellerNoTransactionsSubtitle": "Les transactions des nouvelles commandes apparaîtront ici.",
+  "sellerTransactionsLoadError": "Impossible de charger les transactions",
+  "sellerTotalEarned": "TOTAL GAGNÉ",
+  "sellerSelectedPeriodEarnings": "Gains payés au cours de la période sélectionnée",
+  "sellerAverageValue": "Valeur moyenne",
+  "sellerFailedLoadEarnings": "Échec du chargement des revenus",
+  "sellerStoreProfileTitle": "Profil du magasin",
+  "sellerVerificationTitle": "Vérification du vendeur",
+  "sellerBankDetailsTitle": "Coordonnées bancaires",
+  "sellerSaveChanges": "Enregistrer les modifications",
+  "sellerUpdateProfilePhoto": "Mettre à jour la photo de profil",
+  "sellerProfileUpdated": "Profil mis à jour avec succès",
+  "sellerProfileUpdateFailed": "Échec de la mise à jour du profil",
+  "sellerStoreProfileUpdated": "Profil de magasin mis à jour",
+  "sellerStoreProfileUpdateFailed": "Échec de la mise à jour du profil du magasin",
+  "sellerBusinessNameLabel": "Nom de l'entreprise",
+  "sellerBusinessTypeLabel": "Type d'entreprise",
+  "sellerAccountHolderName": "Nom du titulaire du compte",
+  "sellerAccountNumber": "Numéro de compte",
+  "sellerIfscCode": "Code IFSC",
+  "sellerSubmitVerification": "Soumettre pour vérification",
+  "sellerDocumentsTitle": "Documents",
+  "sellerUploadDocument": "Télécharger un document",
+  "sellerSelectLocation": "Sélectionnez un emplacement",
+  "sellerUseCurrentLocation": "Utiliser l'emplacement actuel",
+  "sellerConfirmLocation": "Confirmer l'emplacement",
+  "sellerFaqTitle": "Foire aux questions",
+  "sellerStillNeedHelp": "Vous avez encore besoin d'aide ?",
+  "sellerContactSupport": "Contacter l'assistance",
+  "sellerComplaintTitle": "Plaintes",
+  "sellerCreateComplaint": "Créer une plainte",
+  "sellerNoComplaints": "Aucune plainte trouvée",
+  "sellerBasicDetails": "Détails de base",
+  "sellerProductNameLabel": "Nom du produit *",
+  "sellerCountryOfOrigin": "Pays d'origine",
+  "sellerSampleCost": "Exemple de coût ( ₹ )",
+  "sellerClassification": "Classification",
+  "sellerTextileSpecifications": "Spécifications textiles",
+  "sellerCompositions": "Compositions",
+  "sellerShortDescription": "Brève description",
+  "sellerLongDescription": "Description longue",
+  "sellerMinimumOrderQuantity": "Quantité minimale de commande (MOQ)",
+  "sellerProductAttributes": "Attributs du produit",
+  "sellerColorVariantType": "Couleur et type de variante",
+  "sellerIsMultiColor": "Le multicolore est-il ?",
+  "sellerMultiColorSubtitle": "Le produit est disponible en plusieurs couleurs",
+  "sellerHasMultipleVariants": "Existe-t-il plusieurs variantes ?",
+  "sellerMultipleVariantsSubtitle": "Différentes tailles/couleurs avec prix séparés",
+  "sellerVariantsTitle": "Variantes",
+  "sellerPriceLabel": "Prix",
+  "sellerStockLabel": "Action",
+  "sellerSizeOptional": "Taille (facultatif)",
+  "sellerCategoryRequired": "Catégorie *",
+  "sellerSubCategoryRequired": "Sous-catégorie *",
+  "sellerProductTypeRequired": "Type de produit *",
+  "sellerProductImages": "Images du produit",
+  "sellerThumbnail": "Vignette",
+  "sellerSearchColorsHint": "Rechercher des couleurs, par ex. Marine",
+  "sellerCustomColorAction": "Vous ne le trouvez pas ? Mélangez une couleur personnalisée",
+  "sellerUpdateStatus": "Statut de la mise à jour",
+  "sellerFinalize": "Finaliser",
+  "sellerBuyerDetails": "Détails de l'acheteur",
+  "sellerProductRequest": "Demande de produit",
+  "sellerShippingDetails": "Détails d'expédition",
+  "sellerProductDetailsTitle": "Détails du produit",
+  "sellerColorVariants": "Variantes de couleurs",
+  "sellerFullDetails": "TOUS LES DÉTAILS",
+  "sellerFabricProperties": "PROPRIÉTÉS DU TISSU",
+  "sellerAdditionalAttributes": "Attributs supplémentaires",
+  "sellerPersonalInformation": "Informations personnelles",
+  "sellerBusinessInformation": "Informations commerciales",
+  "sellerDesignerProfile": "Profil de concepteur",
+  "sellerProfessionalBio": "Biographie professionnelle",
+  "sellerYearsExperience": "Années d'expérience",
+  "sellerSpecializations": "Spécialisations",
+  "sellerPriceRange": "Fourchette de prix (INR)",
+  "sellerMinimumPrice": "Prix ​​minimum",
+  "sellerMaximumPrice": "Prix ​​maximum",
+  "sellerSaveContinue": "Enregistrer et continuer",
+  "sellerConfirmAccountNumber": "Confirmer le numéro de compte",
+  "sellerDocumentNumber": "Numéro du document",
+  "sellerContactDetails": "Coordonnées",
+  "sellerAddressDetails": "Détails de l'adresse",
+  "sellerFullAddress": "Adresse complète",
+  "sellerLandmarkOptional": "Point de repère (facultatif)",
+  "sellerProfileNotLoaded": "Profil non chargé. Essayer à nouveau.",
+  "sellerQuoteMovedNegotiation": "Devis déplacé vers la négociation",
+  "sellerQuoteCancelledSuccess": "Devis annulé",
+  "sellerQuoteFinalizedSuccess": "Devis finalisé avec succès",
+  "sellerAcceptBuyerPriceTitle": "Accepter le prix proposé par l'acheteur",
+  "sellerAcceptBuyerPriceSubtitle": "Utilisez les prix soumis par l'acheteur.",
+  "sellerSetFinalPriceTitle": "Fixer le prix final proposé",
+  "sellerSetFinalPriceSubtitle": "Examinez ou révisez le prix de chaque variante.",
+  "sellerLocationPermissionRequired": "Une autorisation de localisation est requise pour utiliser ceci",
+  "sellerEnableLocationServices": "Veuillez activer les services de localisation",
+  "sellerStatusUpdated": "Statut mis à jour à {status}",
+  "@sellerStatusUpdated": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "sellerHelpFaqAddProductQ": "Comment ajouter un nouveau produit ?",
+  "sellerHelpFaqAddProductA": "Accédez à l'onglet Produits et sélectionnez Ajouter un produit. Remplissez les détails, les catégories et les variantes pour le soumettre pour approbation.",
+  "sellerHelpFaqDocumentsQ": "Quels documents sont nécessaires pour la vérification ?",
+  "sellerHelpFaqDocumentsA": "Vous avez généralement besoin des détails de la TPS, du Business PAN, d'un justificatif de compte bancaire et d'un justificatif d'adresse pour effectuer la vérification du vendeur.",
+  "sellerHelpFaqPayoutQ": "Quand vais-je recevoir mes paiements ?",
+  "sellerHelpFaqPayoutA": "Les paiements sont traités chaque semaine. Vous pouvez suivre les revenus et les paiements à venir depuis Profil > Gains.",
+  "sellerHelpFaqReturnsQ": "Comment puis-je gérer les retours de commandes ?",
+  "sellerHelpFaqReturnsA": "Les demandes de retour apparaissent dans Commandes. Examinez la demande et les images avant de l’accepter ou de la contester.",
+  "sellerHelpFaqLocationQ": "Puis-je mettre à jour l'emplacement de mon entreprise ?",
+  "sellerHelpFaqLocationA": "Oui. Mettez à jour l’adresse professionnelle depuis Profil > Adresse professionnelle. Cela peut déclencher une re-vérification.",
+  "sellerEmailAppError": "Impossible d'ouvrir une application de messagerie.",
+  "sellerPhoneDialerError": "Impossible d'ouvrir le numéroteur téléphonique."
+}

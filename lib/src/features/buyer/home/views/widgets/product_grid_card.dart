@@ -6,7 +6,6 @@ import 'package:gta_app/src/features/buyer/saved/controller/saved_products_contr
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
-import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class ProductGridCard extends ConsumerWidget {
   final ProductCollectionItem item;
@@ -235,22 +234,13 @@ class ProductGridCard extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
                           children: [
-                            Text(
-                              '${context.l10n.productFromPricePrefix} ',
-                              style: GoogleFonts.inter(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                color: BuyerColors.gridCardTextHint,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
                             Flexible(
                               child: Text(
                                 '₹${item.discountedPrice.toStringAsFixed(0)}',
                                 style: GoogleFonts.inter(
-                                  fontSize: 17,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: BuyerColors.primaryLight,
+                                  color: BuyerColors.productPrice,
                                   height: 1,
                                   letterSpacing: -0.5,
                                 ),
@@ -258,39 +248,23 @@ class ProductGridCard extends ConsumerWidget {
                                 maxLines: 1,
                               ),
                             ),
-                            const SizedBox(width: 3),
-                            Flexible(
-                              child: Text(
-                                '/ ${item.unit ?? 'pcs'}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                            if (hasDiscount) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '₹${item.price.toStringAsFixed(0)}',
                                 style: GoogleFonts.inter(
                                   fontSize: 9,
                                   color: BuyerColors.gridCardTextHint,
+                                  decoration: TextDecoration.lineThrough,
                                 ),
                               ),
-                            ),
-                            if (hasDiscount) ...[
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: BuyerColors.gridCardAmberLight,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  context.l10n.productDiscountOff(
-                                    item.discountPercent.toInt().toString(),
-                                  ),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.w700,
-                                    color: BuyerColors.gridCardAmberDark,
-                                    letterSpacing: 0.2,
-                                  ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${item.discountPercent.toInt()}% off',
+                                style: GoogleFonts.inter(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  color: BuyerColors.gridCardAmberDark,
                                 ),
                               ),
                             ],

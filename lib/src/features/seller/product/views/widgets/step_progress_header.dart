@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class StepProgressHeader extends StatelessWidget {
   final int currentStep;
 
   const StepProgressHeader({super.key, required this.currentStep});
 
-  static const _stepLabels = ['Details', 'Description', 'Pricing'];
-
   @override
   Widget build(BuildContext context) {
+    final stepLabels = [
+      context.l10n.sellerStepDetails,
+      context.l10n.productDescriptionTitle,
+      context.l10n.quoteSectionPricing,
+    ];
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: const BoxDecoration(
@@ -21,7 +25,7 @@ class StepProgressHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            children: List.generate(_stepLabels.length, (step) {
+            children: List.generate(stepLabels.length, (step) {
               final isActive = step == currentStep;
               final isDone = step < currentStep;
 
@@ -79,7 +83,7 @@ class StepProgressHeader extends StatelessWidget {
                       const SizedBox(width: 5),
                       Flexible(
                         child: Text(
-                          _stepLabels[step],
+                          stepLabels[step],
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.inter(
@@ -102,7 +106,7 @@ class StepProgressHeader extends StatelessWidget {
           const SizedBox(height: 5),
           Row(
             children: List.generate(
-              _stepLabels.length,
+              stepLabels.length,
               (step) => Expanded(
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),

@@ -11,6 +11,7 @@ import 'package:gta_app/src/features/seller/orders/views/widgets/order_ui_helper
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerOrderListScreen extends ConsumerStatefulWidget {
   static const routePath = '/seller/orders';
@@ -94,12 +95,12 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
 
   void _showFilterSheet(BuildContext context) {
     final statuses = [
-      {'id': '', 'label': 'All'},
-      {'id': 'processing', 'label': 'Processing'},
-      {'id': 'packed', 'label': 'Packed'},
-      {'id': 'shipped', 'label': 'Shipped'},
-      {'id': 'delivered', 'label': 'Delivered'},
-      {'id': 'cancelled', 'label': 'Cancelled'},
+      {'id': '', 'label': context.l10n.quoteStatusAll},
+      {'id': 'processing', 'label': context.l10n.orderStatusProcessing},
+      {'id': 'packed', 'label': context.l10n.sellerStatusPacked},
+      {'id': 'shipped', 'label': context.l10n.sellerStatusShipped},
+      {'id': 'delivered', 'label': context.l10n.sellerStatusDelivered},
+      {'id': 'cancelled', 'label': context.l10n.sellerStatusCancelled},
     ];
 
     // '-1' = newest, '1' = oldest
@@ -151,7 +152,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Filter & Sort',
+                    context.l10n.sellerFilterSortTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -165,7 +166,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                       sheetStatus = null;
                     }),
                     child: Text(
-                      'Reset',
+                      context.l10n.commonReset,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -179,7 +180,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
 
               // Sort section
               Text(
-                'Sort By',
+                context.l10n.filterSortBy,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -191,14 +192,14 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
               Row(
                 children: [
                   _SortChip(
-                    label: 'Newest First',
+                    label: context.l10n.sellerFilterNewestFirst,
                     icon: Icons.arrow_downward_rounded,
                     isSelected: sheetSort == '-1',
                     onTap: () => setSheet(() => sheetSort = '-1'),
                   ),
                   const SizedBox(width: 10),
                   _SortChip(
-                    label: 'Oldest First',
+                    label: context.l10n.sellerFilterOldestFirst,
                     icon: Icons.arrow_upward_rounded,
                     isSelected: sheetSort == '1',
                     onTap: () => setSheet(() => sheetSort = '1'),
@@ -212,7 +213,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
 
               // Status section
               Text(
-                'Status',
+                context.l10n.quoteStatusSection,
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -284,7 +285,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                     ),
                   ),
                   child: Text(
-                    'Apply Filters',
+                    context.l10n.sellerApplyFilters,
                     style: GoogleFonts.inter(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -310,7 +311,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: widget.showAppBar ? const SellerAppBar(title: 'Orders') : null,
+      appBar: widget.showAppBar
+          ? SellerAppBar(title: context.l10n.navOrders)
+          : null,
       body: Column(
         children: [
           Padding(
@@ -320,7 +323,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                 Expanded(
                   child: SellerSearchField(
                     controller: _searchController,
-                    hintText: 'Search by order ID, buyer...',
+                    hintText: context.l10n.sellerOrderSearchHint,
                     onClear: () => _applyFilter(status: _selectedStatus),
                   ),
                 ),
@@ -388,7 +391,9 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                 children: [
                   if (hasSort)
                     _ActiveChip(
-                      label: _sort == '1' ? 'Oldest First' : 'Newest First',
+                      label: _sort == '1'
+                          ? context.l10n.sellerFilterOldestFirst
+                          : context.l10n.sellerFilterNewestFirst,
                       icon: _sort == '1'
                           ? Icons.arrow_upward_rounded
                           : Icons.arrow_downward_rounded,
@@ -398,7 +403,10 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                   if (hasSort && hasStatus) const SizedBox(width: 8),
                   if (hasStatus)
                     _ActiveChip(
-                      label: OrderUIHelpers.getStatusLabel(_selectedStatus!),
+                      label: OrderUIHelpers.getStatusLabel(
+                        context,
+                        _selectedStatus!,
+                      ),
                       onRemove: () => _applyFilter(status: null, sort: _sort),
                     ),
                 ],
@@ -449,7 +457,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                                   .read(sellerOrdersProvider.notifier)
                                   .fetchOrders(refresh: true),
                               icon: const Icon(Icons.refresh),
-                              label: const Text('Retry'),
+                              label: Text(context.l10n.commonRetry),
                               style: ElevatedButton.styleFrom(
                                 minimumSize: const Size(120, 44),
                               ),
@@ -471,7 +479,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No orders found',
+                              context.l10n.sellerNoOrdersTitle,
                               style: GoogleFonts.inter(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -480,7 +488,7 @@ class _SellerOrderListScreenState extends ConsumerState<SellerOrderListScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Orders will appear here once placed',
+                              context.l10n.sellerNoOrdersSubtitle,
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 color: CommonColors.greyText,
@@ -538,14 +546,14 @@ class _OrderListCard extends StatelessWidget {
 
   const _OrderListCard({required this.order});
 
-  String get _buyerName {
+  String _buyerName(BuildContext context) {
     final snap = order.buyerSnapshot;
-    if (snap == null) return 'Buyer';
+    if (snap == null) return context.l10n.sellerBuyerFallback;
     if (snap.name != null && snap.name!.isNotEmpty) return snap.name!;
     final first = snap.firstName ?? '';
     final last = snap.lastName ?? '';
     final full = '$first $last'.trim();
-    return full.isNotEmpty ? full : 'Buyer';
+    return full.isNotEmpty ? full : context.l10n.sellerBuyerFallback;
   }
 
   String? get _thumbUrl {
@@ -639,6 +647,7 @@ class _OrderListCard extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     OrderUIHelpers.getStatusLabel(
+                                      context,
                                       order.orderStatus,
                                     ).toUpperCase(),
                                     style: GoogleFonts.inter(
@@ -682,7 +691,8 @@ class _OrderListCard extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    order.productSnapshot?.name ?? 'Product',
+                                    order.productSnapshot?.name ??
+                                        context.l10n.commonProductFallback,
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -702,7 +712,7 @@ class _OrderListCard extends StatelessWidget {
                                       const SizedBox(width: 3),
                                       Expanded(
                                         child: Text(
-                                          _buyerName,
+                                          _buyerName(context),
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
                                             color: CommonColors.greyText,
@@ -723,7 +733,9 @@ class _OrderListCard extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 3),
                                       Text(
-                                        '$totalQty unit${totalQty == 1 ? '' : 's'}',
+                                        context.l10n.productUnitsCount(
+                                          totalQty.toString(),
+                                        ),
                                         style: GoogleFonts.inter(
                                           fontSize: 12,
                                           color: CommonColors.greyText,
@@ -786,7 +798,10 @@ class _OrderListCard extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    _paymentLabel(order.payment.status),
+                                    _paymentLabel(
+                                      context,
+                                      order.payment.status,
+                                    ),
                                     style: GoogleFonts.inter(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
@@ -832,18 +847,22 @@ class _OrderListCard extends StatelessWidget {
     }
   }
 
-  static String _paymentLabel(String status) {
+  String _paymentLabel(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'paid':
-        return 'Payment Received';
+        return context.l10n.sellerPaymentReceived;
       case 'pending':
-        return 'Payment Pending';
+        return context.l10n.sellerPaymentPending;
       case 'failed':
-        return 'Payment Failed';
+        return context.l10n.sellerPaymentFailed;
       case 'refunded':
-        return 'Refunded';
+        return context.l10n.sellerRefunded;
       default:
-        return 'Payment: ${status[0].toUpperCase()}${status.substring(1)}';
+        return context.l10n.sellerPaymentStatus(
+          status.isEmpty
+              ? context.l10n.sellerUnknown
+              : '${status[0].toUpperCase()}${status.substring(1)}',
+        );
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/category_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -34,12 +35,18 @@ class ProductAttributeFields extends StatelessWidget {
     );
   }
 
-  InputDecoration _decoration(ProductAttributeField field, {String? hint}) {
+  InputDecoration _decoration(
+    BuildContext context,
+    ProductAttributeField field, {
+    String? hint,
+  }) {
     final hasError = invalidFieldNames.contains(field.fieldName);
     return InputDecoration(
       hintText: hint,
       hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 14),
-      errorText: hasError ? '${field.fieldName} is required' : null,
+      errorText: hasError
+          ? context.l10n.sellerAttributeRequired(field.fieldName)
+          : null,
       filled: true,
       fillColor: SellerColors.surfaceLight,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -53,7 +60,10 @@ class ProductAttributeFields extends StatelessWidget {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: SellerColors.primaryLight, width: 1.5),
+        borderSide: const BorderSide(
+          color: SellerColors.primaryLight,
+          width: 1.5,
+        ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -67,22 +77,27 @@ class ProductAttributeFields extends StatelessWidget {
   }
 
   TextStyle get _inputStyle => GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: CommonColors.black,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: CommonColors.black,
+  );
 
   List<String> _selectedOptions(dynamic value) {
     if (value is List) return value.map((item) => item.toString()).toList();
     if (value is String && value.isNotEmpty) {
-      return value.split(',').map((item) => item.trim()).where((item) => item.isNotEmpty).toList();
+      return value
+          .split(',')
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .toList();
     }
     return const [];
   }
 
-  String _dateLabel(dynamic value) => value?.toString().isNotEmpty == true
+  String _dateLabel(BuildContext context, dynamic value) =>
+      value?.toString().isNotEmpty == true
       ? value.toString()
-      : 'Select date';
+      : context.l10n.sellerSelectDate;
 
   @override
   Widget build(BuildContext context) {
@@ -111,11 +126,16 @@ class ProductAttributeFields extends StatelessWidget {
             DropdownButtonFormField<String>(
               key: key,
               value: field.options.contains(value) ? value as String? : null,
-              decoration: _decoration(field),
+              decoration: _decoration(context, field),
               style: _inputStyle,
               isExpanded: true,
               items: field.options
-                  .map((option) => DropdownMenuItem(value: option, child: Text(option, style: _inputStyle)))
+                  .map(
+                    (option) => DropdownMenuItem(
+                      value: option,
+                      child: Text(option, style: _inputStyle),
+                    ),
+                  )
                   .toList(),
               onChanged: (selection) => onChanged(field.fieldName, selection),
             ),
@@ -135,12 +155,22 @@ class ProductAttributeFields extends StatelessWidget {
               children: field.options.map((option) {
                 final isSelected = selected.contains(option);
                 return FilterChip(
-                  label: Text(option, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500)),
+                  label: Text(
+                    option,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   selected: isSelected,
                   backgroundColor: SellerColors.surfaceLight,
                   selectedColor: SellerColors.surface,
                   checkmarkColor: SellerColors.primaryLight,
-                  side: BorderSide(color: isSelected ? SellerColors.primaryLight : Colors.grey.shade200),
+                  side: BorderSide(
+                    color: isSelected
+                        ? SellerColors.primaryLight
+                        : Colors.grey.shade200,
+                  ),
                   onSelected: (isNowSelected) {
                     final next = [...selected];
                     isNowSelected ? next.add(option) : next.remove(option);
@@ -152,7 +182,13 @@ class ProductAttributeFields extends StatelessWidget {
             if (hasError)
               Padding(
                 padding: const EdgeInsets.only(top: 6, left: 12),
-                child: Text('${field.fieldName} is required', style: GoogleFonts.inter(fontSize: 12, color: Colors.red.shade700)),
+                child: Text(
+                  context.l10n.commonFieldRequired,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Colors.red.shade700,
+                  ),
+                ),
               ),
           ],
         );
@@ -166,13 +202,20 @@ class ProductAttributeFields extends StatelessWidget {
             DropdownButtonFormField<String>(
               key: key,
               value: selected,
-              decoration: _decoration(field),
+              decoration: _decoration(context, field),
               style: _inputStyle,
               items: [
-                DropdownMenuItem(value: 'true', child: Text('Yes', style: _inputStyle)),
-                DropdownMenuItem(value: 'false', child: Text('No', style: _inputStyle)),
+                DropdownMenuItem(
+                  value: 'true',
+                  child: Text(context.l10n.commonYes, style: _inputStyle),
+                ),
+                DropdownMenuItem(
+                  value: 'false',
+                  child: Text(context.l10n.commonNo, style: _inputStyle),
+                ),
               ],
-              onChanged: (selection) => onChanged(field.fieldName, selection == 'true'),
+              onChanged: (selection) =>
+                  onChanged(field.fieldName, selection == 'true'),
             ),
           ],
         );
@@ -186,7 +229,9 @@ class ProductAttributeFields extends StatelessWidget {
               key: key,
               borderRadius: BorderRadius.circular(10),
               onTap: () async {
-                final initialDate = DateTime.tryParse(value?.toString() ?? '') ?? DateTime.now();
+                final initialDate =
+                    DateTime.tryParse(value?.toString() ?? '') ??
+                    DateTime.now();
                 final selectedDate = await showDatePicker(
                   context: context,
                   initialDate: initialDate,
@@ -194,15 +239,25 @@ class ProductAttributeFields extends StatelessWidget {
                   lastDate: DateTime(2100),
                 );
                 if (selectedDate != null) {
-                  final formatted = '${selectedDate.year.toString().padLeft(4, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+                  final formatted =
+                      '${selectedDate.year.toString().padLeft(4, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
                   onChanged(field.fieldName, formatted);
                 }
               },
               child: InputDecorator(
-                decoration: _decoration(field).copyWith(suffixIcon: const Icon(Icons.calendar_today_outlined, size: 18)),
+                decoration: _decoration(context, field).copyWith(
+                  suffixIcon: const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 18,
+                  ),
+                ),
                 child: Text(
-                  _dateLabel(value),
-                  style: _inputStyle.copyWith(color: value == null ? Colors.grey.shade400 : CommonColors.black),
+                  _dateLabel(context, value),
+                  style: _inputStyle.copyWith(
+                    color: value == null
+                        ? Colors.grey.shade400
+                        : CommonColors.black,
+                  ),
                 ),
               ),
             ),
@@ -219,7 +274,7 @@ class ProductAttributeFields extends StatelessWidget {
               initialValue: value?.toString() ?? '',
               maxLines: 4,
               onChanged: (text) => onChanged(field.fieldName, text),
-              decoration: _decoration(field),
+              decoration: _decoration(context, field),
               style: _inputStyle,
             ),
           ],
@@ -233,9 +288,11 @@ class ProductAttributeFields extends StatelessWidget {
             TextFormField(
               key: key,
               initialValue: value?.toString() ?? '',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               onChanged: (text) => onChanged(field.fieldName, text),
-              decoration: _decoration(field),
+              decoration: _decoration(context, field),
               style: _inputStyle,
             ),
           ],
@@ -250,7 +307,7 @@ class ProductAttributeFields extends StatelessWidget {
               key: key,
               initialValue: value?.toString() ?? '',
               onChanged: (text) => onChanged(field.fieldName, text),
-              decoration: _decoration(field),
+              decoration: _decoration(context, field),
               style: _inputStyle,
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/models/product_card_model.dart';
@@ -160,7 +161,7 @@ class _ProductImage extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.45),
                 alignment: Alignment.center,
                 child: Text(
-                  'Out of\nStock',
+                  context.l10n.sellerOutOfStock,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 10,
@@ -257,7 +258,7 @@ class _PriceRow extends StatelessWidget {
   Widget build(BuildContext context) {
     if (price == null) {
       return Text(
-        'No price set',
+        context.l10n.sellerNoPriceSet,
         style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
       );
     }
@@ -333,21 +334,21 @@ class _VerificationBadge extends StatelessWidget {
         dot = StatusColors.verifiedDot;
         bg = StatusColors.verifiedBg;
         text = StatusColors.verifiedText;
-        label = 'Verified';
+        label = context.l10n.productVerifiedBadge;
         icon = Icons.verified_rounded;
         break;
       case 'rejected':
         dot = StatusColors.rejectedDot;
         bg = StatusColors.rejectedBg;
         text = StatusColors.rejectedText;
-        label = 'Rejected';
+        label = context.l10n.sellerStatusRejected;
         icon = Icons.cancel_rounded;
         break;
       default:
         dot = StatusColors.pendingDot;
         bg = StatusColors.pendingBg;
         text = StatusColors.pendingText;
-        label = 'Pending';
+        label = context.l10n.quoteStatusPending;
         icon = Icons.schedule_rounded;
     }
 
@@ -423,7 +424,8 @@ class _CardFooter extends StatelessWidget {
               children: [
                 _FooterTag(
                   icon: Icons.shopping_bag_rounded,
-                  label: 'MOQ ${product.minimumOrderQuantity}',
+                  label:
+                      '${context.l10n.productSpecMoq} ${product.minimumOrderQuantity}',
                 ),
                 if (isHex)
                   Row(
@@ -450,11 +452,17 @@ class _CardFooter extends StatelessWidget {
                     ],
                   )
                 else if (product.isMultiColor)
-                  _FooterTag(icon: Icons.palette_rounded, label: 'Multi-Color')
+                  _FooterTag(
+                    icon: Icons.palette_rounded,
+                    label: context.l10n.productSpecMultiColor,
+                  )
                 else if (colorCode != null && colorCode.isNotEmpty)
                   _FooterTag(icon: Icons.circle, label: colorCode),
                 if (product.sampleAvailable)
-                  _FooterTag(icon: Icons.science_rounded, label: 'Sample'),
+                  _FooterTag(
+                    icon: Icons.science_rounded,
+                    label: context.l10n.productAttrSample,
+                  ),
               ],
             ),
           ),
@@ -531,7 +539,7 @@ class _StockBadge extends StatelessWidget {
         : StatusColors.verifiedText;
 
     final String label = !inStock
-        ? 'Out of stock'
+        ? context.l10n.sellerOutOfStock
         : isLow
         ? 'Low: $quantity'
         : '$quantity $unit';

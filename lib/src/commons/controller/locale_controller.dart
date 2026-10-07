@@ -19,11 +19,11 @@ class AppLanguage {
 const List<AppLanguage> kAppLanguages = [
   AppLanguage(code: 'en', nativeName: 'English', englishName: 'English'),
   AppLanguage(code: 'hi', nativeName: 'हिन्दी', englishName: 'Hindi'),
-  AppLanguage(code: 'ta', nativeName: 'தமிழ்', englishName: 'Tamil'),
-  AppLanguage(code: 'te', nativeName: 'తెలుగు', englishName: 'Telugu'),
-  AppLanguage(code: 'bn', nativeName: 'বাংলা', englishName: 'Bengali'),
   AppLanguage(code: 'mr', nativeName: 'मराठी', englishName: 'Marathi'),
-  AppLanguage(code: 'gu', nativeName: 'ગુજરાતી', englishName: 'Gujarati'),
+  AppLanguage(code: 'de', nativeName: 'Deutsch', englishName: 'German'),
+  AppLanguage(code: 'fr', nativeName: 'Français', englishName: 'French'),
+  AppLanguage(code: 'es', nativeName: 'Español', englishName: 'Spanish'),
+  AppLanguage(code: 'ru', nativeName: 'Русский', englishName: 'Russian'),
 ];
 
 final localeControllerProvider = NotifierProvider<LocaleController, Locale>(

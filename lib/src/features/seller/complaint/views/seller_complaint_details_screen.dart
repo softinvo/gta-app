@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/complaint/repository/seller_complaint_repository.dart';
@@ -87,7 +88,10 @@ class _SellerComplaintDetailsScreenState
         _messageController.clear();
         _fetchDetails(); // Refresh to get new messages
         if (mounted) {
-          SnackBarService.showSuccess(context, 'Message sent');
+          SnackBarService.showSuccess(
+            context,
+            context.l10n.complaintMessageSent,
+          );
         }
       },
     );
@@ -108,7 +112,7 @@ class _SellerComplaintDetailsScreenState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Complaint Details',
+          context.l10n.complaintDetailsTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -153,7 +157,7 @@ class _SellerComplaintDetailsScreenState
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Retry'),
+              child: Text(context.l10n.commonRetry),
             ),
           ],
         ),
@@ -161,7 +165,7 @@ class _SellerComplaintDetailsScreenState
     }
 
     if (_complaint == null) {
-      return const Center(child: Text('No complaint found'));
+      return Center(child: Text(context.l10n.complaintNotFound));
     }
 
     return RefreshIndicator(
@@ -237,7 +241,7 @@ class _SellerComplaintDetailsScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Complaint Information',
+                context.l10n.complaintInfoTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -248,16 +252,22 @@ class _SellerComplaintDetailsScreenState
             ],
           ),
           const SizedBox(height: 16),
-          _buildInfoRow('Complaint ID', _complaint!.complaintID),
+          _buildInfoRow(context.l10n.complaintIdLabel, _complaint!.complaintID),
           const Divider(height: 24),
-          _buildInfoRow('Subject', _complaint!.subject),
+          _buildInfoRow(
+            context.l10n.complaintSubjectLabel,
+            _complaint!.subject,
+          ),
           if (_complaint!.orderNumber != null) ...[
             const Divider(height: 24),
-            _buildInfoRow('Order Number', _complaint!.orderNumber!),
+            _buildInfoRow(
+              context.l10n.complaintOrderNumberDisplayLabel,
+              _complaint!.orderNumber!,
+            ),
           ],
           const Divider(height: 24),
           _buildInfoRow(
-            'Created On',
+            context.l10n.complaintCreatedOnLabel,
             DateFormat('dd MMM yyyy, hh:mm a').format(_complaint!.createdAt),
           ),
         ],
@@ -314,7 +324,7 @@ class _SellerComplaintDetailsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Description',
+            context.l10n.complaintDescriptionTitle,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -323,7 +333,7 @@ class _SellerComplaintDetailsScreenState
           ),
           const SizedBox(height: 12),
           Text(
-            _complaint!.description ?? 'No description provided',
+            _complaint!.description ?? context.l10n.complaintNoDescription,
             style: GoogleFonts.inter(
               fontSize: 14,
               color: CommonColors.greyText,
@@ -362,7 +372,7 @@ class _SellerComplaintDetailsScreenState
           Row(
             children: [
               Text(
-                'Messages',
+                context.l10n.complaintMessagesTitle,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -449,7 +459,7 @@ class _SellerComplaintDetailsScreenState
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'ADMIN',
+                        context.l10n.complaintAdminBadge,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -516,7 +526,7 @@ class _SellerComplaintDetailsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Complaint Resolved',
+                  context.l10n.complaintResolvedTitle,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -524,7 +534,7 @@ class _SellerComplaintDetailsScreenState
                   ),
                 ),
                 Text(
-                  'This support request has been resolved. Chat is now closed.',
+                  context.l10n.complaintResolvedMessage,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: Colors.green.shade600,
@@ -563,7 +573,7 @@ class _SellerComplaintDetailsScreenState
               controller: _messageController,
               style: GoogleFonts.inter(fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'Type your message...',
+                hintText: context.l10n.complaintMessageHint,
                 hintStyle: GoogleFonts.inter(
                   color: CommonColors.greyText,
                   fontSize: 14,

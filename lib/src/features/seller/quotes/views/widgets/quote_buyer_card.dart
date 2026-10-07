@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
@@ -29,8 +30,8 @@ class QuoteBuyerCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const QuoteSectionTitle(
-            title: 'Buyer Details',
+          QuoteSectionTitle(
+            title: context.l10n.sellerBuyerDetails,
             icon: Icons.person_outline,
           ),
           const SizedBox(height: 16),
@@ -57,7 +58,7 @@ class QuoteBuyerCard extends StatelessWidget {
                           ? quote.buyerSnapshot!.name!
                           : (quote.buyerName.isNotEmpty
                                 ? quote.buyerName
-                                : 'N/A'),
+                                : context.l10n.sellerNotAvailable),
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -67,7 +68,7 @@ class QuoteBuyerCard extends StatelessWidget {
                     Text(
                       quote.mobileNumber.isNotEmpty
                           ? _maskPhoneNumber(quote.mobileNumber)
-                          : 'N/A',
+                          : context.l10n.sellerNotAvailable,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         color: Theme.of(context).textTheme.bodySmall?.color,

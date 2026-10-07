@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -34,16 +35,20 @@ class _SellerOrderDetailsScreenState
     final sellerId = ref.read(sellerProfileProvider).value?.id;
     if (sellerId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile not loaded. Try again.')),
+        SnackBar(content: Text(context.l10n.sellerProfileNotLoaded)),
       );
       return;
     }
     final snap = order.buyerSnapshot;
-    final rawName = snap?.name ??
-        [snap?.firstName, snap?.lastName]
-            .where((p) => p != null && p.isNotEmpty)
-            .join(' ');
-    final buyerName = rawName.isNotEmpty ? rawName : 'Buyer';
+    final rawName =
+        snap?.name ??
+        [
+          snap?.firstName,
+          snap?.lastName,
+        ].where((p) => p != null && p.isNotEmpty).join(' ');
+    final buyerName = rawName.isNotEmpty
+        ? rawName
+        : context.l10n.sellerBuyerFallback;
 
     Navigator.push(
       context,
@@ -94,7 +99,10 @@ class _SellerOrderDetailsScreenState
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(title: 'Order Details', showLogo: false),
+      appBar: SellerAppBar(
+        title: context.l10n.sellerOrderDetailsTitle,
+        showLogo: false,
+      ),
       body: orderAsync.when(
         data: (order) {
           return SingleChildScrollView(
@@ -108,7 +116,7 @@ class _SellerOrderDetailsScreenState
 
                 // Items
                 Text(
-                  'Items (${order.variants.length})',
+                  '${context.l10n.orderItemsTitle} (${order.variants.length})',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -136,7 +144,8 @@ class _SellerOrderDetailsScreenState
                 // Timeline
                 OrderTimelineCard(
                   order: order,
-                  onUpdateStatus: (order.orderStatus != 'delivered' &&
+                  onUpdateStatus:
+                      (order.orderStatus != 'delivered' &&
                           order.orderStatus != 'cancelled')
                       ? () => _showStatusUpdateSheet(context, ref, order)
                       : null,
@@ -151,22 +160,28 @@ class _SellerOrderDetailsScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline,
-                  size: 48, color: CommonColors.error),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: CommonColors.error,
+              ),
               const SizedBox(height: 12),
               Text(
                 error.toString(),
                 style: GoogleFonts.inter(
-                    fontSize: 14, color: CommonColors.greyText),
+                  fontSize: 14,
+                  color: CommonColors.greyText,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () =>
                     ref.invalidate(sellerOrderDetailsProvider(widget.orderId)),
-                style:
-                    ElevatedButton.styleFrom(minimumSize: const Size(120, 44)),
-                child: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(120, 44),
+                ),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -225,7 +240,7 @@ class _SellerOrderDetailsScreenState
               ),
               const SizedBox(height: 20),
               Text(
-                'Update Order Status',
+                context.l10n.sellerUpdateOrderStatus,
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -234,7 +249,7 @@ class _SellerOrderDetailsScreenState
               ),
               const SizedBox(height: 4),
               Text(
-                'Steps must be updated in order — no skipping',
+                context.l10n.sellerStatusSequenceHint,
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   color: CommonColors.greyText,
@@ -245,8 +260,22 @@ class _SellerOrderDetailsScreenState
               // Status options
               ..._statusOptions.map((option) {
                 final id = option['id']!;
-                final label = option['label']!;
-                final desc = option['description']!;
+                final label = switch (id) {
+                  'processing' => context.l10n.orderStatusProcessing,
+                  'packed' => context.l10n.sellerStatusPacked,
+                  'shipped' => context.l10n.sellerStatusShipped,
+                  'delivered' => context.l10n.sellerStatusDelivered,
+                  'cancelled' => context.l10n.sellerStatusCancelled,
+                  _ => option['label']!,
+                };
+                final desc = switch (id) {
+                  'processing' => context.l10n.orderStepDescProcessing,
+                  'packed' => context.l10n.orderStepDescPacked,
+                  'shipped' => context.l10n.orderStepDescShipped,
+                  'delivered' => context.l10n.orderStepDescDelivered,
+                  'cancelled' => context.l10n.orderStepDescCancelled,
+                  _ => option['description']!,
+                };
 
                 final step = order.workflowTimeline[id];
                 final actualDate = step?.actualDate;
@@ -257,8 +286,10 @@ class _SellerOrderDetailsScreenState
                 final thisSeqIdx = _statusSequence.indexOf(id);
                 // Selectable only if exactly one step ahead, or 'cancelled' (special)
                 final isNextStep = thisSeqIdx == currentSeqIdx + 1;
-                final isCancellable = id == 'cancelled' && !isDone && !isCurrent;
-                final isSkipped = !isDone && !isCurrent && !isNextStep && !isCancellable;
+                final isCancellable =
+                    id == 'cancelled' && !isDone && !isCurrent;
+                final isSkipped =
+                    !isDone && !isCurrent && !isNextStep && !isCancellable;
                 final isDisabled = isDone || isCurrent || isSkipped;
                 final isSelected = selectedStatus == id && !isCurrent;
 
@@ -269,7 +300,9 @@ class _SellerOrderDetailsScreenState
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: InkWell(
-                    onTap: isDisabled ? null : () => setSheet(() => selectedStatus = id),
+                    onTap: isDisabled
+                        ? null
+                        : () => setSheet(() => selectedStatus = id),
                     borderRadius: BorderRadius.circular(14),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 150),
@@ -278,21 +311,21 @@ class _SellerOrderDetailsScreenState
                         color: isDone
                             ? Colors.grey.shade50
                             : isSkipped
-                                ? Colors.grey.shade50
-                                : isCurrent
-                                    ? color.withAlpha(18)
-                                    : isSelected
-                                        ? color.withAlpha(15)
-                                        : Colors.white,
+                            ? Colors.grey.shade50
+                            : isCurrent
+                            ? color.withAlpha(18)
+                            : isSelected
+                            ? color.withAlpha(15)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isDone || isSkipped
                               ? Colors.grey.shade200
                               : isCurrent
-                                  ? color.withAlpha(120)
-                                  : isSelected
-                                      ? color
-                                      : Colors.grey.withAlpha(50),
+                              ? color.withAlpha(120)
+                              : isSelected
+                              ? color
+                              : Colors.grey.withAlpha(50),
                           width: (isCurrent || isSelected) ? 2 : 1,
                         ),
                       ),
@@ -305,22 +338,23 @@ class _SellerOrderDetailsScreenState
                               color: isDone
                                   ? doneColor.withAlpha(25)
                                   : isSkipped
-                                      ? Colors.grey.withAlpha(20)
-                                      : color.withAlpha(
-                                          isCurrent || isSelected ? 30 : 15),
+                                  ? Colors.grey.withAlpha(20)
+                                  : color.withAlpha(
+                                      isCurrent || isSelected ? 30 : 15,
+                                    ),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               isDone
                                   ? Icons.check_circle_rounded
                                   : isSkipped
-                                      ? Icons.lock_clock_rounded
-                                      : icon,
+                                  ? Icons.lock_clock_rounded
+                                  : icon,
                               color: isDone
                                   ? doneColor
                                   : isSkipped
-                                      ? Colors.grey.shade400
-                                      : color,
+                                  ? Colors.grey.shade400
+                                  : color,
                               size: 20,
                             ),
                           ),
@@ -354,13 +388,15 @@ class _SellerOrderDetailsScreenState
                                         ),
                                         decoration: BoxDecoration(
                                           color: color.withAlpha(22),
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
                                           border: Border.all(
                                             color: color.withAlpha(80),
                                           ),
                                         ),
                                         child: Text(
-                                          'Current',
+                                          context.l10n.sellerCurrentLabel,
                                           style: GoogleFonts.inter(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w700,
@@ -382,7 +418,7 @@ class _SellerOrderDetailsScreenState
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'Done · ${dateFmt.format(actualDate.toLocal())}',
+                                        '${context.l10n.sellerDoneLabel} · ${dateFmt.format(actualDate.toLocal())}',
                                         style: GoogleFonts.inter(
                                           fontSize: 11,
                                           color: doneColor,
@@ -401,7 +437,7 @@ class _SellerOrderDetailsScreenState
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'Set · ${dateFmt.format(actualDate.toLocal())}',
+                                        '${context.l10n.sellerSetLabel} · ${dateFmt.format(actualDate.toLocal())}',
                                         style: GoogleFonts.inter(
                                           fontSize: 11,
                                           color: color,
@@ -420,7 +456,7 @@ class _SellerOrderDetailsScreenState
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'Complete previous step first',
+                                        context.l10n.sellerCompletePreviousStep,
                                         style: GoogleFonts.inter(
                                           fontSize: 11,
                                           color: Colors.grey.shade400,
@@ -485,20 +521,25 @@ class _SellerOrderDetailsScreenState
                               .updateStatus(order.id, selectedStatus);
                           if (!mounted) return;
                           setState(() => _isUpdating = false);
-                          ref.invalidate(
-                              sellerOrderDetailsProvider(order.id));
-                          final label =
-                              OrderUIHelpers.getStatusLabel(selectedStatus);
-                          final color =
-                              OrderUIHelpers.getStatusColor(selectedStatus);
+                          ref.invalidate(sellerOrderDetailsProvider(order.id));
+                          final label = OrderUIHelpers.getStatusLabel(
+                            context,
+                            selectedStatus,
+                          );
+                          final color = OrderUIHelpers.getStatusColor(
+                            selectedStatus,
+                          );
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Status updated to $label'),
+                              content: Text(
+                                context.l10n.sellerStatusUpdated(label),
+                              ),
                               backgroundColor: color,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           );
                         },
@@ -515,8 +556,8 @@ class _SellerOrderDetailsScreenState
                   ),
                   child: Text(
                     selectedStatus == order.orderStatus
-                        ? 'No Change'
-                        : 'Confirm Update',
+                        ? context.l10n.sellerNoChange
+                        : context.l10n.sellerConfirmUpdate,
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

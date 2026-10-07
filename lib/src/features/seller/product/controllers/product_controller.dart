@@ -199,7 +199,9 @@ class ProductController extends Notifier<bool> {
     required void Function() onSuccess,
   }) async {
     state = true;
-    final result = await ref.read(productRepositoryProvider).addProduct(product);
+    final result = await ref
+        .read(productRepositoryProvider)
+        .addProduct(product);
     state = false;
     result.fold((l) => onError(l.message), (r) => onSuccess());
   }

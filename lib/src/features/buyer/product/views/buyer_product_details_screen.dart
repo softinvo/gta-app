@@ -90,15 +90,16 @@ class _BuyerProductDetailsScreenState
                 overflow: TextOverflow.ellipsis,
               )
             : null,
-        actions: async.asData?.value != null
-            ? [
-                IconButton(
-                  icon: const Icon(Icons.share_outlined, size: 22),
-                  color: CommonColors.black,
-                  onPressed: () {},
-                ),
-              ]
-            : null,
+        // Share action intentionally hidden until sharing is implemented.
+        // actions: async.asData?.value != null
+        //     ? [
+        //         IconButton(
+        //           icon: const Icon(Icons.share_outlined, size: 22),
+        //           color: CommonColors.black,
+        //           onPressed: () {},
+        //         ),
+        //       ]
+        //     : null,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: const Color(0xFFF0F0F0)),
@@ -1289,6 +1290,7 @@ class _SellerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isVerified = seller.verificationStatus == 'approved';
+    final hasAvatar = seller.avatar?.fileUrl.isNotEmpty == true;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -1324,25 +1326,26 @@ class _SellerCard extends StatelessWidget {
                 height: 48,
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
-                  gradient: BuyerColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: BuyerColors.primary,
+                  ),
                 ),
-                // Gradient is always the background so a missing or failed
-                // avatar still shows a visible (not white-on-white) icon.
-                child: seller.avatar?.fileUrl.isNotEmpty == true
+                child: hasAvatar
                     ? AppNetworkImage(
                         url: seller.avatar!.fileUrl,
                         width: 48,
                         height: 48,
                         errorWidget: const Icon(
-                          Icons.storefront_outlined,
-                          color: Colors.white,
+                          Icons.person_outline_rounded,
+                          color: Colors.black,
                           size: 24,
                         ),
                       )
                     : const Icon(
-                        Icons.storefront_outlined,
-                        color: Colors.white,
+                        Icons.person_outline_rounded,
+                        color: Colors.black,
                         size: 24,
                       ),
               ),

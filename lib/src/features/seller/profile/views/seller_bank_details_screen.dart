@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,7 +63,9 @@ class _SellerBankDetailsScreenState
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    final error = await ref.read(sellerProfileProvider.notifier).addBankDetails(
+    final error = await ref
+        .read(sellerProfileProvider.notifier)
+        .addBankDetails(
           accountHolderName: _holderNameController.text.trim(),
           bankAccountNumber: _accountNumberController.text.trim(),
           ifscCode: _ifscController.text.trim().toUpperCase(),
@@ -71,7 +74,7 @@ class _SellerBankDetailsScreenState
 
     if (!mounted) return;
     if (error == null) {
-      SnackBarService.showSuccess(context, 'Bank details saved successfully');
+      SnackBarService.showSuccess(context, context.l10n.sellerBankSaved);
       context.pop();
     } else {
       SnackBarService.showError(context, error);
@@ -90,8 +93,8 @@ class _SellerBankDetailsScreenState
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Bank Details',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerBankDetailsTitle,
         showLogo: false,
         centerTitle: true,
       ),
@@ -122,7 +125,7 @@ class _SellerBankDetailsScreenState
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Your payouts (90% of each order) will be settled to this account via Cashfree Easy Split.',
+                        context.l10n.sellerPayoutAccountInfo,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           color: SellerColors.primaryLight,
@@ -143,49 +146,19 @@ class _SellerBankDetailsScreenState
 
               const SizedBox(height: 24),
 
-              _SectionLabel(label: 'Account Holder Name'),
+              _SectionLabel(label: context.l10n.sellerAccountHolderName),
               const SizedBox(height: 8),
               _BankTextField(
                 controller: _holderNameController,
-                hint: 'As printed on bank passbook',
+                hint: context.l10n.sellerAccountHolderHint,
                 inputType: TextInputType.name,
                 textCapitalization: TextCapitalization.words,
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Name is required';
-                  if (v.trim().length < 3) return 'Enter a valid name';
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              _SectionLabel(label: 'Bank Account Number'),
-              const SizedBox(height: 8),
-              _BankTextField(
-                controller: _accountNumberController,
-                hint: 'Enter account number',
-                inputType: TextInputType.number,
-                formatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Account number is required';
-                  if (v.trim().length < 9) return 'Enter a valid account number';
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              _SectionLabel(label: 'Confirm Account Number'),
-              const SizedBox(height: 8),
-              _BankTextField(
-                controller: _confirmAccountController,
-                hint: 'Re-enter account number',
-                inputType: TextInputType.number,
-                formatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Please confirm account number';
-                  if (v.trim() != _accountNumberController.text.trim()) {
-                    return 'Account numbers do not match';
+                  if (v == null || v.trim().isEmpty) {
+                    return context.l10n.sellerNameRequired;
+                  }
+                  if (v.trim().length < 3) {
+                    return context.l10n.sellerValidName;
                   }
                   return null;
                 },
@@ -193,7 +166,44 @@ class _SellerBankDetailsScreenState
 
               const SizedBox(height: 20),
 
-              _SectionLabel(label: 'IFSC Code'),
+              _SectionLabel(label: context.l10n.sellerAccountNumber),
+              const SizedBox(height: 8),
+              _BankTextField(
+                controller: _accountNumberController,
+                hint: context.l10n.sellerAccountNumberHint,
+                inputType: TextInputType.number,
+                formatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty)
+                    return context.l10n.sellerAccountNumberRequired;
+                  if (v.trim().length < 9)
+                    return context.l10n.sellerValidAccountNumber;
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              _SectionLabel(label: context.l10n.sellerConfirmAccountNumber),
+              const SizedBox(height: 8),
+              _BankTextField(
+                controller: _confirmAccountController,
+                hint: context.l10n.sellerConfirmAccountHint,
+                inputType: TextInputType.number,
+                formatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty)
+                    return context.l10n.sellerConfirmAccountRequired;
+                  if (v.trim() != _accountNumberController.text.trim()) {
+                    return context.l10n.sellerAccountNumbersMismatch;
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              _SectionLabel(label: context.l10n.sellerIfscCode),
               const SizedBox(height: 8),
               _BankTextField(
                 controller: _ifscController,
@@ -205,10 +215,11 @@ class _SellerBankDetailsScreenState
                   LengthLimitingTextInputFormatter(11),
                 ],
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'IFSC code is required';
+                  if (v == null || v.trim().isEmpty)
+                    return context.l10n.sellerIfscRequired;
                   final ifsc = v.trim().toUpperCase();
                   if (!RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$').hasMatch(ifsc)) {
-                    return 'Enter a valid IFSC code';
+                    return context.l10n.sellerValidIfsc;
                   }
                   return null;
                 },
@@ -218,8 +229,8 @@ class _SellerBankDetailsScreenState
 
               SellerGradientButton(
                 label: hasBankDetails
-                    ? 'Update Bank Details'
-                    : 'Save Bank Details',
+                    ? context.l10n.sellerUpdateBankDetails
+                    : context.l10n.sellerSaveBankDetails,
                 isLoading: _isLoading,
                 onTap: _submit,
               ),
@@ -249,25 +260,25 @@ class _VendorStatusBadge extends StatelessWidget {
         bg = const Color(0xFFE8F5E9);
         fg = const Color(0xFF2E7D32);
         icon = Icons.verified_rounded;
-        label = 'Bank account verified';
+        label = context.l10n.sellerBankVerified;
         break;
       case 'IN_BANK_VALIDATION':
         bg = const Color(0xFFFFF8E1);
         fg = const Color(0xFFF57F17);
         icon = Icons.hourglass_top_rounded;
-        label = 'Bank account under verification';
+        label = context.l10n.sellerBankUnderVerification;
         break;
       case 'BLOCKED':
         bg = const Color(0xFFFFEBEE);
         fg = const Color(0xFFC62828);
         icon = Icons.block_rounded;
-        label = 'Bank account blocked — contact support';
+        label = context.l10n.sellerBankBlocked;
         break;
       default:
         bg = const Color(0xFFF4F6F9);
         fg = CommonColors.greyText;
         icon = Icons.account_balance_rounded;
-        label = 'Bank account not yet verified';
+        label = context.l10n.sellerBankNotVerified;
     }
 
     return Container(
@@ -345,7 +356,10 @@ class _BankTextField extends StatelessWidget {
         ),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade200),

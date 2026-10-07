@@ -46,7 +46,9 @@ class SellerOrderRepository {
         final Map<String, dynamic> data = jsonDecode(r.body);
         if (data['success'] == true) {
           final List ordersJson = data['data'] ?? [];
-          final orders = ordersJson.map((json) => Order.fromJson(json)).toList();
+          final orders = ordersJson
+              .map((json) => Order.fromJson(json))
+              .toList();
           final rawMeta = data['meta'] as Map<String, dynamic>?;
           final meta = {
             'page': rawMeta?['page'] ?? page,

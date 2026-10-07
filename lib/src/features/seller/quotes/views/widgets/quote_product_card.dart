@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
@@ -36,8 +37,8 @@ class QuoteProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const QuoteSectionTitle(
-            title: 'Product Request',
+          QuoteSectionTitle(
+            title: context.l10n.sellerProductRequest,
             icon: Icons.inventory_2_outlined,
           ),
           const SizedBox(height: 16),
@@ -79,7 +80,8 @@ class QuoteProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      quote.productSnapshot?.name ?? 'Product Details',
+                      quote.productSnapshot?.name ??
+                          context.l10n.sellerProductDetailsTitle,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -88,7 +90,7 @@ class QuoteProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${quote.productSnapshot?.category ?? 'Category'} • ${quote.productSnapshot?.subCategory ?? 'Sub-category'}',
+                      '${quote.productSnapshot?.category ?? context.l10n.filterCategory} • ${quote.productSnapshot?.subCategory ?? context.l10n.categoriesSubCategoriesFallback}',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: Theme.of(context).textTheme.bodySmall?.color,
@@ -107,7 +109,7 @@ class QuoteProductCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Total units: ${quote.selectedVariants.fold<int>(0, (sum, v) => sum + v.quantity)}',
+                        '${context.l10n.sellerTotalUnits}: ${quote.selectedVariants.fold<int>(0, (sum, v) => sum + v.quantity)}',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -122,7 +124,7 @@ class QuoteProductCard extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Requested Variants:',
+            '${context.l10n.sellerRequestedVariants}:',
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -170,7 +172,7 @@ class QuoteProductCard extends StatelessWidget {
                               QuoteUIHelpers.colorName(
                                 variant.variantColorCode!,
                               ),
-                            'Size: ${variant.size ?? 'Standard'}',
+                            '${context.l10n.productTableSize}: ${variant.size ?? context.l10n.sellerStandardSize}',
                           ].join(' · '),
                           style: GoogleFonts.inter(
                             fontSize: 13,
@@ -183,7 +185,7 @@ class QuoteProductCard extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      'Qty: ${variant.quantity}',
+                      '${context.l10n.quoteTableQuantity}: ${variant.quantity}',
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,

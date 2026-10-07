@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'quote_section_title.dart';
@@ -26,8 +27,8 @@ class QuoteDeliveryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const QuoteSectionTitle(
-            title: 'Shipping Details',
+          QuoteSectionTitle(
+            title: context.l10n.sellerShippingDetails,
             icon: Icons.local_shipping_outlined,
           ),
           const SizedBox(height: 16),
@@ -52,7 +53,7 @@ class QuoteDeliveryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Delivery Address',
+                      context.l10n.quoteDeliveryAddressTitle,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

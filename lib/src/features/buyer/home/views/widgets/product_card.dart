@@ -174,43 +174,37 @@ class ProductCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '${context.l10n.productFromPricePrefix} ',
-                          style: GoogleFonts.inter(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: CommonColors.greyText,
-                          ),
-                        ),
-                        Text(
                           '₹${item.discountedPrice.toStringAsFixed(0)}',
                           style: GoogleFonts.inter(
-                            fontSize: 16,
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
-                            color: BuyerColors.primaryLight,
+                            color: BuyerColors.productPrice,
                           ),
                         ),
-                        Expanded(
-                          child: Text(
-                            '/ ${item.unit ?? 'pcs'}',
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              color: CommonColors.greyText,
-                            ),
-                          ),
-                        ),
-                        if (hasDiscount)
+                        if (hasDiscount) ...[
                           Padding(
                             padding: const EdgeInsets.only(left: 6, bottom: 1),
                             child: Text(
                               '₹${item.price.toStringAsFixed(0)}',
                               style: GoogleFonts.inter(
-                                fontSize: 11,
+                                fontSize: 10,
                                 color: CommonColors.greyText,
                                 decoration: TextDecoration.lineThrough,
                               ),
                             ),
                           ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5, bottom: 1),
+                            child: Text(
+                              '${item.discountPercent.toInt()}% off',
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.red.shade600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],

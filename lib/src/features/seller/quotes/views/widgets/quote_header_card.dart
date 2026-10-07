@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:intl/intl.dart';
 import 'quote_ui_helpers.dart';
 
@@ -60,7 +61,8 @@ class QuoteHeaderCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      quote.productSnapshot?.name ?? 'Quotation',
+                      quote.productSnapshot?.name ??
+                          context.l10n.quoteFallbackName,
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -91,7 +93,7 @@ class QuoteHeaderCard extends StatelessWidget {
                   border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                 ),
                 child: Text(
-                  quote.status.toUpperCase(),
+                  _statusLabel(context, quote.status).toUpperCase(),
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -129,7 +131,7 @@ class QuoteHeaderCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                _stepLabel(quote.step),
+                _stepLabel(context, quote.step),
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   color: CommonColors.greyText,
@@ -142,20 +144,35 @@ class QuoteHeaderCard extends StatelessWidget {
     );
   }
 
-  static String _stepLabel(String step) {
+  static String _statusLabel(BuildContext context, String status) {
+    switch (status.toLowerCase()) {
+      case 'submitted':
+        return context.l10n.sellerStatusNew;
+      case 'in-progress':
+        return context.l10n.sellerStatusInProgress;
+      case 'agreed':
+        return context.l10n.sellerStatusAgreed;
+      case 'cancelled':
+        return context.l10n.sellerStatusCancelled;
+      default:
+        return status.replaceAll('_', ' ');
+    }
+  }
+
+  static String _stepLabel(BuildContext context, String step) {
     switch (step) {
       case 'submitted':
-        return 'Submitted';
+        return context.l10n.quoteStepSubmitted;
       case 'seller_reviewing':
-        return 'Under Review';
+        return context.l10n.quoteStepUnderReview;
       case 'negotiation':
-        return 'Negotiation';
+        return context.l10n.quoteStepNegotiation;
       case 'agreement_reached':
-        return 'Agreement Reached';
+        return context.l10n.quoteStepAgreementReached;
       case 'payment_done':
-        return 'Payment Done';
+        return context.l10n.quoteStepPaymentDone;
       case 'completed':
-        return 'Completed';
+        return context.l10n.quoteStatusCompleted;
       default:
         return step.replaceAll('_', ' ');
     }

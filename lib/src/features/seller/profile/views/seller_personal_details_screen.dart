@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -79,7 +80,7 @@ class _SellerPersonalDetailsScreenState
             ),
             const SizedBox(height: 20),
             Text(
-              'Update Profile Photo',
+              context.l10n.sellerUpdateProfilePhoto,
               style: GoogleFonts.poppins(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -88,7 +89,7 @@ class _SellerPersonalDetailsScreenState
             ),
             const SizedBox(height: 6),
             Text(
-              'Choose a source to upload your photo',
+              context.l10n.sellerChoosePhotoSource,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: CommonColors.greyText,
@@ -100,7 +101,7 @@ class _SellerPersonalDetailsScreenState
                 Expanded(
                   child: _UploadOptionTile(
                     icon: Icons.camera_alt_rounded,
-                    label: 'Camera',
+                    label: context.l10n.commonCamera,
                     onTap: () => Navigator.pop(context, ImageSource.camera),
                   ),
                 ),
@@ -108,7 +109,7 @@ class _SellerPersonalDetailsScreenState
                 Expanded(
                   child: _UploadOptionTile(
                     icon: Icons.photo_library_rounded,
-                    label: 'Gallery',
+                    label: context.l10n.commonGallery,
                     onTap: () => Navigator.pop(context, ImageSource.gallery),
                   ),
                 ),
@@ -132,9 +133,15 @@ class _SellerPersonalDetailsScreenState
         setState(() => _isUploading = false);
         if (mounted) {
           if (success) {
-            SnackBarService.showSuccess(context, 'Profile photo updated');
+            SnackBarService.showSuccess(
+              context,
+              context.l10n.editProfilePictureUpdated,
+            );
           } else {
-            SnackBarService.showError(context, 'Failed to upload photo');
+            SnackBarService.showError(
+              context,
+              context.l10n.editProfileUpdateFailed,
+            );
           }
         }
       }
@@ -154,10 +161,13 @@ class _SellerPersonalDetailsScreenState
     setState(() => _isLoading = false);
     if (mounted) {
       if (success) {
-        SnackBarService.showSuccess(context, 'Profile updated successfully');
+        SnackBarService.showSuccess(context, context.l10n.sellerProfileUpdated);
         Navigator.pop(context);
       } else {
-        SnackBarService.showError(context, 'Failed to update profile');
+        SnackBarService.showError(
+          context,
+          context.l10n.sellerProfileUpdateFailed,
+        );
       }
     }
   }
@@ -178,18 +188,21 @@ class _SellerPersonalDetailsScreenState
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Personal Details',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerPersonalDetailsTitle,
         showLogo: false,
         centerTitle: true,
       ),
       body: sellerAsync.when(
         data: (seller) {
-          if (seller == null) return const Center(child: Text('No data'));
+          if (seller == null) {
+            return Center(child: Text(context.l10n.editProfileDataNotFound));
+          }
           return _buildContent(seller);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, _) =>
+            Center(child: Text('${context.l10n.commonErrorPrefix}: $err')),
       ),
     );
   }
@@ -209,45 +222,48 @@ class _SellerPersonalDetailsScreenState
 
             // ── Personal Info card ───────────────────────────────────
             _SectionCard(
-              title: 'Personal Information',
+              title: context.l10n.sellerPersonalInformation,
               icon: Icons.person_outline_rounded,
               children: [
                 _FormField(
-                  label: 'Full Name',
+                  label: context.l10n.commonNameLabel,
                   controller: _nameController,
-                  hint: 'Enter your full name',
+                  hint: context.l10n.editProfileFirstNameHint,
                   icon: Icons.person_outline_rounded,
                 ),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'Email Address',
+                  label: context.l10n.editProfileEmailLabel,
                   controller: _emailController,
-                  hint: 'Enter your email',
+                  hint: context.l10n.editProfileEmailHint,
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return context.l10n.sellerEmailRequired;
                     }
-                    final emailRegex =
-                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    final emailRegex = RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    );
                     if (!emailRegex.hasMatch(value)) {
-                      return 'Please enter a valid email';
+                      return context.l10n.sellerValidEmail;
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'Phone Number',
+                  label: context.l10n.commonPhoneLabel,
                   controller: _phoneController,
-                  hint: 'Phone number',
+                  hint: context.l10n.addressPhoneLabel,
                   icon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
                   enabled: false,
                   trailingWidget: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(6),
@@ -255,11 +271,14 @@ class _SellerPersonalDetailsScreenState
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.lock_outline_rounded,
-                            size: 11, color: CommonColors.greyText),
+                        Icon(
+                          Icons.lock_outline_rounded,
+                          size: 11,
+                          color: CommonColors.greyText,
+                        ),
                         const SizedBox(width: 3),
                         Text(
-                          'Locked',
+                          context.l10n.sellerLocked,
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -277,7 +296,7 @@ class _SellerPersonalDetailsScreenState
 
             // ── Gender card ──────────────────────────────────────────
             _SectionCard(
-              title: 'Gender',
+              title: context.l10n.editProfileGenderLabel,
               icon: Icons.wc_rounded,
               children: [_buildGenderSelector()],
             ),
@@ -286,7 +305,7 @@ class _SellerPersonalDetailsScreenState
 
             // ── Save button ──────────────────────────────────────────
             SellerGradientButton(
-              label: 'Save Changes',
+              label: context.l10n.sellerSaveChanges,
               isLoading: _isLoading,
               onTap: _saveProfile,
             ),
@@ -356,8 +375,11 @@ class _SellerPersonalDetailsScreenState
                   ),
                 ],
               ),
-              child: const Icon(Icons.camera_alt_rounded,
-                  size: 13, color: Colors.white),
+              child: const Icon(
+                Icons.camera_alt_rounded,
+                size: 13,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -366,10 +388,10 @@ class _SellerPersonalDetailsScreenState
   }
 
   Widget _buildGenderSelector() {
-    const options = [
-      ('male', 'Male', Icons.male_rounded),
-      ('female', 'Female', Icons.female_rounded),
-      ('other', 'Other', Icons.transgender_rounded),
+    final options = [
+      ('male', context.l10n.genderMale, Icons.male_rounded),
+      ('female', context.l10n.genderFemale, Icons.female_rounded),
+      ('other', context.l10n.genderOther, Icons.transgender_rounded),
     ];
     return Row(
       children: options.map((opt) {
@@ -379,9 +401,7 @@ class _SellerPersonalDetailsScreenState
             onTap: () => setState(() => _gender = opt.$1),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: EdgeInsets.only(
-                right: opt.$1 != 'other' ? 10 : 0,
-              ),
+              margin: EdgeInsets.only(right: opt.$1 != 'other' ? 10 : 0),
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
                 color: isSelected
@@ -396,7 +416,9 @@ class _SellerPersonalDetailsScreenState
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: SellerColors.primaryLight.withValues(alpha: 0.3),
+                          color: SellerColors.primaryLight.withValues(
+                            alpha: 0.3,
+                          ),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -416,8 +438,9 @@ class _SellerPersonalDetailsScreenState
                     opt.$2,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                       color: isSelected ? Colors.white : CommonColors.greyText,
                     ),
                   ),
@@ -581,8 +604,10 @@ class _FormField extends StatelessWidget {
                 ),
               ),
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 52, minHeight: 48),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 52,
+              minHeight: 48,
+            ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 15,
@@ -593,40 +618,43 @@ class _FormField extends StatelessWidget {
                 : SellerColors.fieldDisabledFill,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: SellerColors.fieldBorder),
+              borderSide: const BorderSide(color: SellerColors.fieldBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: SellerColors.fieldBorder),
+              borderSide: const BorderSide(color: SellerColors.fieldBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                  color: SellerColors.primaryLight, width: 2),
+                color: SellerColors.primaryLight,
+                width: 2,
+              ),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: SellerColors.fieldDisabledBorder),
+              borderSide: const BorderSide(
+                color: SellerColors.fieldDisabledBorder,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: CommonColors.error),
+              borderSide: const BorderSide(color: CommonColors.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-                  const BorderSide(color: CommonColors.error, width: 1.5),
+              borderSide: const BorderSide(
+                color: CommonColors.error,
+                width: 1.5,
+              ),
             ),
           ),
-          validator: validator ??
+          validator:
+              validator ??
               (enabled
                   ? (value) {
                       if (value == null || value.isEmpty) {
-                        return 'This field is required';
+                        return context.l10n.commonFieldRequired;
                       }
                       return null;
                     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
@@ -25,7 +26,8 @@ class QuotePricingCard extends StatelessWidget {
         quote.pricing.totalGst +
         quote.pricing.deliveryCharges -
         quote.pricing.discountAmount;
-    final total = quote.totalAgreedAmount != null && quote.totalAgreedAmount! > 0
+    final total =
+        quote.totalAgreedAmount != null && quote.totalAgreedAmount! > 0
         ? quote.totalAgreedAmount!
         : calculatedTotal;
 
@@ -45,20 +47,26 @@ class QuotePricingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const QuoteSectionTitle(
-            title: 'Pricing Details',
+          QuoteSectionTitle(
+            title: context.l10n.quoteSectionPricing,
             icon: Icons.payments_outlined,
           ),
           const SizedBox(height: 16),
-          QuotePricingRow(label: 'Subtotal', value: agreedSubtotal),
-          QuotePricingRow(label: 'GST', value: quote.pricing.totalGst),
           QuotePricingRow(
-            label: 'Delivery Charges',
+            label: context.l10n.pricingSubtotal,
+            value: agreedSubtotal,
+          ),
+          QuotePricingRow(
+            label: context.l10n.pricingGst,
+            value: quote.pricing.totalGst,
+          ),
+          QuotePricingRow(
+            label: context.l10n.pricingDelivery,
             value: quote.pricing.deliveryCharges,
           ),
           if (quote.pricing.discountAmount > 0)
             QuotePricingRow(
-              label: 'Discount',
+              label: context.l10n.pricingDiscount,
               value: quote.pricing.discountAmount,
               isDiscount: true,
             ),
@@ -70,7 +78,7 @@ class QuotePricingCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Agreed Amount',
+                context.l10n.sellerTotalAgreedAmount,
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

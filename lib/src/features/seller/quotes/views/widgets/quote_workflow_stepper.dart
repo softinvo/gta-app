@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/quotation_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -18,36 +19,41 @@ class QuoteWorkflowStepper extends StatelessWidget {
 
   static const _kGreen = Color(0xFF27AE60);
 
-  static const List<(String, String, String, IconData)> _steps = [
-    ('submitted', 'Submitted', 'Quotation sent to buyer', Icons.send_outlined),
+  List<(String, String, String, IconData)> _steps(BuildContext context) => [
+    (
+      'submitted',
+      context.l10n.quoteStepSubmitted,
+      context.l10n.quoteStepDescSubmitted,
+      Icons.send_outlined,
+    ),
     (
       'seller_reviewing',
-      'Under Review',
-      'You are reviewing this request',
+      context.l10n.quoteStepUnderReview,
+      context.l10n.quoteStepDescReviewing,
       Icons.manage_search_outlined,
     ),
     (
       'negotiation',
-      'Negotiation',
-      'Price negotiation in progress',
+      context.l10n.quoteStepNegotiation,
+      context.l10n.quoteStepDescNegotiation,
       Icons.forum_outlined,
     ),
     (
       'agreement_reached',
-      'Agreement Reached',
-      'Terms agreed, ready for order',
+      context.l10n.quoteStepAgreementReached,
+      context.l10n.quoteStepDescAgreement,
       Icons.handshake_outlined,
     ),
     (
       'payment_done',
-      'Payment Done',
-      'Payment completed successfully',
+      context.l10n.quoteStepPaymentDone,
+      context.l10n.quoteStepDescPayment,
       Icons.payment_outlined,
     ),
     (
       'completed',
-      'Completed',
-      'Order fulfilled and delivered',
+      context.l10n.quoteStatusCompleted,
+      context.l10n.quoteStepDescCompleted,
       Icons.done_all_rounded,
     ),
   ];
@@ -55,13 +61,12 @@ class QuoteWorkflowStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCancelled = quote.status == 'cancelled';
-    final currentIndex = _steps.indexWhere((s) => s.$1 == quote.step);
+    final steps = _steps(context);
+    final currentIndex = steps.indexWhere((s) => s.$1 == quote.step);
 
     final visibleSteps = isCancelled
-        ? _steps
-            .where((s) => quote.workflowTimeline.containsKey(s.$1))
-            .toList()
-        : _steps.toList();
+        ? steps.where((s) => quote.workflowTimeline.containsKey(s.$1)).toList()
+        : steps.toList();
 
     final completedCount = isCancelled ? visibleSteps.length : currentIndex + 1;
     final totalCount = visibleSteps.length;
@@ -92,7 +97,7 @@ class QuoteWorkflowStepper extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Quote Timeline',
+                context.l10n.quoteSectionTimeline,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -101,10 +106,17 @@ class QuoteWorkflowStepper extends StatelessWidget {
               ),
               const Spacer(),
               if (isCancelled)
-                _Badge(label: 'CANCELLED', color: CommonColors.error)
+                _Badge(
+                  label: context.l10n.quoteBadgeCancelled,
+                  color: CommonColors.error,
+                )
               else
                 Text(
-                  'Step $completedCount of $totalCount',
+                  context.l10n.quoteTimelineStepOf(
+                    completedCount.toString(),
+                    totalCount.toString(),
+                    currentIndex >= 0 ? steps[currentIndex].$2 : '',
+                  ),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: CommonColors.greyText,
@@ -143,10 +155,11 @@ class QuoteWorkflowStepper extends StatelessWidget {
             final isLast = !isCancelled && i == visibleSteps.length - 1;
             Widget? action;
             if (key == 'seller_reviewing' &&
-                (quote.step == 'submitted' || quote.step == 'seller_reviewing') &&
+                (quote.step == 'submitted' ||
+                    quote.step == 'seller_reviewing') &&
                 onStartNegotiation != null) {
               action = _StepActionButton(
-                label: 'Update Status',
+                label: context.l10n.sellerUpdateStatus,
                 icon: Icons.forum_outlined,
                 onTap: onStartNegotiation!,
               );
@@ -154,7 +167,7 @@ class QuoteWorkflowStepper extends StatelessWidget {
                 quote.step == 'negotiation' &&
                 onFinalize != null) {
               action = _StepActionButton(
-                label: 'Update Status',
+                label: context.l10n.sellerUpdateStatus,
                 icon: Icons.check_circle_outline,
                 onTap: onFinalize!,
               );
@@ -177,8 +190,8 @@ class QuoteWorkflowStepper extends StatelessWidget {
           // Cancelled marker
           if (isCancelled) ...[
             _QuoteTimelineStep(
-              label: 'Cancelled',
-              description: 'This quotation was cancelled',
+              label: context.l10n.sellerStatusCancelled,
+              description: context.l10n.sellerQuotationCancelled,
               icon: Icons.cancel_outlined,
               date: quote.workflowTimeline['cancelled']?.actualDate,
               isCompleted: false,
@@ -229,10 +242,10 @@ class _QuoteTimelineStep extends StatelessWidget {
     final dotColor = isCancelStep
         ? CommonColors.error
         : isCompleted
-            ? _kGreen
-            : isCurrent
-                ? SellerColors.primaryLight
-                : const Color(0xFFCCCCCC);
+        ? _kGreen
+        : isCurrent
+        ? SellerColors.primaryLight
+        : const Color(0xFFCCCCCC);
 
     return IntrinsicHeight(
       child: Row(
@@ -294,20 +307,23 @@ class _QuoteTimelineStep extends StatelessWidget {
                             color: isCancelStep
                                 ? CommonColors.error
                                 : isCompleted
-                                    ? CommonColors.black
-                                    : isCurrent
-                                        ? SellerColors.primaryLight
-                                        : CommonColors.greyText,
+                                ? CommonColors.black
+                                : isCurrent
+                                ? SellerColors.primaryLight
+                                : CommonColors.greyText,
                           ),
                         ),
                       ),
                       if (isCurrent && !isCancelStep)
                         _Badge(
-                          label: 'ACTIVE',
+                          label: context.l10n.quoteBadgeActive,
                           color: SellerColors.primaryLight,
                         )
                       else if (isNext)
-                        _Badge(label: 'NEXT', color: CommonColors.greyText),
+                        _Badge(
+                          label: context.l10n.quoteBadgeNext,
+                          color: CommonColors.greyText,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 2),
@@ -315,8 +331,8 @@ class _QuoteTimelineStep extends StatelessWidget {
                     date != null
                         ? DateFormat('d MMM yyyy, h:mm a').format(date!)
                         : isCurrent && !isCancelStep
-                            ? 'In progress...'
-                            : description,
+                        ? context.l10n.orderInProgressLabel
+                        : description,
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: isCurrent && date == null && !isCancelStep
@@ -352,23 +368,18 @@ class _StepActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ElevatedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 16),
-        label: Text(label),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: SellerColors.primaryLight,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          textStyle: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+    onPressed: onTap,
+    icon: Icon(icon, size: 16),
+    label: Text(label),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: SellerColors.primaryLight,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      textStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    ),
+  );
 }
 
 class _DotWidget extends StatelessWidget {
@@ -408,10 +419,7 @@ class _DotWidget extends StatelessWidget {
       return Container(
         width: 32,
         height: 32,
-        decoration: const BoxDecoration(
-          color: _kGreen,
-          shape: BoxShape.circle,
-        ),
+        decoration: const BoxDecoration(color: _kGreen, shape: BoxShape.circle),
         child: const Icon(Icons.check, size: 16, color: Colors.white),
       );
     }

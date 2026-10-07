@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,21 @@ import 'package:gta_app/src/models/attachment_model.dart';
 import 'package:gta_app/src/models/seller_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
+
+String _specializationLabel(BuildContext context, String value) =>
+    switch (value) {
+      'Bridal' => context.l10n.sellerSpecializationBridal,
+      'Party Wear' => context.l10n.sellerSpecializationPartyWear,
+      'Custom Tailoring' => context.l10n.sellerSpecializationCustomTailoring,
+      'Fashion Consultation' =>
+        context.l10n.sellerSpecializationFashionConsultation,
+      'Ethnic Wear' => context.l10n.sellerSpecializationEthnicWear,
+      'Western Wear' => context.l10n.sellerSpecializationWesternWear,
+      'Kids Wear' => context.l10n.sellerSpecializationKidsWear,
+      'Accessories' => context.l10n.sellerSpecializationAccessories,
+      'Other' => context.l10n.sellerSpecializationOther,
+      _ => value,
+    };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Screen
@@ -34,8 +50,6 @@ class _SellerOnboardingScreenState
     extends ConsumerState<SellerOnboardingScreen> {
   late final PageController _pageController;
   int _currentPage = 0;
-
-  static const _stepLabels = ['Store Profile', 'Bank Details', 'Documents'];
 
   @override
   void initState() {
@@ -72,6 +86,11 @@ class _SellerOnboardingScreenState
 
   @override
   Widget build(BuildContext context) {
+    final stepLabels = [
+      context.l10n.sellerStoreProfileTitle,
+      context.l10n.sellerBankDetailsTitle,
+      context.l10n.sellerDocumentsTitle,
+    ];
     return PopScope(
       canPop: _currentPage == 0,
       onPopInvokedWithResult: (didPop, _) {
@@ -85,7 +104,7 @@ class _SellerOnboardingScreenState
       child: Scaffold(
         backgroundColor: SellerColors.background,
         appBar: SellerAppBar(
-          title: _stepLabels[_currentPage],
+          title: stepLabels[_currentPage],
           showLogo: false,
           centerTitle: true,
           leading: SellerBackButton(onPressed: _goPrev),
@@ -93,7 +112,7 @@ class _SellerOnboardingScreenState
         ),
         body: Column(
           children: [
-            _StepIndicator(currentStep: _currentPage, stepLabels: _stepLabels),
+            _StepIndicator(currentStep: _currentPage, stepLabels: stepLabels),
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -352,10 +371,16 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
 
     if (mounted) {
       if (success) {
-        SnackBarService.showSuccess(context, 'Store profile saved');
+        SnackBarService.showSuccess(
+          context,
+          context.l10n.sellerStoreProfileUpdated,
+        );
         widget.onNext();
       } else {
-        SnackBarService.showError(context, 'Failed to save store profile');
+        SnackBarService.showError(
+          context,
+          context.l10n.sellerStoreProfileUpdateFailed,
+        );
       }
     }
   }
@@ -396,7 +421,8 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
 
     return sellerAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) =>
+          Center(child: Text('${context.l10n.commonErrorPrefix}: $e')),
       data: (_) => _buildForm(),
     );
   }
@@ -412,13 +438,13 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionCard(
-              title: 'Business Information',
+              title: context.l10n.sellerBusinessInformation,
               icon: Icons.store_rounded,
               children: [
                 _OnboardingField(
-                  label: 'Business Name',
+                  label: context.l10n.sellerBusinessNameLabel,
                   controller: _businessNameController,
-                  hint: 'Enter your business name',
+                  hint: context.l10n.sellerEnterBusinessName,
                   icon: Icons.storefront_outlined,
                 ),
                 const SizedBox(height: 16),
@@ -431,15 +457,15 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
             if (isDesigner) ...[
               const SizedBox(height: 16),
               _SectionCard(
-                title: 'Designer Profile',
+                title: context.l10n.sellerDesignerProfile,
                 icon: Icons.palette_outlined,
                 children: [
                   _buildAvailabilitySelector(),
                   const SizedBox(height: 16),
                   _OnboardingField(
-                    label: 'Professional Bio',
+                    label: context.l10n.sellerProfessionalBio,
                     controller: _bioController,
-                    hint: 'Describe your expertise and style...',
+                    hint: context.l10n.sellerBioHint,
                     icon: Icons.notes_rounded,
                     maxLines: 4,
                     maxLength: 1000,
@@ -447,7 +473,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                   ),
                   const SizedBox(height: 16),
                   _OnboardingField(
-                    label: 'Years of Experience',
+                    label: context.l10n.sellerYearsExperience,
                     controller: _yearsController,
                     hint: 'e.g. 5',
                     icon: Icons.timeline_rounded,
@@ -459,20 +485,20 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
               ),
               const SizedBox(height: 16),
               _SectionCard(
-                title: 'Specializations',
+                title: context.l10n.sellerSpecializations,
                 icon: Icons.star_outline_rounded,
                 children: [_buildSpecializationChips()],
               ),
               const SizedBox(height: 16),
               _SectionCard(
-                title: 'Price Range (INR)',
+                title: context.l10n.sellerPriceRange,
                 icon: Icons.currency_rupee_rounded,
                 children: [
                   Row(
                     children: [
                       Expanded(
                         child: _OnboardingField(
-                          label: 'Min Price',
+                          label: context.l10n.sellerMinimumPrice,
                           controller: _priceMinController,
                           hint: '500',
                           icon: Icons.arrow_downward_rounded,
@@ -486,7 +512,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _OnboardingField(
-                          label: 'Max Price',
+                          label: context.l10n.sellerMaximumPrice,
                           controller: _priceMaxController,
                           hint: '50000',
                           icon: Icons.arrow_upward_rounded,
@@ -505,7 +531,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
 
             const SizedBox(height: 28),
             SellerGradientButton(
-              label: 'Save & Continue',
+              label: context.l10n.sellerSaveContinue,
               isLoading: _isLoading,
               onTap: _save,
               leadingIcon: const Icon(
@@ -521,19 +547,39 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
   }
 
   Widget _buildBusinessTypeSelector() {
-    const types = [
-      (BusinessType.wholeseller, 'Wholeseller', Icons.warehouse_rounded),
-      (BusinessType.retailer, 'Retailer', Icons.shopping_bag_outlined),
-      (BusinessType.manufacturer, 'Manufacturer', Icons.factory_outlined),
-      (BusinessType.designer, 'Designer', Icons.palette_outlined),
-      (BusinessType.service, 'Service', Icons.miscellaneous_services_rounded),
+    final types = [
+      (
+        BusinessType.wholeseller,
+        context.l10n.sellerBusinessTypeWholesaler,
+        Icons.warehouse_rounded,
+      ),
+      (
+        BusinessType.retailer,
+        context.l10n.sellerBusinessTypeRetailer,
+        Icons.shopping_bag_outlined,
+      ),
+      (
+        BusinessType.manufacturer,
+        context.l10n.sellerBusinessTypeManufacturer,
+        Icons.factory_outlined,
+      ),
+      (
+        BusinessType.designer,
+        context.l10n.sellerBusinessTypeDesigner,
+        Icons.palette_outlined,
+      ),
+      (
+        BusinessType.service,
+        context.l10n.sellerBusinessTypeService,
+        Icons.miscellaneous_services_rounded,
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Business Type',
+          context.l10n.sellerBusinessTypeLabel,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -613,13 +659,13 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
         ? '${_registrationDate!.day.toString().padLeft(2, '0')}/'
               '${_registrationDate!.month.toString().padLeft(2, '0')}/'
               '${_registrationDate!.year}'
-        : 'Select date';
+        : context.l10n.sellerSelectDate;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Business Registration Date',
+          context.l10n.sellerBusinessRegistrationDate,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -670,17 +716,29 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
   }
 
   Widget _buildAvailabilitySelector() {
-    const options = [
-      (AvailabilityStatus.available, 'Available', Color(0xFF43A047)),
-      (AvailabilityStatus.busy, 'Busy', Color(0xFFF57F17)),
-      (AvailabilityStatus.notTakingOrders, 'Closed', Color(0xFFE53935)),
+    final options = [
+      (
+        AvailabilityStatus.available,
+        context.l10n.commonAvailable,
+        const Color(0xFF43A047),
+      ),
+      (
+        AvailabilityStatus.busy,
+        context.l10n.sellerBusy,
+        const Color(0xFFF57F17),
+      ),
+      (
+        AvailabilityStatus.notTakingOrders,
+        context.l10n.sellerClosed,
+        const Color(0xFFE53935),
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Availability',
+          context.l10n.sellerAvailability,
           style: GoogleFonts.inter(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -788,7 +846,7 @@ class _StoreProfilePageState extends ConsumerState<_StoreProfilePage> {
                   const SizedBox(width: 4),
                 ],
                 Text(
-                  spec,
+                  _specializationLabel(context, spec),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
@@ -867,7 +925,7 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
     setState(() => _isLoading = false);
     if (!mounted) return;
     if (error == null) {
-      SnackBarService.showSuccess(context, 'Bank details saved');
+      SnackBarService.showSuccess(context, context.l10n.sellerBankSaved);
       widget.onNext();
     } else {
       SnackBarService.showError(context, error);
@@ -909,7 +967,7 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Your payouts (90% of each order) will be settled to this account via Cashfree Easy Split.',
+                      context.l10n.sellerPayoutSplitInfo,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: SellerColors.primaryLight,
@@ -930,35 +988,39 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
 
             const SizedBox(height: 24),
 
-            _FieldLabel(label: 'Account Holder Name'),
+            _FieldLabel(label: context.l10n.sellerAccountHolderName),
             const SizedBox(height: 8),
             _BankTextField(
               controller: _holderNameController,
-              hint: 'As printed on bank passbook',
+              hint: context.l10n.sellerAccountHolderHint,
               inputType: TextInputType.name,
               textCapitalization: TextCapitalization.words,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Name is required';
-                if (v.trim().length < 3) return 'Enter a valid name';
+                if (v == null || v.trim().isEmpty) {
+                  return context.l10n.sellerNameRequired;
+                }
+                if (v.trim().length < 3) {
+                  return context.l10n.sellerValidName;
+                }
                 return null;
               },
             ),
 
             const SizedBox(height: 20),
 
-            _FieldLabel(label: 'Bank Account Number'),
+            _FieldLabel(label: context.l10n.sellerAccountNumber),
             const SizedBox(height: 8),
             _BankTextField(
               controller: _accountNumberController,
-              hint: 'Enter account number',
+              hint: context.l10n.sellerAccountNumberHint,
               inputType: TextInputType.number,
               formatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (v) {
                 if (v == null || v.trim().isEmpty) {
-                  return 'Account number is required';
+                  return context.l10n.sellerAccountNumberRequired;
                 }
                 if (v.trim().length < 9) {
-                  return 'Enter a valid account number';
+                  return context.l10n.sellerValidAccountNumber;
                 }
                 return null;
               },
@@ -966,19 +1028,19 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
 
             const SizedBox(height: 20),
 
-            _FieldLabel(label: 'Confirm Account Number'),
+            _FieldLabel(label: context.l10n.sellerConfirmAccountNumber),
             const SizedBox(height: 8),
             _BankTextField(
               controller: _confirmAccountController,
-              hint: 'Re-enter account number',
+              hint: context.l10n.sellerConfirmAccountHint,
               inputType: TextInputType.number,
               formatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (v) {
                 if (v == null || v.trim().isEmpty) {
-                  return 'Please confirm account number';
+                  return context.l10n.sellerConfirmAccountRequired;
                 }
                 if (v.trim() != _accountNumberController.text.trim()) {
-                  return 'Account numbers do not match';
+                  return context.l10n.sellerAccountNumbersMismatch;
                 }
                 return null;
               },
@@ -986,7 +1048,7 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
 
             const SizedBox(height: 20),
 
-            _FieldLabel(label: 'IFSC Code'),
+            _FieldLabel(label: context.l10n.sellerIfscCode),
             const SizedBox(height: 8),
             _BankTextField(
               controller: _ifscController,
@@ -999,11 +1061,11 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
               ],
               validator: (v) {
                 if (v == null || v.trim().isEmpty) {
-                  return 'IFSC code is required';
+                  return context.l10n.sellerIfscRequired;
                 }
                 final ifsc = v.trim().toUpperCase();
                 if (!RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$').hasMatch(ifsc)) {
-                  return 'Enter a valid IFSC code';
+                  return context.l10n.sellerValidIfsc;
                 }
                 return null;
               },
@@ -1012,7 +1074,9 @@ class _BankDetailsPageState extends ConsumerState<_BankDetailsPage> {
             const SizedBox(height: 36),
 
             SellerGradientButton(
-              label: hasBankDetails ? 'Update & Continue' : 'Save & Continue',
+              label: hasBankDetails
+                  ? context.l10n.sellerSaveContinue
+                  : context.l10n.sellerSaveContinue,
               isLoading: _isLoading,
               onTap: _submit,
               leadingIcon: const Icon(
@@ -1039,6 +1103,14 @@ class _DocMeta {
   final IconData icon;
   const _DocMeta(this.type, this.icon);
 }
+
+String _documentLabel(BuildContext context, String type) => switch (type) {
+  'PAN Card' => context.l10n.sellerPanCard,
+  'GST Certificate' => context.l10n.sellerGstCertificate,
+  'Business License' => context.l10n.sellerBusinessLicense,
+  'Address Proof' => context.l10n.sellerAddressProof,
+  _ => type,
+};
 
 const _requiredDocs = [
   _DocMeta('PAN Card', Icons.credit_card_rounded),
@@ -1170,7 +1242,7 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
     if (error == null) {
       SnackBarService.showSuccess(
         context,
-        'Documents submitted for verification',
+        context.l10n.sellerDocumentsSubmitted,
       );
       widget.onDone();
     } else {
@@ -1214,8 +1286,8 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
           ],
           Text(
             status == VerificationStatus.rejected
-                ? 'Update Documents'
-                : 'Required Documents',
+                ? context.l10n.sellerUpdateDocuments
+                : context.l10n.sellerRequiredDocuments,
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -1224,7 +1296,7 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Upload a clear image of each document',
+            context.l10n.sellerUploadClearDocuments,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -1243,7 +1315,7 @@ class _VerificationPageState extends ConsumerState<_VerificationPage> {
             opacity: _canSubmit ? 1.0 : 0.45,
             duration: const Duration(milliseconds: 200),
             child: SellerGradientButton(
-              label: 'Submit for Verification',
+              label: context.l10n.sellerSubmitVerification,
               isLoading: _isSubmitting,
               onTap: _canSubmit && !_isSubmitting ? _submit : () {},
             ),
@@ -1436,7 +1508,7 @@ class _OnboardingField extends StatelessWidget {
           validator: required
               ? (v) {
                   if (v == null || v.trim().isEmpty) {
-                    return 'This field is required';
+                    return context.l10n.commonFieldRequired;
                   }
                   return null;
                 }
@@ -1546,25 +1618,25 @@ class _VendorStatusBadge extends StatelessWidget {
         bg = const Color(0xFFE8F5E9);
         fg = const Color(0xFF2E7D32);
         icon = Icons.verified_rounded;
-        label = 'Bank account verified';
+        label = context.l10n.sellerBankVerified;
         break;
       case 'IN_BANK_VALIDATION':
         bg = const Color(0xFFFFF8E1);
         fg = const Color(0xFFF57F17);
         icon = Icons.hourglass_top_rounded;
-        label = 'Bank account under verification';
+        label = context.l10n.sellerBankUnderVerification;
         break;
       case 'BLOCKED':
         bg = const Color(0xFFFFEBEE);
         fg = const Color(0xFFC62828);
         icon = Icons.block_rounded;
-        label = 'Bank account blocked — contact support';
+        label = context.l10n.sellerBankBlocked;
         break;
       default:
         bg = SellerColors.surface;
         fg = CommonColors.greyText;
         icon = Icons.account_balance_rounded;
-        label = 'Bank account not yet verified';
+        label = context.l10n.sellerBankNotVerified;
     }
 
     return Container(
@@ -1646,7 +1718,7 @@ class _DocUploadCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                meta.type,
+                _documentLabel(context, meta.type),
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -1663,7 +1735,7 @@ class _DocUploadCard extends StatelessWidget {
               color: SellerColors.textPrimary,
             ),
             decoration: InputDecoration(
-              hintText: 'Document number',
+              hintText: context.l10n.sellerDocumentNumber,
               hintStyle: GoogleFonts.inter(
                 fontSize: 13,
                 color: SellerColors.accentLight,
@@ -1810,7 +1882,9 @@ class _DocUploadButton extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    hasExisting ? 'Replace Image' : 'Upload Image',
+                    hasExisting
+                        ? context.l10n.sellerReplaceImage
+                        : context.l10n.sellerUploadImage,
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -1850,7 +1924,9 @@ class _PickerSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Upload $docType',
+            context.l10n.sellerUploadDocumentName(
+              _documentLabel(context, docType),
+            ),
             style: GoogleFonts.poppins(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -1859,7 +1935,7 @@ class _PickerSheet extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Choose image source',
+            context.l10n.sellerChooseImageSource,
             style: GoogleFonts.inter(
               fontSize: 13,
               color: CommonColors.greyText,
@@ -1871,7 +1947,7 @@ class _PickerSheet extends StatelessWidget {
               Expanded(
                 child: _PickerOption(
                   icon: Icons.camera_alt_rounded,
-                  label: 'Camera',
+                  label: context.l10n.commonCamera,
                   onTap: () => onSource(ImageSource.camera),
                 ),
               ),
@@ -1879,7 +1955,7 @@ class _PickerSheet extends StatelessWidget {
               Expanded(
                 child: _PickerOption(
                   icon: Icons.photo_library_rounded,
-                  label: 'Gallery',
+                  label: context.l10n.commonGallery,
                   onTap: () => onSource(ImageSource.gallery),
                 ),
               ),
@@ -1980,7 +2056,7 @@ class _ApprovedBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Account Verified',
+                  context.l10n.verificationStatusApprovedTitle,
                   style: GoogleFonts.poppins(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -1989,7 +2065,7 @@ class _ApprovedBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your business is verified on Texax Marketplace.\nYou can now sell and receive payouts.',
+                  context.l10n.verificationStatusApprovedDesc,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 13,
@@ -2001,7 +2077,7 @@ class _ApprovedBanner extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
-          SellerGradientButton(label: 'Done', onTap: onFinish),
+          SellerGradientButton(label: context.l10n.commonDone, onTap: onFinish),
         ],
       ),
     );
@@ -2033,7 +2109,7 @@ class _PendingBanner extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Under Review',
+              context.l10n.verificationStatusPendingTitle,
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -2042,7 +2118,7 @@ class _PendingBanner extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your documents are being reviewed.\nThis usually takes 24–48 hours.',
+              context.l10n.verificationStatusPendingDesc,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 13,
@@ -2084,7 +2160,7 @@ class _RejectionBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Rejection Reason',
+                  context.l10n.sellerRejectionReason,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,

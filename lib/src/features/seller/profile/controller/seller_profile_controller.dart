@@ -48,13 +48,10 @@ class SellerProfileController extends Notifier<AsyncValue<Seller?>> {
     List<Map<String, dynamic>> documents,
   ) async {
     final result = await _repo.updateProfile({'documents': documents});
-    return result.fold(
-      (failure) => failure.message,
-      (updatedSeller) {
-        state = AsyncValue.data(updatedSeller);
-        return null;
-      },
-    );
+    return result.fold((failure) => failure.message, (updatedSeller) {
+      state = AsyncValue.data(updatedSeller);
+      return null;
+    });
   }
 
   /// Update profile details
@@ -92,13 +89,10 @@ class SellerProfileController extends Notifier<AsyncValue<Seller?>> {
       bankAccountNumber: bankAccountNumber,
       ifscCode: ifscCode,
     );
-    return result.fold(
-      (failure) => failure.message,
-      (_) async {
-        await getProfile();
-        return null;
-      },
-    );
+    return result.fold((failure) => failure.message, (_) async {
+      await getProfile();
+      return null;
+    });
   }
 
   /// Upload and update profile picture

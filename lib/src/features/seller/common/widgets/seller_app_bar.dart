@@ -30,7 +30,9 @@ class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final shouldShowBackButton =
-        automaticallyImplyLeading && leading == null && Navigator.canPop(context);
+        automaticallyImplyLeading &&
+        leading == null &&
+        Navigator.canPop(context);
 
     return AppBar(
       backgroundColor: CommonColors.white,
@@ -39,8 +41,8 @@ class SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: Colors.transparent,
       toolbarHeight: 64,
       automaticallyImplyLeading: false,
-      leading: leading ??
-          (shouldShowBackButton ? const SellerBackButton() : null),
+      leading:
+          leading ?? (shouldShowBackButton ? const SellerBackButton() : null),
       centerTitle: showLogo ? centerTitle : true,
       systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -77,7 +79,11 @@ class SellerBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back_ios, color: CommonColors.black, size: 20),
+      icon: const Icon(
+        Icons.arrow_back_ios,
+        color: CommonColors.black,
+        size: 20,
+      ),
       onPressed: onPressed ?? () => Navigator.maybePop(context),
     );
   }

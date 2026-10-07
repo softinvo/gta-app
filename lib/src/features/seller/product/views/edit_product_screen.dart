@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/product/controllers/category_controller.dart';
@@ -88,9 +89,13 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
     final p = widget.product;
 
     _nameController = TextEditingController(text: p.name);
-    _shortDescController = TextEditingController(text: p.description.short ?? '');
+    _shortDescController = TextEditingController(
+      text: p.description.short ?? '',
+    );
     _longDescController = TextEditingController(text: p.description.long ?? '');
-    _moqController = TextEditingController(text: p.minimumOrderQuantity.toString());
+    _moqController = TextEditingController(
+      text: p.minimumOrderQuantity.toString(),
+    );
     _originController = TextEditingController(text: p.countryOfOrigin ?? '');
     _sampleCostController = TextEditingController(
       text: p.sampleCost != null ? p.sampleCost.toString() : '0',
@@ -170,14 +175,16 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   bool _validateCurrentStep() {
     if (_currentStep == 0) {
       if (!_formKey.currentState!.validate()) return false;
-      if (_selectedCategoryId == null || _selectedSubCategoryId == null || _selectedProductTypeId == null) {
-        _showError('Please complete the classification');
+      if (_selectedCategoryId == null ||
+          _selectedSubCategoryId == null ||
+          _selectedProductTypeId == null) {
+        _showError(context.l10n.sellerCompleteClassification);
         return false;
       }
     } else if (_currentStep == 2) {
       if (_hasVariants && !_isMultiColor) {
         if (_variants.isEmpty) {
-          _showError('Please add at least one variant');
+          _showError(context.l10n.sellerAddVariantError);
           return false;
         }
       } else {
@@ -194,19 +201,25 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
     final type = _selectedProductType;
     if (type == null) return true;
     final invalid = type.fields
-        .where((field) => field.required && _isAttributeValueEmpty(_attributeValues[field.fieldName]))
+        .where(
+          (field) =>
+              field.required &&
+              _isAttributeValueEmpty(_attributeValues[field.fieldName]),
+        )
         .map((field) => field.fieldName)
         .toSet();
     setState(() => _invalidAttributeNames = invalid);
     if (invalid.isNotEmpty) {
-      _showError('Please complete all required product attributes');
+      _showError(context.l10n.sellerRequiredAttributesError);
       return false;
     }
     return true;
   }
 
   bool _isAttributeValueEmpty(dynamic value) =>
-      value == null || (value is String && value.trim().isEmpty) || (value is List && value.isEmpty);
+      value == null ||
+      (value is String && value.trim().isEmpty) ||
+      (value is List && value.isEmpty);
 
   void _selectProductType(
     ProductType type, {
@@ -254,7 +267,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_hasVariants && !_isMultiColor && _variants.isEmpty) {
-      _showError('Please add at least one variant');
+      _showError(context.l10n.sellerAddVariantError);
       return;
     }
 
@@ -268,25 +281,34 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
       final uploader = ref.read(uploadUtilsProvider);
 
       if (_singleThumbnailFile != null) {
-        final result = await uploader.uploadFile(_singleThumbnailFile!, 'Product');
+        final result = await uploader.uploadFile(
+          _singleThumbnailFile!,
+          'Product',
+        );
         if (!mounted) return;
         bool failed = false;
-        result.fold(
-          (f) { failed = true; _showError('Thumbnail upload failed: ${f.message}'); },
-          (a) => thumbnail = a,
-        );
-        if (failed) { setState(() => _isUploadingImages = false); return; }
+        result.fold((f) {
+          failed = true;
+          _showError('Thumbnail upload failed: ${f.message}');
+        }, (a) => thumbnail = a);
+        if (failed) {
+          setState(() => _isUploadingImages = false);
+          return;
+        }
       }
 
       for (final file in _singlePreviewFiles) {
         final result = await uploader.uploadFile(file, 'Product');
         if (!mounted) return;
         bool failed = false;
-        result.fold(
-          (f) { failed = true; _showError('Preview image upload failed: ${f.message}'); },
-          (a) => newPreviews.add(a),
-        );
-        if (failed) { setState(() => _isUploadingImages = false); return; }
+        result.fold((f) {
+          failed = true;
+          _showError('Preview image upload failed: ${f.message}');
+        }, (a) => newPreviews.add(a));
+        if (failed) {
+          setState(() => _isUploadingImages = false);
+          return;
+        }
       }
 
       if (mounted) setState(() => _isUploadingImages = false);
@@ -362,49 +384,69 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
       category: _selectedCategoryName ?? widget.product.category,
       subCategory: _selectedSubCategoryName ?? widget.product.subCategory,
       productType: _selectedProductTypeName ?? widget.product.productType,
-      gsm: _gsmController.text.trim().isEmpty ? null : _gsmController.text.trim(),
-      width: _widthController.text.trim().isEmpty ? null : _widthController.text.trim(),
-      compositions: _compositionsController.text.trim().isEmpty ? null : _compositionsController.text.trim(),
+      gsm: _gsmController.text.trim().isEmpty
+          ? null
+          : _gsmController.text.trim(),
+      width: _widthController.text.trim().isEmpty
+          ? null
+          : _widthController.text.trim(),
+      compositions: _compositionsController.text.trim().isEmpty
+          ? null
+          : _compositionsController.text.trim(),
       isMultiColor: _isMultiColor,
       description: ProductDescription(
-        short: _shortDescController.text.trim().isEmpty ? null : _shortDescController.text.trim(),
-        long: _longDescController.text.trim().isEmpty ? null : _longDescController.text.trim(),
+        short: _shortDescController.text.trim().isEmpty
+            ? null
+            : _shortDescController.text.trim(),
+        long: _longDescController.text.trim().isEmpty
+            ? null
+            : _longDescController.text.trim(),
       ),
-      countryOfOrigin: _originController.text.trim().isEmpty ? null : _originController.text.trim(),
+      countryOfOrigin: _originController.text.trim().isEmpty
+          ? null
+          : _originController.text.trim(),
       sampleAvailable: _sampleAvailable,
-      sampleCost: _sampleAvailable ? double.tryParse(_sampleCostController.text) : null,
+      sampleCost: _sampleAvailable
+          ? double.tryParse(_sampleCostController.text)
+          : null,
       minimumOrderQuantity: int.tryParse(_moqController.text) ?? 1,
       attributes: Map<String, dynamic>.from(_attributeValues),
       hasVariants: _isMultiColor ? false : _hasVariants,
       variants: variants,
     );
 
-    ref.read(productControllerProvider.notifier).updateProduct(
-      productId: widget.product.id!,
-      product: updated,
-      onError: (msg) => _showError(msg),
-      onSuccess: () {
-        ref.invalidate(
-          productDetailsProvider((
-            productId: widget.product.id!,
-            variantColorCode: null,
-          )),
+    ref
+        .read(productControllerProvider.notifier)
+        .updateProduct(
+          productId: widget.product.id!,
+          product: updated,
+          onError: (msg) => _showError(msg),
+          onSuccess: () {
+            ref.invalidate(
+              productDetailsProvider((
+                productId: widget.product.id!,
+                variantColorCode: null,
+              )),
+            );
+            ref.read(productListProvider.notifier).fetchProducts(refresh: true);
+            SnackBarService.showSuccess(
+              context,
+              context.l10n.sellerProductUpdatedSuccess,
+            );
+            Navigator.pop(context);
+          },
         );
-        ref.read(productListProvider.notifier).fetchProducts(refresh: true);
-        SnackBarService.showSuccess(context, 'Product updated successfully!');
-        Navigator.pop(context);
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(productControllerProvider) || _isUploadingImages;
+    final isLoading =
+        ref.watch(productControllerProvider) || _isUploadingImages;
 
     return Scaffold(
       backgroundColor: SellerColors.background,
-      appBar: const SellerAppBar(
-        title: 'Edit Product',
+      appBar: SellerAppBar(
+        title: context.l10n.sellerEditProductTitle,
         showLogo: false,
         centerTitle: true,
         actions: [],
@@ -439,7 +481,8 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                         _buildDescriptionCard(),
                         const SizedBox(height: 16),
                         _buildOrderCard(),
-                        if (_selectedProductType?.fields.isNotEmpty == true) ...[
+                        if (_selectedProductType?.fields.isNotEmpty ==
+                            true) ...[
                           const SizedBox(height: 16),
                           _buildProductAttributesCard(),
                         ],
@@ -539,16 +582,16 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildBasicInfoCard() {
     return _buildSectionCard(
       icon: Icons.inventory_2_outlined,
-      title: 'Basic Details',
+      title: context.l10n.sellerBasicDetails,
       children: [
         CustomFormTextField(
-          label: 'Product Name *',
+          label: context.l10n.sellerProductNameLabel,
           controller: _nameController,
           hint: 'e.g. Premium Cotton Shirt',
         ),
         _gap(),
         CustomFormTextField(
-          label: 'Country of Origin',
+          label: context.l10n.sellerCountryOfOrigin,
           controller: _originController,
           hint: 'e.g. India',
           isRequired: false,
@@ -558,8 +601,11 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Sample Available',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              context.l10n.productSampleAvailableTitle,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
             ),
             CustomSwitchToggle(
               value: _sampleAvailable,
@@ -571,7 +617,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         if (_sampleAvailable) ...[
           _gap(),
           CustomFormTextField(
-            label: 'Sample Cost (₹)',
+            label: context.l10n.sellerSampleCost,
             controller: _sampleCostController,
             keyboardType: TextInputType.number,
             hint: '0',
@@ -584,7 +630,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildClassificationCard() {
     return _buildSectionCard(
       icon: Icons.category_outlined,
-      title: 'Classification',
+      title: context.l10n.sellerClassification,
       children: [
         _buildCategoryDropdown(),
         if (_selectedCategoryId != null) ...[
@@ -602,13 +648,13 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildTextileSpecsCard() {
     return _buildSectionCard(
       icon: Icons.straighten_outlined,
-      title: 'Textile Specifications',
+      title: context.l10n.sellerTextileSpecifications,
       children: [
         Row(
           children: [
             Expanded(
               child: CustomFormTextField(
-                label: 'GSM',
+                label: context.l10n.productAttrGsm,
                 controller: _gsmController,
                 hint: 'e.g. 180',
                 isRequired: false,
@@ -618,7 +664,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: CustomFormTextField(
-                label: 'Width',
+                label: context.l10n.productAttrWidth,
                 controller: _widthController,
                 hint: 'e.g. 58 inches',
                 isRequired: false,
@@ -628,7 +674,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         ),
         _gap(),
         CustomFormTextField(
-          label: 'Compositions',
+          label: context.l10n.sellerCompositions,
           controller: _compositionsController,
           hint: 'e.g. 100% Cotton',
           isRequired: false,
@@ -642,20 +688,20 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildDescriptionCard() {
     return _buildSectionCard(
       icon: Icons.description_outlined,
-      title: 'Product Description',
+      title: context.l10n.productDescriptionTitle,
       children: [
         CustomFormTextField(
-          label: 'Short Description',
+          label: context.l10n.sellerShortDescription,
           controller: _shortDescController,
-          hint: 'Brief summary of the product',
+          hint: context.l10n.sellerShortDescriptionHint,
           maxLines: 2,
           isRequired: false,
         ),
         _gap(),
         CustomFormTextField(
-          label: 'Long Description',
+          label: context.l10n.sellerLongDescription,
           controller: _longDescController,
-          hint: 'Detailed product information...',
+          hint: context.l10n.sellerLongDescriptionHint,
           maxLines: 5,
           isRequired: false,
         ),
@@ -666,10 +712,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildOrderCard() {
     return _buildSectionCard(
       icon: Icons.shopping_bag_outlined,
-      title: 'Order Details',
+      title: context.l10n.sellerOrderDetailsTitle,
       children: [
         CustomFormTextField(
-          label: 'Minimum Order Quantity (MOQ)',
+          label: context.l10n.sellerMinimumOrderQuantity,
           controller: _moqController,
           hint: 'e.g. 100',
           keyboardType: TextInputType.number,
@@ -682,7 +728,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
     final type = _selectedProductType!;
     return _buildSectionCard(
       icon: Icons.tune_rounded,
-      title: 'Product Attributes',
+      title: context.l10n.sellerProductAttributes,
       children: [
         ProductAttributeFields(
           productTypeId: type.id,
@@ -692,7 +738,8 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           onChanged: (fieldName, value) {
             setState(() {
               _attributeValues[fieldName] = value;
-              _invalidAttributeNames = {..._invalidAttributeNames}..remove(fieldName);
+              _invalidAttributeNames = {..._invalidAttributeNames}
+                ..remove(fieldName);
             });
           },
         ),
@@ -705,11 +752,11 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildVariantTypeCard() {
     return _buildSectionCard(
       icon: Icons.palette_outlined,
-      title: 'Color & Variant Type',
+      title: context.l10n.sellerColorVariantType,
       children: [
         _buildToggleRow(
-          label: 'Is Multi-Color?',
-          subtitle: 'Product comes in multiple colors',
+          label: context.l10n.sellerIsMultiColor,
+          subtitle: context.l10n.sellerMultiColorSubtitle,
           value: _isMultiColor,
           onChanged: (val) {
             setState(() {
@@ -727,8 +774,8 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           Divider(height: 1, color: Colors.grey.shade100),
           _gap(12),
           _buildToggleRow(
-            label: 'Has Multiple Variants?',
-            subtitle: 'Different sizes/colors with separate pricing',
+            label: context.l10n.sellerHasMultipleVariants,
+            subtitle: context.l10n.sellerMultipleVariantsSubtitle,
             value: _hasVariants,
             onChanged: (val) => setState(() => _hasVariants = val),
           ),
@@ -760,7 +807,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: CommonColors.greyText,
+                ),
               ),
             ],
           ),
@@ -779,9 +829,11 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
     if (_hasVariants && !_isMultiColor) {
       return _buildSectionCard(
         icon: Icons.style_outlined,
-        title: 'Variants (${_variants.length})',
+        title: '${context.l10n.sellerVariantsTitle} (${_variants.length})',
         children: [
-          ..._variants.asMap().entries.map((e) => _buildVariantTile(e.value, e.key)),
+          ..._variants.asMap().entries.map(
+            (e) => _buildVariantTile(e.value, e.key),
+          ),
           if (_variants.isNotEmpty) _gap(),
           GestureDetector(
             onTap: _showAddVariantDialog,
@@ -798,10 +850,14 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_rounded, color: SellerColors.primaryLight, size: 20),
+                  Icon(
+                    Icons.add_rounded,
+                    color: SellerColors.primaryLight,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
-                    'Add Variant',
+                    context.l10n.sellerAddVariant,
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -818,14 +874,16 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
 
     return _buildSectionCard(
       icon: Icons.sell_outlined,
-      title: _isMultiColor ? 'Pricing & Stock' : 'Pricing, Stock & Color',
+      title: _isMultiColor
+          ? context.l10n.sellerPricingStock
+          : context.l10n.sellerPricingStockColor,
       children: [
         Row(
           children: [
             Expanded(
               flex: 3,
               child: CustomFormTextField(
-                label: 'Price',
+                label: context.l10n.sellerPriceLabel,
                 controller: _singlePriceController,
                 keyboardType: TextInputType.number,
                 hint: '0.00',
@@ -840,7 +898,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             Expanded(
               flex: 2,
               child: CustomFormTextField(
-                label: 'Stock',
+                label: context.l10n.sellerStockLabel,
                 controller: _singleStockController,
                 keyboardType: TextInputType.number,
                 hint: '0',
@@ -855,7 +913,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         ),
         _gap(),
         CustomFormTextField(
-          label: 'Size (Optional)',
+          label: context.l10n.sellerSizeOptional,
           controller: _singleSizeController,
           hint: 'e.g. XL, 42, 5m',
           isRequired: false,
@@ -896,11 +954,13 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 onPressed: isLoading ? null : _previousStep,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 9),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   side: BorderSide(color: SellerColors.primaryLight),
                 ),
                 child: Text(
-                  'Back',
+                  context.l10n.sellerBack,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -924,16 +984,23 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   padding: const EdgeInsets.symmetric(vertical: 9),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: isLoading
                     ? const SizedBox(
                         height: 18,
                         width: 18,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
                       )
                     : Text(
-                        _currentStep == 2 ? 'Save Changes' : 'Next',
+                        _currentStep == 2
+                            ? context.l10n.sellerSaveChanges
+                            : context.l10n.sellerNext,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -955,7 +1022,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
     return categoriesAsync.when(
       data: (categories) {
         if (_selectedCategoryId == null) {
-          final match = categories.where((c) => c.name == _presetCategoryName).firstOrNull;
+          final match = categories
+              .where((c) => c.name == _presetCategoryName)
+              .firstOrNull;
           if (match != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
@@ -968,7 +1037,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           }
         }
         return CustomFormDropdown<String>(
-          label: 'Category *',
+          label: context.l10n.sellerCategoryRequired,
           value: _selectedCategoryId,
           items: categories
               .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
@@ -976,7 +1045,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           onChanged: (val) {
             setState(() {
               _selectedCategoryId = val;
-              _selectedCategoryName = categories.firstWhere((c) => c.id == val).name;
+              _selectedCategoryName = categories
+                  .firstWhere((c) => c.id == val)
+                  .name;
               _selectedSubCategoryId = null;
               _selectedSubCategoryName = null;
               _selectedProductTypeId = null;
@@ -986,17 +1057,23 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         );
       },
       loading: () => const LinearProgressIndicator(),
-      error: (err, _) => Text('Error loading categories',
-          style: GoogleFonts.inter(color: Colors.red)),
+      error: (err, _) => Text(
+        context.l10n.sellerErrorLoadingCategories,
+        style: GoogleFonts.inter(color: Colors.red),
+      ),
     );
   }
 
   Widget _buildSubCategoryDropdown() {
-    final subCategoriesAsync = ref.watch(subCategoriesProvider(_selectedCategoryId!));
+    final subCategoriesAsync = ref.watch(
+      subCategoriesProvider(_selectedCategoryId!),
+    );
     return subCategoriesAsync.when(
       data: (subCats) {
         if (_selectedSubCategoryId == null && _presetSubCategoryName != null) {
-          final match = subCats.where((c) => c.name == _presetSubCategoryName).firstOrNull;
+          final match = subCats
+              .where((c) => c.name == _presetSubCategoryName)
+              .firstOrNull;
           if (match != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
@@ -1009,7 +1086,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           }
         }
         return CustomFormDropdown<String>(
-          label: 'Sub Category *',
+          label: context.l10n.sellerSubCategoryRequired,
           value: _selectedSubCategoryId,
           items: subCats
               .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
@@ -1017,7 +1094,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           onChanged: (val) {
             setState(() {
               _selectedSubCategoryId = val;
-              _selectedSubCategoryName = subCats.firstWhere((c) => c.id == val).name;
+              _selectedSubCategoryName = subCats
+                  .firstWhere((c) => c.id == val)
+                  .name;
               _selectedProductTypeId = null;
               _selectedProductTypeName = null;
             });
@@ -1025,27 +1104,36 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         );
       },
       loading: () => const LinearProgressIndicator(),
-      error: (err, _) => Text('Error loading sub categories',
-          style: GoogleFonts.inter(color: Colors.red)),
+      error: (err, _) => Text(
+        context.l10n.sellerErrorLoadingSubcategories,
+        style: GoogleFonts.inter(color: Colors.red),
+      ),
     );
   }
 
   Widget _buildProductTypeDropdown() {
-    final productTypesAsync = ref.watch(productTypesProvider(_selectedSubCategoryId!));
+    final productTypesAsync = ref.watch(
+      productTypesProvider(_selectedSubCategoryId!),
+    );
     return productTypesAsync.when(
       data: (types) {
         if (_selectedProductTypeId == null && _presetProductTypeName != null) {
-          final match = types.where((t) => t.name == _presetProductTypeName).firstOrNull;
+          final match = types
+              .where((t) => t.name == _presetProductTypeName)
+              .firstOrNull;
           if (match != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                _selectProductType(match, existingAttributes: widget.product.attributes);
+                _selectProductType(
+                  match,
+                  existingAttributes: widget.product.attributes,
+                );
               }
             });
           }
         }
         return CustomFormDropdown<String>(
-          label: 'Product Type *',
+          label: context.l10n.sellerProductTypeRequired,
           value: _selectedProductTypeId,
           items: types
               .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
@@ -1056,8 +1144,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         );
       },
       loading: () => const LinearProgressIndicator(),
-      error: (err, _) => Text('Error loading product types',
-          style: GoogleFonts.inter(color: Colors.red)),
+      error: (err, _) => Text(
+        context.l10n.sellerErrorLoadingProductTypes,
+        style: GoogleFonts.inter(color: Colors.red),
+      ),
     );
   }
 
@@ -1107,7 +1197,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${v.variantColorCode == null ? "No Color" : GtaColors.nameFromHex(v.variantColorCode) ?? v.variantColorCode}${v.size != null ? " · ${v.size}" : ""}',
+                  '${v.variantColorCode == null ? context.l10n.sellerNoColor : GtaColors.nameFromHex(v.variantColorCode) ?? v.variantColorCode}${v.size != null ? " · ${v.size}" : ""}',
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -1117,7 +1207,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 const SizedBox(height: 2),
                 Text(
                   '${v.price.currency} ${v.price.value}  ·  ${v.stock.quantity} ${v.stock.unit ?? ""}',
-                  style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: CommonColors.greyText,
+                  ),
                 ),
               ],
             ),
@@ -1142,7 +1235,11 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade200),
       ),
-      child: const Icon(Icons.image_outlined, color: CommonColors.greyText, size: 20),
+      child: const Icon(
+        Icons.image_outlined,
+        color: CommonColors.greyText,
+        size: 20,
+      ),
     );
   }
 
@@ -1162,10 +1259,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   Widget _buildImageUploadCard() {
     return _buildSectionCard(
       icon: Icons.photo_library_outlined,
-      title: 'Product Images',
+      title: context.l10n.sellerProductImages,
       children: [
         Text(
-          'The main photo is shown first to buyers in listings.',
+          context.l10n.sellerMainPhotoHint,
           style: GoogleFonts.inter(fontSize: 12, color: CommonColors.greyText),
         ),
         _gap(16),
@@ -1181,14 +1278,15 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   // ── Thumbnail ──
 
   Widget _buildThumbnailSection() {
-    final hasThumbnail = _singleThumbnailFile != null || _existingThumbnail != null;
+    final hasThumbnail =
+        _singleThumbnailFile != null || _existingThumbnail != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Text(
-              'Main Photo',
+              context.l10n.sellerMainPhoto,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -1203,7 +1301,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Text(
-                'Recommended',
+                context.l10n.sellerRecommended,
                 style: GoogleFonts.inter(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -1249,7 +1347,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: SellerColors.primaryLight.withValues(alpha: 0.12),
+                        color: SellerColors.primaryLight.withValues(
+                          alpha: 0.12,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1279,7 +1379,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             ),
             const SizedBox(height: 14),
             Text(
-              'Add Main Photo',
+              context.l10n.sellerAddMainPhoto,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -1289,15 +1389,24 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             const SizedBox(height: 4),
             Text(
               'JPG or PNG • Best at 800 × 800',
-              style: GoogleFonts.inter(fontSize: 11, color: CommonColors.greyText),
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: CommonColors.greyText,
+              ),
             ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _sourceChip(icon: Icons.camera_alt_outlined, label: 'Camera'),
+                _sourceChip(
+                  icon: Icons.camera_alt_outlined,
+                  label: context.l10n.commonCamera,
+                ),
                 const SizedBox(width: 8),
-                _sourceChip(icon: Icons.photo_library_outlined, label: 'Gallery'),
+                _sourceChip(
+                  icon: Icons.photo_library_outlined,
+                  label: context.l10n.commonGallery,
+                ),
               ],
             ),
           ],
@@ -1315,12 +1424,19 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             placeholder: (_, url) => Container(
               color: SellerColors.surface,
               child: const Center(
-                child: CircularProgressIndicator(strokeWidth: 2, color: SellerColors.primaryLight),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: SellerColors.primaryLight,
+                ),
               ),
             ),
             errorWidget: (_, url, error) => Container(
               color: SellerColors.surface,
-              child: const Icon(Icons.broken_image_outlined, color: SellerColors.accentLight, size: 36),
+              child: const Icon(
+                Icons.broken_image_outlined,
+                color: SellerColors.accentLight,
+                size: 36,
+              ),
             ),
           );
 
@@ -1359,7 +1475,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: SellerColors.primaryLight,
                       borderRadius: BorderRadius.circular(6),
@@ -1367,10 +1486,14 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Colors.white,
+                          size: 10,
+                        ),
                         const SizedBox(width: 3),
                         Text(
-                          'Main',
+                          context.l10n.sellerMain,
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
@@ -1384,19 +1507,28 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                   GestureDetector(
                     onTap: () => _showImageSourcePicker(),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.edit_outlined, color: Colors.white, size: 12),
+                          const Icon(
+                            Icons.edit_outlined,
+                            color: Colors.white,
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Text(
-                            'Change',
+                            context.l10n.sellerChange,
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -1424,7 +1556,11 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                   color: Colors.black.withValues(alpha: 0.55),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.white, size: 15),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 15,
+                ),
               ),
             ),
           ),
@@ -1471,7 +1607,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Preview Photos',
+              context.l10n.sellerPreviewPhotos,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -1489,7 +1625,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: count > 0 ? SellerColors.primaryLight : CommonColors.greyText,
+                  color: count > 0
+                      ? SellerColors.primaryLight
+                      : CommonColors.greyText,
                 ),
               ),
             ),
@@ -1517,17 +1655,23 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
               placeholder: (_, url) => Container(color: SellerColors.surface),
               errorWidget: (_, url, error) => Container(
                 color: SellerColors.surface,
-                child: const Icon(Icons.broken_image_outlined, color: SellerColors.accentLight, size: 24),
+                child: const Icon(
+                  Icons.broken_image_outlined,
+                  color: SellerColors.accentLight,
+                  size: 24,
+                ),
               ),
             ),
-            onRemove: () => setState(() => _existingPreviews.removeAt(entry.key)),
+            onRemove: () =>
+                setState(() => _existingPreviews.removeAt(entry.key)),
           );
         }),
         // Newly picked local files
         ..._singlePreviewFiles.asMap().entries.map((entry) {
           return _previewTile(
             child: Image.file(entry.value, fit: BoxFit.cover),
-            onRemove: () => setState(() => _singlePreviewFiles.removeAt(entry.key)),
+            onRemove: () =>
+                setState(() => _singlePreviewFiles.removeAt(entry.key)),
           );
         }),
         if (total < maxPreviews) _addPreviewTile(),
@@ -1557,7 +1701,11 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                   color: Color(0xFFE53935),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close_rounded, color: Colors.white, size: 13),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 13,
+                ),
               ),
             ),
           ),
@@ -1588,11 +1736,15 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: SellerColors.fieldBorder),
               ),
-              child: const Icon(Icons.add_rounded, color: SellerColors.primaryLight, size: 20),
+              child: const Icon(
+                Icons.add_rounded,
+                color: SellerColors.primaryLight,
+                size: 20,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Add Photo',
+              context.l10n.sellerAddPhoto,
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
@@ -1630,7 +1782,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Choose Photo Source',
+              context.l10n.sellerChoosePhotoSource,
               style: GoogleFonts.poppins(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -1643,7 +1795,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 Expanded(
                   child: _sourcePickerButton(
                     icon: Icons.camera_alt_rounded,
-                    label: 'Camera',
+                    label: context.l10n.commonCamera,
                     onTap: () {
                       Navigator.pop(ctx);
                       _pickThumbnailFrom(ImageSource.camera);
@@ -1654,7 +1806,7 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
                 Expanded(
                   child: _sourcePickerButton(
                     icon: Icons.photo_library_rounded,
-                    label: 'Gallery',
+                    label: context.l10n.commonGallery,
                     onTap: () {
                       Navigator.pop(ctx);
                       _pickThumbnailFrom(ImageSource.gallery);
@@ -1717,7 +1869,10 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
   }
 
   Future<void> _pickThumbnailFrom(ImageSource source) async {
-    final picked = await ImagePicker().pickImage(source: source, imageQuality: 80);
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 80,
+    );
     if (picked != null && mounted) {
       setState(() {
         _singleThumbnailFile = File(picked.path);
@@ -1736,7 +1891,9 @@ class _EditProductScreenState extends ConsumerState<EditProductScreen> {
       limit: remaining,
     );
     if (picked.isNotEmpty && mounted) {
-      setState(() => _singlePreviewFiles.addAll(picked.map((x) => File(x.path))));
+      setState(
+        () => _singlePreviewFiles.addAll(picked.map((x) => File(x.path))),
+      );
     }
   }
 }

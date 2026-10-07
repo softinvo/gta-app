@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/features/seller/complaint/controller/seller_complaint_controller.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/snackbar_service.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerCreateComplaintScreen extends ConsumerStatefulWidget {
   final String category;
@@ -22,11 +23,22 @@ class _SellerCreateComplaintScreenState
   final _descriptionController = TextEditingController();
   final _orderNumberController = TextEditingController();
   bool _isLoading = false;
+  bool _subjectInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _subjectController.text = '${widget.category} Issue';
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_subjectInitialized) {
+      _subjectController.text = context.l10n.sellerComplaintSubjectIssue(
+        widget.category,
+      );
+      _subjectInitialized = true;
+    }
   }
 
   @override
@@ -55,14 +67,11 @@ class _SellerCreateComplaintScreenState
     setState(() => _isLoading = false);
 
     if (success && mounted) {
-      SnackBarService.showSuccess(context, 'Complaint submitted successfully!');
+      SnackBarService.showSuccess(context, context.l10n.complaintSubmitSuccess);
       ref.invalidate(sellerComplaintsProvider);
       Navigator.pop(context);
     } else if (mounted) {
-      SnackBarService.showError(
-        context,
-        'Failed to submit complaint. Try again.',
-      );
+      SnackBarService.showError(context, context.l10n.complaintSubmitFailed);
     }
   }
 
@@ -79,7 +88,7 @@ class _SellerCreateComplaintScreenState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Raise a Complaint',
+          context.l10n.helpRaiseComplaintTitle,
           style: GoogleFonts.poppins(
             color: CommonColors.black,
             fontSize: 18,
@@ -126,32 +135,34 @@ class _SellerCreateComplaintScreenState
               ),
               const SizedBox(height: 24),
 
-              _buildLabel('Subject'),
+              _buildLabel(context.l10n.complaintSubjectLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _subjectController,
-                hint: 'Brief subject of your complaint',
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Subject is required' : null,
+                hint: context.l10n.complaintSubjectHint,
+                validator: (v) => v == null || v.isEmpty
+                    ? context.l10n.complaintSubjectRequired
+                    : null,
               ),
               const SizedBox(height: 20),
 
-              _buildLabel('Order Number (Optional)'),
+              _buildLabel(context.l10n.complaintOrderNumberLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _orderNumberController,
-                hint: 'Enter order number if applicable',
+                hint: context.l10n.complaintOrderNumberHint,
               ),
               const SizedBox(height: 20),
 
-              _buildLabel('Description'),
+              _buildLabel(context.l10n.complaintDescriptionLabel),
               const SizedBox(height: 8),
               _buildTextField(
                 controller: _descriptionController,
-                hint: 'Describe your issue in detail...',
+                hint: context.l10n.complaintDescriptionHint,
                 maxLines: 6,
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Description is required' : null,
+                validator: (v) => v == null || v.isEmpty
+                    ? context.l10n.complaintDescriptionRequired
+                    : null,
               ),
               const SizedBox(height: 32),
 
@@ -178,7 +189,7 @@ class _SellerCreateComplaintScreenState
                           ),
                         )
                       : Text(
-                          'Submit Complaint',
+                          context.l10n.complaintSubmitCta,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

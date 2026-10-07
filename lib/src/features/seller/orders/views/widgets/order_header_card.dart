@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -14,7 +15,8 @@ class OrderHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusColor = OrderUIHelpers.getStatusColor(order.orderStatus);
     final paymentColor = OrderUIHelpers.getPaymentColor(order.payment.status);
-    final buyerName = order.buyerSnapshot?.name ??
+    final buyerName =
+        order.buyerSnapshot?.name ??
         [
           order.buyerSnapshot?.firstName,
           order.buyerSnapshot?.lastName,
@@ -54,7 +56,8 @@ class OrderHeaderCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      order.productSnapshot?.name ?? 'Order',
+                      order.productSnapshot?.name ??
+                          context.l10n.commonOrderFallback,
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -81,12 +84,18 @@ class OrderHeaderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _StatusBadge(
-                    label: OrderUIHelpers.getStatusLabel(order.orderStatus),
+                    label: OrderUIHelpers.getStatusLabel(
+                      context,
+                      order.orderStatus,
+                    ),
                     color: statusColor,
                   ),
                   const SizedBox(height: 6),
                   _StatusBadge(
-                    label: OrderUIHelpers.getPaymentLabel(order.payment.status),
+                    label: OrderUIHelpers.getPaymentLabel(
+                      context,
+                      order.payment.status,
+                    ),
                     color: paymentColor,
                     icon: order.payment.status == 'paid'
                         ? Icons.check_circle_outline_rounded
@@ -113,7 +122,9 @@ class OrderHeaderCard extends StatelessWidget {
               const SizedBox(width: 5),
               Expanded(
                 child: Text(
-                  buyerName.isNotEmpty ? buyerName : 'Buyer',
+                  buyerName.isNotEmpty
+                      ? buyerName
+                      : context.l10n.sellerBuyerFallback,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: CommonColors.black,

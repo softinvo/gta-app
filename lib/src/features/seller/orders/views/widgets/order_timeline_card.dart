@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/models/order_model.dart';
 import 'package:gta_app/src/res/colors.dart';
@@ -103,7 +104,7 @@ class OrderTimelineCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Order Tracking',
+                context.l10n.orderTrackingTitle,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -113,12 +114,15 @@ class OrderTimelineCard extends StatelessWidget {
               const Spacer(),
               if (isCancelled)
                 _Badge(
-                  label: 'CANCELLED',
+                  label: context.l10n.quoteBadgeCancelled,
                   color: CommonColors.error,
                 )
               else
                 Text(
-                  'Step $completedCount of $stepCount',
+                  context.l10n.orderStepCounter(
+                    completedCount.toString(),
+                    stepCount.toString(),
+                  ),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: CommonColors.greyText,
@@ -158,7 +162,7 @@ class OrderTimelineCard extends StatelessWidget {
               final next = _isNext(meta.key);
               final date = meta.key == 'order_placed'
                   ? (order.workflowTimeline['order_placed']?.actualDate ??
-                      order.createdAt)
+                        order.createdAt)
                   : order.workflowTimeline[meta.key]?.actualDate;
 
               return _TimelineStep(
@@ -181,7 +185,7 @@ class OrderTimelineCard extends StatelessWidget {
                 onPressed: onUpdateStatus,
                 icon: const Icon(Icons.edit_rounded, size: 16),
                 label: Text(
-                  'Update Order Status',
+                  context.l10n.sellerUpdateOrderStatus,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -227,6 +231,26 @@ class _TimelineStep extends StatelessWidget {
     required this.isPending,
   });
 
+  String _label(BuildContext context) => switch (meta.key) {
+    'order_placed' => context.l10n.orderStepPlaced,
+    'processing' => context.l10n.orderStatusProcessing,
+    'packed' => context.l10n.sellerStatusPacked,
+    'shipped' => context.l10n.sellerStatusShipped,
+    'delivered' => context.l10n.sellerStatusDelivered,
+    'cancelled' => context.l10n.orderStepCancelledLabel,
+    _ => meta.label,
+  };
+
+  String _description(BuildContext context) => switch (meta.key) {
+    'order_placed' => context.l10n.orderStepDescPlaced,
+    'processing' => context.l10n.orderStepDescProcessing,
+    'packed' => context.l10n.orderStepDescPacked,
+    'shipped' => context.l10n.orderStepDescShipped,
+    'delivered' => context.l10n.orderStepDescDelivered,
+    'cancelled' => context.l10n.orderStepDescCancelled,
+    _ => meta.description,
+  };
+
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
@@ -249,7 +273,9 @@ class _TimelineStep extends StatelessWidget {
                         ? Container(
                             width: 2,
                             margin: const EdgeInsets.symmetric(vertical: 3),
-                            color: const Color(0xFF27AE60).withValues(alpha: 0.4),
+                            color: const Color(
+                              0xFF27AE60,
+                            ).withValues(alpha: 0.4),
                           )
                         : Padding(
                             padding: const EdgeInsets.symmetric(vertical: 3),
@@ -258,8 +284,9 @@ class _TimelineStep extends StatelessWidget {
                               painter: _VerticalDashedPainter(
                                 color: isPending && !isCurrent
                                     ? const Color(0xFFDDDDDD)
-                                    : SellerColors.primaryLight
-                                        .withValues(alpha: 0.3),
+                                    : SellerColors.primaryLight.withValues(
+                                        alpha: 0.3,
+                                      ),
                               ),
                             ),
                           ),
@@ -280,7 +307,7 @@ class _TimelineStep extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          meta.label,
+                          _label(context),
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             fontWeight: isCompleted || isCurrent
@@ -289,15 +316,21 @@ class _TimelineStep extends StatelessWidget {
                             color: isCompleted
                                 ? CommonColors.black
                                 : isCurrent
-                                    ? SellerColors.primaryLight
-                                    : CommonColors.greyText,
+                                ? SellerColors.primaryLight
+                                : CommonColors.greyText,
                           ),
                         ),
                       ),
                       if (isCurrent)
-                        _Badge(label: 'ACTIVE', color: SellerColors.primaryLight)
+                        _Badge(
+                          label: context.l10n.quoteBadgeActive,
+                          color: SellerColors.primaryLight,
+                        )
                       else if (isNext)
-                        _Badge(label: 'NEXT', color: CommonColors.greyText),
+                        _Badge(
+                          label: context.l10n.quoteBadgeNext,
+                          color: CommonColors.greyText,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 2),
@@ -305,8 +338,8 @@ class _TimelineStep extends StatelessWidget {
                     date != null
                         ? DateFormat('d MMM yyyy, h:mm a').format(date!)
                         : isCurrent
-                            ? 'In progress...'
-                            : meta.description,
+                        ? context.l10n.orderInProgressLabel
+                        : _description(context),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       color: isCurrent && date == null

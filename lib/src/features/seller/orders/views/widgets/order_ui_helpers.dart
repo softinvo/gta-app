@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class OrderUIHelpers {
   static Color getStatusColor(String status) {
@@ -21,18 +22,18 @@ class OrderUIHelpers {
     }
   }
 
-  static String getStatusLabel(String status) {
+  static String getStatusLabel(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'processing':
-        return 'Processing';
+        return context.l10n.orderStatusProcessing;
       case 'packed':
-        return 'Packed';
+        return context.l10n.sellerStatusPacked;
       case 'shipped':
-        return 'Shipped';
+        return context.l10n.sellerStatusShipped;
       case 'delivered':
-        return 'Delivered';
+        return context.l10n.sellerStatusDelivered;
       case 'cancelled':
-        return 'Cancelled';
+        return context.l10n.sellerStatusCancelled;
       default:
         return status;
     }
@@ -55,14 +56,20 @@ class OrderUIHelpers {
     }
   }
 
-  static String getPaymentLabel(String status) {
+  static String getPaymentLabel(BuildContext context, String status) {
     switch (status.toLowerCase()) {
-      case 'paid':     return 'Paid';
-      case 'pending':  return 'Pending';
-      case 'failed':   return 'Failed';
-      case 'refunded': return 'Refunded';
-      case 'cancelled': return 'Cancelled';
-      default:         return status;
+      case 'paid':
+        return context.l10n.sellerPaid;
+      case 'pending':
+        return context.l10n.sellerPending;
+      case 'failed':
+        return context.l10n.sellerFailed;
+      case 'refunded':
+        return context.l10n.sellerRefunded;
+      case 'cancelled':
+        return context.l10n.sellerStatusCancelled;
+      default:
+        return status;
     }
   }
 

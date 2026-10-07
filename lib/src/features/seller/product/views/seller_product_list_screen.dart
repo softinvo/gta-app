@@ -9,6 +9,7 @@ import 'package:gta_app/src/features/seller/product/controllers/product_controll
 import 'package:gta_app/src/features/seller/product/views/widgets/seller_product_card.dart';
 import 'package:gta_app/src/features/seller/product/views/add_product_screen.dart';
 import 'package:gta_app/src/res/colors.dart';
+import 'package:gta_app/src/utils/l10n_extensions.dart';
 
 class SellerProductListScreen extends ConsumerStatefulWidget {
   final bool showAppBar;
@@ -79,7 +80,7 @@ class _SellerProductListScreenState
     return Scaffold(
       backgroundColor: SellerColors.background,
       appBar: widget.showAppBar
-          ? const SellerAppBar(title: 'My Products')
+          ? SellerAppBar(title: context.l10n.sellerProductsTitle)
           : null,
       body: Column(
         children: [
@@ -92,7 +93,7 @@ class _SellerProductListScreenState
                 Expanded(
                   child: SellerSearchField(
                     controller: _searchController,
-                    hintText: 'Search products...',
+                    hintText: context.l10n.sellerProductsSearchHint,
                     onClear: () => _onSearch(''),
                   ),
                 ),
@@ -172,7 +173,7 @@ class _SellerProductListScreenState
                 elevation: 0,
                 icon: const Icon(Icons.add_rounded, color: CommonColors.white),
                 label: Text(
-                  'Add Product',
+                  context.l10n.sellerAddProductTitle,
                   style: GoogleFonts.poppins(
                     color: CommonColors.white,
                     fontWeight: FontWeight.w600,
@@ -213,7 +214,7 @@ class _SellerProductListScreenState
                   .fetchProducts(refresh: true),
               icon: const Icon(Icons.refresh_rounded),
               label: Text(
-                'Retry',
+                context.l10n.commonRetry,
                 style: GoogleFonts.inter(fontWeight: FontWeight.w600),
               ),
               style: OutlinedButton.styleFrom(
@@ -284,7 +285,7 @@ class _SellerProductListScreenState
             ),
             const SizedBox(height: 28),
             Text(
-              'No Products Yet',
+              context.l10n.sellerNoProductsTitle,
               style: GoogleFonts.poppins(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -293,7 +294,7 @@ class _SellerProductListScreenState
             ),
             const SizedBox(height: 10),
             Text(
-              'Add your first product and start\nreaching buyers across the platform.',
+              context.l10n.sellerNoProductsSubtitle,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 14,
@@ -332,7 +333,7 @@ class _SellerProductListScreenState
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Add Your First Product',
+                      context.l10n.sellerAddFirstProduct,
                       style: GoogleFonts.poppins(
                         color: CommonColors.white,
                         fontWeight: FontWeight.w600,

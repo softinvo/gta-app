@@ -94,7 +94,9 @@ class CustomFormTextField extends StatelessWidget {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
-                  color: SellerColors.primaryLight, width: 1.5),
+                color: SellerColors.primaryLight,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -180,7 +182,9 @@ class CustomFormDropdown<T> extends StatelessWidget {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
-                  color: SellerColors.primaryLight, width: 1.5),
+                color: SellerColors.primaryLight,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -214,9 +218,7 @@ class CustomSuffixDropdown<T> extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(color: Colors.grey.shade200),
-          ),
+          border: Border(left: BorderSide(color: Colors.grey.shade200)),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<T>(

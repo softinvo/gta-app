@@ -147,21 +147,20 @@ class SellerOrdersController extends Notifier<OrderListState> {
 
   Future<void> updateStatus(String orderId, String status) async {
     final result = await _repo.updateOrderStatus(orderId, status);
-    result.fold(
-      (failure) {},
-      (_) async => fetchOrders(refresh: true),
-    );
+    result.fold((failure) {}, (_) async => fetchOrders(refresh: true));
   }
 }
 
 // ── Single Order Providers ────────────────────────────────────────────────────
 
-final sellerOrderDetailsProvider =
-    FutureProvider.family<Order, String>((ref, orderId) async {
-      final repo = ref.read(sellerOrderRepositoryProvider);
-      final result = await repo.getOrderDetails(orderId);
-      return result.fold((failure) => throw failure.message, (order) => order);
-    });
+final sellerOrderDetailsProvider = FutureProvider.family<Order, String>((
+  ref,
+  orderId,
+) async {
+  final repo = ref.read(sellerOrderRepositoryProvider);
+  final result = await repo.getOrderDetails(orderId);
+  return result.fold((failure) => throw failure.message, (order) => order);
+});
 
 final sellerOrderStatsProvider =
     FutureProvider.family<Map<String, dynamic>, String>((ref, range) async {
