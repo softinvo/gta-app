@@ -14,6 +14,7 @@ import '../../quotes/controller/seller_quote_controller.dart';
 import '../../quotes/views/seller_quote_list_screen.dart';
 import 'package:gta_app/src/features/chat/views/chat_list_tab.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
+import 'package:gta_app/src/utils/responsive.dart';
 
 class SellerDashboardScreen extends ConsumerStatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -1153,11 +1154,13 @@ class _StatsRow extends ConsumerWidget {
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: responsiveGridDelegate(
+          context,
+          aspectRatio: 1.6,
+          minTileWidth: 150,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1.6,
+          maxColumns: 4,
         ),
         itemCount: stats.length,
         itemBuilder: (_, i) => _StatCard(data: stats[i]),

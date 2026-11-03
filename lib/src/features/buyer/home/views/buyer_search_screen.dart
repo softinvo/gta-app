@@ -8,6 +8,7 @@ import 'package:gta_app/src/features/buyer/product/controller/buyer_product_cont
 import 'package:gta_app/src/models/product_collection_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
+import 'package:gta_app/src/utils/responsive.dart';
 
 class BuyerSearchScreen extends ConsumerStatefulWidget {
   // Pre-applied filters — used when arriving from a category card tap
@@ -481,12 +482,7 @@ class _ResultsGrid extends StatelessWidget {
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
+            gridDelegate: responsiveGridDelegate(context, aspectRatio: 0.65),
             itemCount: items.length,
             itemBuilder: (_, i) => GestureDetector(
               onTap: () =>
@@ -588,12 +584,7 @@ class _ResultsSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.7,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
+      gridDelegate: responsiveGridDelegate(context, aspectRatio: 0.65),
       itemCount: 6,
       itemBuilder: (_, __) => Container(
         decoration: BoxDecoration(

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_colors/gta_colors.dart';
 import 'color_hex_utils.dart';
+import 'package:gta_app/src/utils/responsive.dart';
 
 /// A tappable form field showing the picked color (swatch + name) that
 /// opens [showColorPickerSheet] on tap. Replaces a raw hex text field —
@@ -272,13 +273,16 @@ class _ColorPickerSheetState extends State<_ColorPickerSheet> {
                   : GridView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                       shrinkWrap: true,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 4,
-                            childAspectRatio: 0.78,
-                          ),
+                      gridDelegate: responsiveGridDelegate(
+                        context,
+                        aspectRatio: 0.78,
+                        minTileWidth: 70,
+                        crossAxisSpacing: 4,
+                        mainAxisSpacing: 12,
+                        horizontalPadding: 32,
+                        minColumns: 4,
+                        maxColumns: 8,
+                      ),
                       itemCount: results.length,
                       itemBuilder: (context, index) {
                         final c = results[index];

@@ -121,15 +121,6 @@ class ProductGridCard extends ConsumerWidget {
                           ref.read(savedProductsProvider.notifier).toggle(item),
                     ),
                   ),
-                  if (item.sampleAvailable)
-                    const Positioned(
-                      left: 10,
-                      bottom: 8,
-                      child: _BadgePill(
-                        label: 'Sample available',
-                        color: BuyerColors.gridBadgeTop,
-                      ),
-                    ),
                   if (!item.inStock)
                     Positioned(
                       right: 8,
@@ -170,6 +161,20 @@ class ProductGridCard extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        if (item.sampleAvailable) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Sample available',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: CommonColors.error,
+                              height: 1.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                         // In the compact grid card, show either the short
                         // description or the richer fabric/MOQ/color metadata
                         // so the fixed-height layout never overflows.

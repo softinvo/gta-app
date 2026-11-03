@@ -7,6 +7,7 @@ import 'package:gta_app/src/models/category_model.dart';
 import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/app_network_image.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
+import 'package:gta_app/src/utils/responsive.dart';
 
 // ── Drill-down level ──────────────────────────────────────────────────────────
 
@@ -444,11 +445,13 @@ class _Grid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.all(20),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 16,
+      gridDelegate: responsiveGridDelegate(
+        context,
+        aspectRatio: 0.75,
+        minTileWidth: 100,
         mainAxisSpacing: 20,
-        childAspectRatio: 0.75,
+        minColumns: 3,
+        maxColumns: 8,
       ),
       itemCount: count,
       itemBuilder: (_, i) => builder(i),

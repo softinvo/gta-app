@@ -11,6 +11,7 @@ import 'package:gta_app/src/res/colors.dart';
 import 'package:gta_app/src/utils/l10n_extensions.dart';
 import 'package:shimmer/shimmer.dart';
 import '../widgets/home_widgets.dart';
+import 'package:gta_app/src/utils/responsive.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
@@ -198,12 +199,7 @@ class _GridSection extends StatelessWidget {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
+            gridDelegate: responsiveGridDelegate(context, aspectRatio: 0.6),
             itemCount: items.length,
             itemBuilder: (_, i) => ProductGridCard(
               item: items[i],
@@ -260,12 +256,7 @@ class _CollectionsSkeleton extends StatelessWidget {
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.65,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
+              gridDelegate: responsiveGridDelegate(context, aspectRatio: 0.6),
               itemCount: 4,
               itemBuilder: (_, _) => Container(
                 decoration: BoxDecoration(

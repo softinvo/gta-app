@@ -6,6 +6,7 @@ import 'package:gta_app/src/commons/controller/locale_controller.dart';
 import 'package:gta_app/l10n/generated/app_localizations.dart';
 import 'package:gta_app/src/res/strings.dart';
 import 'package:gta_app/src/res/theme.dart';
+import 'package:gta_app/src/utils/responsive.dart';
 import 'package:gta_app/src/utils/router.dart';
 
 class App extends ConsumerWidget {
@@ -20,11 +21,6 @@ class App extends ConsumerWidget {
         statusBarBrightness: Brightness.light,
       ),
     );
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
 
     final locale = ref.watch(localeControllerProvider);
 
@@ -42,6 +38,30 @@ class App extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: router,
+      builder: (context, child) {
+        final media = MediaQuery.of(context);
+
+        // Phones stay portrait; tablets may rotate to use the wider screen.
+        SystemChrome.setPreferredOrientations(
+          media.size.shortestSide >= kTabletShortestSide
+              ? DeviceOrientation.values
+              : const [
+                  DeviceOrientation.portraitUp,
+                  DeviceOrientation.portraitDown,
+                ],
+        );
+
+        // Respect the user's font size, but cap it so layouts don't break.
+        return MediaQuery(
+          data: media.copyWith(
+            textScaler: media.textScaler.clamp(
+              minScaleFactor: 0.85,
+              maxScaleFactor: 1.3,
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

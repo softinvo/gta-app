@@ -3,7 +3,7 @@ import 'package:gta_app/src/utils/config.dart';
 class BasePaths {
   static const baseImagePath = "assets/images";
   static const baseProdUrl = 'https://api.texax.in/api/v1/';
-  static const baseTestUrl = "http://192.168.175.146:5001/api/v1/";
+  static const baseTestUrl = "http://10.75.23.254:5002/api/v1/";
   static const baseUrl = AppConfig.devMode ? baseTestUrl : baseProdUrl;
 
   // Chat server — port 5002, no auth
