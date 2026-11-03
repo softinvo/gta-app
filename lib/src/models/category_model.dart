@@ -54,11 +54,13 @@ class ProductType {
   final String id;
   final String name;
   final String status;
+  final String? thumbnail;
   final List<ProductAttributeField> fields;
 
   ProductType({
     required this.id,
     required this.name,
+    this.thumbnail,
     this.status = 'active',
     this.fields = const [],
   });
@@ -69,6 +71,7 @@ class ProductType {
       id: json['_id'],
       name: json['name'] ?? '',
       status: json['status'] ?? 'active',
+      thumbnail: json['thumbnail'],
       fields: rawFields is List
           ? rawFields
               .whereType<Map>()

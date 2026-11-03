@@ -350,17 +350,19 @@ class _ProductTypesList extends ConsumerWidget {
                         ),
                         child: Row(
                           children: [
-                            Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: BuyerColors.primaryLight.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.style_outlined,
-                                size: 18,
-                                color: BuyerColors.primaryLight,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: (items[i].thumbnail?.isNotEmpty ?? false)
+                                    ? Image.network(
+                                        items[i].thumbnail!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            _productTypePlaceholder(),
+                                      )
+                                    : _productTypePlaceholder(),
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -387,6 +389,15 @@ class _ProductTypesList extends ConsumerWidget {
     );
   }
 }
+
+Widget _productTypePlaceholder() => Container(
+      color: BuyerColors.primaryLight.withValues(alpha: 0.12),
+      child: const Icon(
+        Icons.style_outlined,
+        size: 22,
+        color: BuyerColors.primaryLight,
+      ),
+    );
 
 // ── "View all" banner shown atop the sub-category / product-type levels ───────
 
